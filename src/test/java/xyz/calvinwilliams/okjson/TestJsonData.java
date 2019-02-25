@@ -18,7 +18,7 @@ public class TestJsonData {
 	public Branch3		branch3 ;
 	
 	public LinkedList<String>	list4 ;
-	public LinkedList<Integer>	list5 ;
+	public ArrayList<Integer>	list5 ;
 	public LinkedList<Boolean>	list6 ;
 }
 

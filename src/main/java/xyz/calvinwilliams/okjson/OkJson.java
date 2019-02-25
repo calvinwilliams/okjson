@@ -237,7 +237,7 @@ public class OkJson {
 			Class<?> typeClazz = fld.getType() ;
 			// Object typeObject = typeClazz.newInstance() ;
 			// if( typeObject instanceof List) {
-			if( typeClazz == LinkedList.class ) {
+			if( typeClazz == ArrayList.class || typeClazz == LinkedList.class ) {
 				Type type = fld.getGenericType() ;
 				ParameterizedType pt = (ParameterizedType) type ;
 				Class<?> typeClass = (Class<?>) pt.getActualTypeArguments()[0] ;
