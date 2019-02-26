@@ -19,6 +19,9 @@ public class OkJson {
 		TOKEN_TYPE_NULL // null
 	}
 	
+	private static ThreadLocal<HashMap<String,HashMap<String,Field>>>	stringMapFieldsCache ;
+	private static ThreadLocal<HashMap<String,HashMap<String,Method>>>	stringMapMethodsCache ;
+	
 	private boolean				strictPolicyEnable ;
 	private boolean				directSetPropertyEnable ;
 	
@@ -33,15 +36,16 @@ public class OkJson {
 	private int					errorCode ;
 	private String				errorDesc ;
 	
-	final private static int	TOKEN_ERROR_END_OF_BUFFER = 1 ;
-	final private static int	TOKEN_ERROR_INVALID_BYTE = -11 ;
-	final private static int	TOKEN_ERROR_NAME_INVALID = -12 ;
-	final private static int	TOKEN_ERROR_EXPECT_COLON_AFTER_NAME = -13 ;
-	final private static int	TOKEN_ERROR_NAME_NOT_FOUND_IN_OBJECT = -14 ;
-	final private static int	TOKEN_ERROR_PORPERTY_TYPE_NOT_MATCH_IN_OBJECT = -15 ;
-	final private static int	TOKEN_ERROR_FIND_FIRST_LEFT_BRACE = -16 ;
-	final private static int	TOKEN_ERROR_EXCEPTION = -17 ;
-	final private static int	TOKEN_ERROR_UNEXPECT = -18 ;
+	final private static int	OKJSON_ERROR_END_OF_BUFFER = 1 ;
+	final private static int	OKJSON_ERROR_INVALID_BYTE = -11 ;
+	final private static int	OKJSON_ERROR_NAME_INVALID = -12 ;
+	final private static int	OKJSON_ERROR_EXPECT_COLON_AFTER_NAME = -13 ;
+	final private static int	OKJSON_ERROR_NAME_NOT_FOUND_IN_OBJECT = -14 ;
+	final private static int	OKJSON_ERROR_PORPERTY_TYPE_NOT_MATCH_IN_OBJECT = -15 ;
+	final private static int	OKJSON_ERROR_FIND_FIRST_LEFT_BRACE = -16 ;
+	final private static int	OKJSON_ERROR_EXCEPTION = -17 ;
+	final private static int	OKJSON_ERROR_UNEXPECT = -18 ;
+	final private static int	OKJSON_ERROR_NEW_OBJECT = -19 ;
 	
 	/* example >>>
 	 * {
@@ -76,7 +80,7 @@ public class OkJson {
 				return 0;
 			}
 		}
-		return TOKEN_ERROR_END_OF_BUFFER;
+		return OKJSON_ERROR_END_OF_BUFFER;
 	}
 	
 	private int tokenJsonWord( char[] jsonCharArray ) {
@@ -130,7 +134,7 @@ public class OkJson {
 					jsonOffset++;
 				}
 				if( jsonOffset >= jsonLength )
-					return TOKEN_ERROR_END_OF_BUFFER;
+					return OKJSON_ERROR_END_OF_BUFFER;
 				
 				return 0;
 			}
@@ -225,27 +229,27 @@ public class OkJson {
 			else
 			{
 				errorDesc = "Invalid byte '" + ch + "'" ;
-				return TOKEN_ERROR_INVALID_BYTE;
+				return OKJSON_ERROR_INVALID_BYTE;
 			}
 		}
-		return TOKEN_ERROR_END_OF_BUFFER;
+		return OKJSON_ERROR_END_OF_BUFFER;
 	}
 	
 	@SuppressWarnings("unchecked")
-	private int evalObjectList( char[] jsonCharArray, TokenType valueTokenType, int valueBeginOffset, int valueEndOffset, Object obj, Field fld ) {
+	private int addList( char[] jsonCharArray, TokenType valueTokenType, int valueBeginOffset, int valueEndOffset, Object object, Field field ) {
 
 		try {
-			Class<?> typeClazz = fld.getType() ;
+			Class<?> typeClazz = field.getType() ;
 			// Object typeObject = typeClazz.newInstance() ;
 			// if( typeObject instanceof List) {
 			if( typeClazz == ArrayList.class || typeClazz == LinkedList.class ) {
-				Type type = fld.getGenericType() ;
+				Type type = field.getGenericType() ;
 				ParameterizedType pt = (ParameterizedType) type ;
 				Class<?> typeClass = (Class<?>) pt.getActualTypeArguments()[0] ;
 				if( typeClass == String.class ) {
 					if( valueTokenType == TokenType.TOKEN_TYPE_STRING ) {
 						String value = new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1) ;
-						((List<Object>) obj).add( value );
+						((List<Object>) object).add( value );
 					}
 					else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
 						;
@@ -254,7 +258,7 @@ public class OkJson {
 				else if( typeClass == Byte.class ) {
 					if( valueTokenType == TokenType.TOKEN_TYPE_INTEGER ) {
 						Byte value = Byte.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
-						((List<Object>) obj).add( value );
+						((List<Object>) object).add( value );
 					}
 					else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
 						;
@@ -263,7 +267,7 @@ public class OkJson {
 				else if( typeClass == Short.class ) {
 					if( valueTokenType == TokenType.TOKEN_TYPE_INTEGER ) {
 						Short value = Short.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
-						((List<Object>) obj).add( value );
+						((List<Object>) object).add( value );
 					}
 					else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
 						;
@@ -272,7 +276,7 @@ public class OkJson {
 				else if( typeClass == Integer.class ) {
 					if( valueTokenType == TokenType.TOKEN_TYPE_INTEGER ) {
 						Integer value = Integer.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
-						((List<Object>) obj).add( value );
+						((List<Object>) object).add( value );
 					}
 					else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
 						;
@@ -281,7 +285,7 @@ public class OkJson {
 				else if( typeClass == Long.class ) {
 					if( valueTokenType == TokenType.TOKEN_TYPE_INTEGER ) {
 						Long value = Long.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
-						((List<Object>) obj).add( value );
+						((List<Object>) object).add( value );
 					}
 					else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
 						;
@@ -290,7 +294,7 @@ public class OkJson {
 				else if( typeClass == Float.class ) {
 					if( valueTokenType == TokenType.TOKEN_TYPE_DECIMAL ) {
 						Float value = Float.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
-						((List<Object>) obj).add( value );
+						((List<Object>) object).add( value );
 					}
 					else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
 						;
@@ -299,7 +303,7 @@ public class OkJson {
 				else if( typeClass == Double.class ) {
 					if( valueTokenType == TokenType.TOKEN_TYPE_DECIMAL ) {
 						Double value = Double.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
-						((List<Object>) obj).add( value );
+						((List<Object>) object).add( value );
 					}
 					else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
 						;
@@ -307,11 +311,7 @@ public class OkJson {
 				}
 				else if( typeClass == Boolean.class ) {
 					if( valueTokenType == TokenType.TOKEN_TYPE_BOOL ) {
-						/*
-						Double value = Double.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
-						((List<Object>) obj).add( value );
-						*/
-						((List<Object>) obj).add( booleanValue );
+						((List<Object>) object).add( booleanValue );
 					}
 					else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
 						;
@@ -322,49 +322,43 @@ public class OkJson {
 				}
 				else {
 					if( strictPolicyEnable == true )
-						return TOKEN_ERROR_PORPERTY_TYPE_NOT_MATCH_IN_OBJECT;
+						return OKJSON_ERROR_PORPERTY_TYPE_NOT_MATCH_IN_OBJECT;
 				}
 			} else {
 				if( strictPolicyEnable == true )
-					return TOKEN_ERROR_PORPERTY_TYPE_NOT_MATCH_IN_OBJECT;
+					return OKJSON_ERROR_PORPERTY_TYPE_NOT_MATCH_IN_OBJECT;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			return TOKEN_ERROR_EXCEPTION;
+			return OKJSON_ERROR_EXCEPTION;
 		}
 
 		return 0;
 	}
 
-	private int stringToListObject( char[] jsonCharArray, Object obj, Field fld ) {
-		
-		TokenType			valueTokenType ;
-		int					valueBeginOffset ;
-		int					valueEndOffset ;
+	private int stringToListObject( char[] jsonCharArray, Object object, Field field ) {
 		
 		int					nret ;
 		
 		while(true) {
 			// token "value"
 			nret = tokenJsonWord( jsonCharArray ) ;
-			if( nret == TOKEN_ERROR_END_OF_BUFFER ) {
+			if( nret == OKJSON_ERROR_END_OF_BUFFER ) {
 				break;
 			}
 			if( nret != 0 ) {
 				return nret;
 			}
 			
-			valueTokenType = tokenType ;
-			valueBeginOffset = beginOffset ;
-			valueEndOffset = endOffset ;
-			
-			nret = evalObjectList( jsonCharArray, valueTokenType, valueBeginOffset, valueEndOffset, obj, fld ) ;
-			if( nret != 0 )
-				return nret;
+			if( object != null ) {
+				nret = addList( jsonCharArray, tokenType, beginOffset, endOffset, object, field ) ;
+				if( nret != 0 )
+					return nret;
+			}
 			
 			// token ',' or ']'
 			nret = tokenJsonWord( jsonCharArray ) ;
-			if( nret == TOKEN_ERROR_END_OF_BUFFER ) {
+			if( nret == OKJSON_ERROR_END_OF_BUFFER ) {
 				break;
 			}
 			if( nret != 0 ) {
@@ -380,7 +374,7 @@ public class OkJson {
 				if( beginPos < 0 )
 					beginPos = 0 ;
 				errorDesc = "expect ':' but \"" + String.copyValueOf(jsonCharArray,beginOffset,endOffset-beginOffset+1) + "\"" ;
-				return TOKEN_ERROR_EXPECT_COLON_AFTER_NAME;
+				return OKJSON_ERROR_EXPECT_COLON_AFTER_NAME;
 			}
 			
 		}
@@ -388,7 +382,7 @@ public class OkJson {
 		return 0;
 	}
 		
-	private int evalObjectProperty( char[] jsonCharArray, TokenType valueTokenType, int valueBeginOffset, int valueEndOffset, Object obj, Field field, Method method ) {
+	private int setProperty( char[] jsonCharArray, TokenType valueTokenType, int valueBeginOffset, int valueEndOffset, Object obj, Field field, Method method ) {
 		
 		if( field.getType() == String.class ) {
 			if( valueTokenType == TokenType.TOKEN_TYPE_STRING ) {
@@ -405,7 +399,7 @@ public class OkJson {
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
-					return TOKEN_ERROR_EXCEPTION;
+					return OKJSON_ERROR_EXCEPTION;
 				}
 			}
 			else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
@@ -421,7 +415,7 @@ public class OkJson {
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
-					return TOKEN_ERROR_EXCEPTION;
+					return OKJSON_ERROR_EXCEPTION;
 				}
 			}
 		}
@@ -439,7 +433,7 @@ public class OkJson {
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
-				return TOKEN_ERROR_EXCEPTION;
+				return OKJSON_ERROR_EXCEPTION;
 			}
 		}
 		else if( field.getType().getName().equals("short") && valueTokenType == TokenType.TOKEN_TYPE_INTEGER ) {
@@ -456,7 +450,7 @@ public class OkJson {
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
-				return TOKEN_ERROR_EXCEPTION;
+				return OKJSON_ERROR_EXCEPTION;
 			}
 		}
 		else if( field.getType().getName().equals("int") && valueTokenType == TokenType.TOKEN_TYPE_INTEGER ) {
@@ -473,7 +467,7 @@ public class OkJson {
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
-				return TOKEN_ERROR_EXCEPTION;
+				return OKJSON_ERROR_EXCEPTION;
 			}
 		}
 		else if( field.getType().getName().equals("long") && valueTokenType == TokenType.TOKEN_TYPE_INTEGER ) {
@@ -490,7 +484,7 @@ public class OkJson {
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
-				return TOKEN_ERROR_EXCEPTION;
+				return OKJSON_ERROR_EXCEPTION;
 			}
 		}
 		else if( field.getType().getName().equals("float") && valueTokenType == TokenType.TOKEN_TYPE_DECIMAL ) {
@@ -507,7 +501,7 @@ public class OkJson {
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
-				return TOKEN_ERROR_EXCEPTION;
+				return OKJSON_ERROR_EXCEPTION;
 			}
 		}
 		else if( field.getType().getName().equals("double") && valueTokenType == TokenType.TOKEN_TYPE_DECIMAL ) {
@@ -524,7 +518,7 @@ public class OkJson {
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
-				return TOKEN_ERROR_EXCEPTION;
+				return OKJSON_ERROR_EXCEPTION;
 			}
 		}
 		else if( field.getType().getName().equals("boolean") && valueTokenType == TokenType.TOKEN_TYPE_BOOL ) {
@@ -540,7 +534,7 @@ public class OkJson {
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
-				return TOKEN_ERROR_EXCEPTION;
+				return OKJSON_ERROR_EXCEPTION;
 			}
 		}
 		else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
@@ -556,56 +550,85 @@ public class OkJson {
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
-				return TOKEN_ERROR_EXCEPTION;
+				return OKJSON_ERROR_EXCEPTION;
 			}
 		}
 		else {
 			if( strictPolicyEnable == true )
-				return TOKEN_ERROR_PORPERTY_TYPE_NOT_MATCH_IN_OBJECT;
+				return OKJSON_ERROR_PORPERTY_TYPE_NOT_MATCH_IN_OBJECT;
 		}
 		
 		return 0;
 	}
 	
-	private int stringToObjectProperties( char[] jsonCharArray, Object obj, Field fld ) {
+	private int stringToObjectProperties( char[] jsonCharArray, Object object ) {
 		
-		Class				clazz ;
-		Field[]				fields ;
-		String				fieldName ;
-		Map<String,Field>	stringMapField ;
-		Method				method ;
-		Map<String,Method>	stringMapMethod ;
-		int					nameBeginOffset ;
-		int					nameEndOffset ;
-		String				name ;
-		TokenType			valueTokenType ;
-		int					valueBeginOffset ;
-		int					valueEndOffset ;
+		Class					clazz ;
+		HashMap<String,Field>	stringMapFields ;
+		HashMap<String,Method>	stringMapMethods ;
+		Field[]					fields ;
+		Field					field ;
+		Method					method ;
+		int						nameBeginOffset ;
+		int						nameEndOffset ;
+		String					name ;
+		TokenType				valueTokenType ;
+		int						valueBeginOffset ;
+		int						valueEndOffset ;
 		
-		int					nret ;
+		int						nret ;
 		
-		clazz = obj.getClass();
-		fields = clazz.getDeclaredFields() ;
-		stringMapField = new HashMap<String,Field>() ;
-		stringMapMethod = new HashMap<String,Method>() ;
-		for( Field field : fields ) {
-			fieldName = field.getName();
-			stringMapField.put(fieldName, field);
+		if( object != null ) {
+			clazz = object.getClass();
 			
-			try {
-				method = clazz.getDeclaredMethod( "set" + fieldName.substring(0,1).toUpperCase(Locale.getDefault()) + fieldName.substring(1), field.getType() ) ;
-				stringMapMethod.put(fieldName, method);
-			} catch (NoSuchMethodException e) {
-				;
-			} catch (SecurityException e) {
-				;
+			stringMapFields = stringMapFieldsCache.get().get( clazz.getName() ) ;
+			if( stringMapFields == null ) {
+				// System.out.println("no class["+clazz.getName()+"] fields cache");
+				stringMapFields = new HashMap<String,Field>() ;
+				stringMapFieldsCache.get().put( clazz.getName(), stringMapFields ) ;
+			} else {
+				// System.out.println("yes , class["+clazz.getName()+"] fields cached");
 			}
+			
+			stringMapMethods = stringMapMethodsCache.get().get( clazz.getName() ) ;
+			if( stringMapMethods == null ) {
+				// System.out.println("no class["+clazz.getName()+"] methods cache");
+				stringMapMethods = new HashMap<String,Method>() ;
+				stringMapMethodsCache.get().put( clazz.getName(), stringMapMethods ) ;
+			} else {
+				// System.out.println("yes , class["+clazz.getName()+"] methods cached");
+			}
+			
+			if( stringMapFields.isEmpty() ) {
+				fields = clazz.getDeclaredFields() ;
+				for( Field f : fields ) {
+					name = f.getName();
+
+					// System.out.println("add field["+f.getName()+"] to class["+clazz.getName()+"] cache");
+					stringMapFields.put(name, f);
+
+					try {
+						method = clazz.getDeclaredMethod( "set" + name.substring(0,1).toUpperCase(Locale.getDefault()) + name.substring(1), f.getType() ) ;
+						// System.out.println("add method["+method.getName()+"] to class["+clazz.getName()+"] cache");
+						stringMapMethods.put(name, method);
+					} catch (NoSuchMethodException e2) {
+						;
+					} catch (SecurityException e2) {
+						;
+					}
+				}
+			} else {
+				// System.out.println("reuse fields and methods in class["+clazz.getName()+"] cache");
+			}
+		} else {
+			stringMapFields = null ;
+			stringMapMethods = null ;
 		}
 		
 		while(true) {
 			// token "name"
 			nret = tokenJsonWord( jsonCharArray ) ;
-			if( nret == TOKEN_ERROR_END_OF_BUFFER ) {
+			if( nret == OKJSON_ERROR_END_OF_BUFFER ) {
 				break;
 			}
 			if( nret != 0 ) {
@@ -614,25 +637,29 @@ public class OkJson {
 			
 			nameBeginOffset = beginOffset ;
 			nameEndOffset = endOffset ;
-			
 			name = new String(jsonCharArray,nameBeginOffset,nameEndOffset-nameBeginOffset+1) ;
 			
-			Field field = stringMapField.get(name) ;
-			if( field == null ) {
-				if( strictPolicyEnable == true )
-					return TOKEN_ERROR_NAME_NOT_FOUND_IN_OBJECT;
-			}
+			if( object != null ) {
+				field = stringMapFields.get(name) ;
+				if( field == null ) {
+					if( strictPolicyEnable == true )
+						return OKJSON_ERROR_NAME_NOT_FOUND_IN_OBJECT;
+				}
 
-			method = stringMapMethod.get(name) ;
+				method = stringMapMethods.get(name) ;
+			} else {
+				field = null ;
+				method = null ;
+			}
 			
 			if( tokenType != TokenType.TOKEN_TYPE_STRING ) {
 				errorDesc = "name[" + String.copyValueOf(jsonCharArray,beginOffset,endOffset-beginOffset+1) + "] is not a string " ;
-				return TOKEN_ERROR_NAME_INVALID;
+				return OKJSON_ERROR_NAME_INVALID;
 			}
 			
 			// token ':' or ',' or ']'
 			nret = tokenJsonWord( jsonCharArray ) ;
-			if( nret == TOKEN_ERROR_END_OF_BUFFER ) {
+			if( nret == OKJSON_ERROR_END_OF_BUFFER ) {
 				break;
 			}
 			if( nret != 0 ) {
@@ -650,12 +677,12 @@ public class OkJson {
 				if( beginPos < 0 )
 					beginPos = 0 ;
 				errorDesc = "expect ':' but \"" + String.copyValueOf(jsonCharArray,beginOffset,endOffset-beginOffset+1) + "\"" ;
-				return TOKEN_ERROR_EXPECT_COLON_AFTER_NAME;
+				return OKJSON_ERROR_EXPECT_COLON_AFTER_NAME;
 			}
 			
 			// token '{' or '[' or "value"
 			nret = tokenJsonWord( jsonCharArray ) ;
-			if( nret == TOKEN_ERROR_END_OF_BUFFER ) {
+			if( nret == OKJSON_ERROR_END_OF_BUFFER ) {
 				break;
 			}
 			if( nret != 0 ) {
@@ -666,43 +693,45 @@ public class OkJson {
 			valueBeginOffset = beginOffset ;
 			valueEndOffset = endOffset ;
 			
-			if( tokenType == TokenType.TOKEN_TYPE_LEFT_BRACE ) {
+			if( tokenType == TokenType.TOKEN_TYPE_LEFT_BRACE || tokenType == TokenType.TOKEN_TYPE_LEFT_BRACKET ) {
 				try {
-					Object inObj = field.getType().newInstance() ;
-					if( inObj == null )
-						return TOKEN_ERROR_UNEXPECT;
-					nret = stringToObjectProperties( jsonCharArray, inObj, field ) ;
+					Object childObject ;
+					
+					if( field != null ) {
+						childObject = field.getType().newInstance() ;
+						if( childObject == null )
+							return OKJSON_ERROR_UNEXPECT;
+					} else {
+						childObject = null ;
+					}
+					
+					if( tokenType == TokenType.TOKEN_TYPE_LEFT_BRACE ) {
+						nret = stringToObjectProperties( jsonCharArray, childObject ) ;
+					} else {
+						nret = stringToListObject( jsonCharArray, childObject, field ) ;
+					}
 					if( nret != 0 )
 						return nret;
-					field.set( obj, inObj );
+					
+					if( field != null ) {
+						field.set( object, childObject );
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
-					return TOKEN_ERROR_EXCEPTION;
-				}
-			}
-			else if( tokenType == TokenType.TOKEN_TYPE_LEFT_BRACKET ) {
-				try {
-					Object inObj = field.getType().newInstance() ;
-					if( inObj == null )
-						return TOKEN_ERROR_UNEXPECT;
-					nret = stringToListObject( jsonCharArray, inObj, field ) ;
-					if( nret != 0 )
-						return nret;
-					field.set( obj, inObj );
-				} catch (Exception e) {
-					e.printStackTrace();
-					return TOKEN_ERROR_EXCEPTION;
+					return OKJSON_ERROR_EXCEPTION;
 				}
 			}
 			else {
-				nret = evalObjectProperty( jsonCharArray, valueTokenType, valueBeginOffset, valueEndOffset, obj, field, method ) ;
-				if( nret != 0 )
-					return nret;
+				if( object != null ) {
+					nret = setProperty( jsonCharArray, valueTokenType, valueBeginOffset, valueEndOffset, object, field, method ) ;
+					if( nret != 0 )
+						return nret;
+				}
 			}
 			
 			// token ',' or '}' or ']'
 			nret = tokenJsonWord( jsonCharArray ) ;
-			if( nret == TOKEN_ERROR_END_OF_BUFFER ) {
+			if( nret == OKJSON_ERROR_END_OF_BUFFER ) {
 				break;
 			}
 			if( nret != 0 ) {
@@ -722,16 +751,42 @@ public class OkJson {
 				if( beginPos < 0 )
 					beginPos = 0 ;
 				errorDesc = "expect ',' or '}' or ']' but \"" + String.copyValueOf(jsonCharArray,beginOffset,endOffset-beginOffset+1) + "\"" ;
-				return TOKEN_ERROR_EXPECT_COLON_AFTER_NAME;
+				return OKJSON_ERROR_EXPECT_COLON_AFTER_NAME;
 			}
 		}
 		
 		return 0;
 	}
 	
-	public <T> T stringToObject( char[] jsonCharArray, Class<T> clazz ) {
+	@SuppressWarnings("unused")
+	public <T> T stringToObject( String jsonString, Class<T> clazz ) {
+		
+		HashMap<String,Object>	stringMapFields ;
+		HashMap<String,Object>	stringMapMethods ;
+		
+		char[]	jsonCharArray = jsonString.toCharArray() ;
 		
 		T		obj ;
+		
+		if( stringMapFieldsCache == null ) {
+			stringMapFieldsCache = new ThreadLocal<HashMap<String,HashMap<String,Field>>>() ;
+			if( stringMapFieldsCache == null ) {
+				errorDesc = "New object failed for clazz" ;
+				errorCode = OKJSON_ERROR_NEW_OBJECT;
+				return null;
+			}
+			stringMapFieldsCache.set(new HashMap<String,HashMap<String,Field>>());
+		}
+		
+		if( stringMapMethodsCache == null ) {
+			stringMapMethodsCache = new ThreadLocal<HashMap<String,HashMap<String,Method>>>() ;
+			if( stringMapMethodsCache == null ) {
+				errorDesc = "New object failed for clazz" ;
+				errorCode = OKJSON_ERROR_NEW_OBJECT;
+				return null;
+			}
+			stringMapMethodsCache.set(new HashMap<String,HashMap<String,Method>>());
+		}
 		
 		jsonOffset = 0 ;
 		jsonLength = jsonCharArray.length ;
@@ -741,7 +796,7 @@ public class OkJson {
 			return null;
 		}
 		if( tokenType != TokenType.TOKEN_TYPE_LEFT_BRACE ) {
-			errorCode = TOKEN_ERROR_FIND_FIRST_LEFT_BRACE ;
+			errorCode = OKJSON_ERROR_FIND_FIRST_LEFT_BRACE ;
 			return null;
 		}
 		
@@ -752,15 +807,11 @@ public class OkJson {
 			return null;
 		}
 		
-		errorCode = stringToObjectProperties( jsonCharArray, obj, null ) ;
+		errorCode = stringToObjectProperties( jsonCharArray, obj ) ;
 		if( errorCode != 0 )
 			return null;
 		
 		return obj;
-	}
-	
-	public <T> T stringToObject( String jsonString, Class<T> clazz ) {
-		return stringToObject( jsonString.toCharArray(), clazz );
 	}
 	
 	public String objectToString() {

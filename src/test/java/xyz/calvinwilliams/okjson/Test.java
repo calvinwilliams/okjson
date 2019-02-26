@@ -11,7 +11,9 @@ import xyz.calvinwilliams.okjson.TestDataClass;
  *
  */
 public class Test {
-	public static void printObject( TestDataClass obj ) {
+	
+	public static void printTestDataClass( TestDataClass obj ) {
+		
 		System.out.println( "------------------------------ dump TestDataClass" );
 		System.out.println( "TestDataClass.str1["+obj.str1+"]" );
 		System.out.println( "TestDataClass.byte1["+obj.byte1+"]" );
@@ -90,59 +92,31 @@ public class Test {
 		System.out.println( "------------------------------ dump end" );
 	}
 	
-	public static void testStringToObject( char[] json ) {
+	public static void testStringToObject( String jsonString ) {
 		
-		OkJson okJson = new OkJson() ;
-		okJson.setDirectSetPropertyEnable( true );
+		OkJson okjson = new OkJson() ;
+		okjson.setDirectSetPropertyEnable( true );
 		// OkJson.setStrictPolicy(true);
-		TestDataClass obj = okJson.stringToObject( json, TestDataClass.class ) ;
+		TestDataClass obj = okjson.stringToObject( jsonString, TestDataClass.class ) ;
 		if( obj == null ) {
-			System.out.println( "stringToObject failed["+okJson.getErrorCode()+"]["+okJson.getErrorDesc()+"]" );
+			System.out.println( "stringToObject failed["+okjson.getErrorCode()+"]["+okjson.getErrorDesc()+"]" );
 			return;
 		}
 		else {
 			System.out.println( "stringToObject ok" );
-			printObject( obj );
+			printTestDataClass( obj );
 		}
-		
-		return;
-	}
-	
-	public static void pressStringToObject( char[] json ) {
-		
-		long l , count = 10000000 ;
-		long beginMillisSecondstamp = System.currentTimeMillis() ;
-		
-		for( l = 0 ; l < count ; l++ ) {
-			OkJson okJson = new OkJson() ;
-			okJson.setDirectSetPropertyEnable( true );
-			// OkJson.setStrictPolicy(true);
-			TestDataClass obj = okJson.stringToObject( json, TestDataClass.class ) ;
-			if( obj == null ) {
-				System.out.println( "stringToObject failed["+okJson.getErrorCode()+"]" );
-				return;
-			}
-			else if( l == 0 ){
-				System.out.println( "stringToObject ok" );
-				printObject( obj );
-			}
-		}
-		
-		long endMillisSecondstamp = System.currentTimeMillis() ;
-		double diffMillisSecond = (endMillisSecondstamp-beginMillisSecondstamp)/1000.0 ;
-		System.out.println( "count["+count+"] elapse["+diffMillisSecond+"]ms" );
 		
 		return;
 	}
 	
 	public static void testJsonFromString() {
-		String str = "{\n"
+		String jsonString = "{\n"
 						+ "	\"str1\" : \"value1\" ,\n"
 						+ "	\"int1\" : 123 ,\n"
 						+ "	\"double1\" : 456.789\n"
 						+ "}\n" ;
-		char[] json = str.toCharArray() ;
-		testStringToObject(json);
+		testStringToObject(jsonString);
 		return;
 	}
 	
@@ -158,25 +132,8 @@ public class Test {
 			e.printStackTrace();
 			return;
 		}
-		String str = new String(json) ;
-		testStringToObject(str.toCharArray());
-		return;
-	}
-	
-	public static void pressJsonFromFile() {
-		File file = new File( "test.json" ) ;
-		Long fileSize = file.length() ;
-		byte[] json = new byte[fileSize.intValue()] ;
-		try {
-			FileInputStream in = new FileInputStream(file);
-			in.read(json);
-			in.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-			return;
-		}
-		String str = new String(json) ;
-		pressStringToObject(str.toCharArray());
+		String jsonString = new String(json) ;
+		testStringToObject(jsonString);
 		return;
 	}
 	
