@@ -1,0 +1,64 @@
+{
+	"str1" : "str1" ,
+	"byte1" : 1 ,
+	"short1" : 12 ,
+	"int1" : 1234 ,
+	"long1" : 12345678 ,
+	"float1" : 1.234 ,
+	"double1" : 1.2345678 ,
+	"boolean1" : true ,
+	"null1" : null ,
+	"name1" : "value1" , 
+	
+	"branch2" : {
+		"str2" : "str2" ,
+		"byte2" : 2 ,
+		"short2" : 23 ,
+		"int2" : 2345 ,
+		"long2" : 23456789 ,
+		"float2" : 2.345 ,
+		"double2" : 2345.6789 ,
+		"boolean2" : false ,
+		"null2" : null
+	} ,
+	
+	"branch3" : {
+		"str3" : "str3" ,
+		"byte3" : 3 ,
+		"short3" : 34 ,
+		"int3" : 3456 ,
+		"long3" : 34567890 ,
+		"float3" : 3.456 ,
+		"double3" : 3456.7890 ,
+		"boolean3" : true ,
+		"null3" : null ,
+		
+		"branch33" : {
+			"str33" : "str33" ,
+			"byte33" : 33 ,
+			"short33" : 33 ,
+			"int33" : 3345 ,
+			"long33" : 33456789 ,
+			"float33" : 33.45 ,
+			"double33" : 3345.6789 ,
+			"boolean33" : false ,
+			"null33" : null ,
+			"name33" : "value33"
+		}
+	} ,
+	
+	"list4" : [
+		"AAA" , "BBB" , "CCC"
+	] ,
+	
+	"list5" : [
+		12 , 34 , 56
+	] ,
+	
+	"list6" : [
+		true , false , true
+	]
+	
+	
+	
+}
