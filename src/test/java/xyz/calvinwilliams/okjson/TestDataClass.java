@@ -30,6 +30,8 @@ public class TestDataClass {
 	public LinkedList<String>	list4 ;
 	public ArrayList<Integer>	list5 ;
 	public LinkedList<Boolean>	list6 ;
+	
+	public ArrayList<Branch7>	list7 ;
 }
 
 class Branch2 {
@@ -78,4 +80,9 @@ class Branch33 {
 		System.out.println( "setName33" );
 		this.name33 = name33;
 	}
+}
+
+class Branch7 {
+	public String		str7 ;
+	public int			int7 ;
 }
