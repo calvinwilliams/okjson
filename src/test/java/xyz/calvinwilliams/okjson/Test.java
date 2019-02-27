@@ -89,6 +89,15 @@ public class Test {
 			}
 		}
 		
+		System.out.println( "------------------------------ dump TestDataClass.list7" );
+		if( obj.list7 != null ) {
+			Iterator<Branch7> iterList7 = obj.list7.iterator() ;
+			while( iterList7.hasNext() ) {
+				Branch7 value = iterList7.next() ;
+				System.out.println( "TestDataClass.list6.<Branch7>.str7["+value.str7+"] .int7["+value.int7+"]" );
+			}
+		}
+		
 		System.out.println( "------------------------------ dump end" );
 	}
 	

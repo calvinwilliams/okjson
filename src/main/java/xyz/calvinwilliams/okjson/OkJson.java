@@ -46,6 +46,7 @@ public class OkJson {
 	final private static int	OKJSON_ERROR_EXCEPTION = -17 ;
 	final private static int	OKJSON_ERROR_UNEXPECT = -18 ;
 	final private static int	OKJSON_ERROR_NEW_OBJECT = -19 ;
+	final private static int	OKJSON_ERROR_UNEXPECT_TOKEN_AFTER_LEFT_BRACE = -20 ;
 	
 	/* example >>>
 	 * {
@@ -232,10 +233,10 @@ public class OkJson {
 				return OKJSON_ERROR_INVALID_BYTE;
 			}
 		}
+		
 		return OKJSON_ERROR_END_OF_BUFFER;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private int addListObject( char[] jsonCharArray, TokenType valueTokenType, int valueBeginOffset, int valueEndOffset, Object object, Field field ) {
 
 		try {
@@ -336,83 +337,77 @@ public class OkJson {
 
 	private int stringToListObject( char[] jsonCharArray, Object object, Field field ) {
 		
-//		int					nret ;
-//		
-//		while(true) {
-//			// token "name"
-//			nret = tokenJsonWord( jsonCharArray ) ;
-//			if( nret == OKJSON_ERROR_END_OF_BUFFER ) {
-//				break;
-//			}
-//			if( nret != 0 ) {
-//				return nret;
-//			}
-//			
-//			if( object != null ) {
-//				nret = addListObject( jsonCharArray, tokenType, beginOffset, endOffset, object, field ) ;
-//				if( nret != 0 )
-//					return nret;
-//			}
-//			
-//			// token ':' or ',' or ']'
-//			nret = tokenJsonWord( jsonCharArray ) ;
-//			if( nret == OKJSON_ERROR_END_OF_BUFFER ) {
-//				break;
-//			}
-//			if( nret != 0 ) {
-//				return nret;
-//			}
-//			
-//			if( tokenType == TokenType.TOKEN_TYPE_COMMA ) {
-//				continue;
-//			} else if( tokenType == TokenType.TOKEN_TYPE_RIGHT_BRACKET ) {
-//				break;
-//			} else {
-//				int beginPos = endOffset - 16 ;
-//				if( beginPos < 0 )
-//					beginPos = 0 ;
-//				errorDesc = "expect ':' but \"" + String.copyValueOf(jsonCharArray,beginOffset,endOffset-beginOffset+1) + "\"" ;
-//				return OKJSON_ERROR_EXPECT_COLON_AFTER_NAME;
-//			}
-//			
-//		}
+		TokenType			valueTokenType ;
+		int					valueBeginOffset ;
+		int					valueEndOffset ;
 		
-		errorCode = tokenJsonWord( jsonCharArray ) ;
-		if( errorCode != 0 ) {
-			return errorCode;
-		}
+		int					nret ;
 		
-		if( tokenType != TokenType.TOKEN_TYPE_LEFT_BRACE ) {
-			errorCode = OKJSON_ERROR_FIND_FIRST_LEFT_BRACE ;
-			return errorCode;
-		}
-		
-		try {
-			Class<?> clazz = field.getType() ;
-			if( clazz == ArrayList.class || clazz == LinkedList.class ) {
-				Type type = field.getGenericType() ;
-				ParameterizedType pt = (ParameterizedType) type ;
-				Class<?> typeClazz = (Class<?>) pt.getActualTypeArguments()[0] ;
-				
-				if( typeClazz == String.class
-					|| typeClazz == Byte.class || typeClazz == Short.class || typeClazz == Integer.class || typeClazz == Long.class
-					|| typeClazz == Float.class || typeClazz == Double.class
-					|| typeClazz == Boolean.class ) {
-						errorCode = stringToObjectProperties( jsonCharArray , object ) ;
+		while(true) {
+			// token "value" or '{'
+			nret = tokenJsonWord( jsonCharArray ) ;
+			if( nret == OKJSON_ERROR_END_OF_BUFFER ) {
+				break;
+			}
+			if( nret != 0 ) {
+				return nret;
+			}
+			
+			if( tokenType == TokenType.TOKEN_TYPE_LEFT_BRACE ) {
+				try {
+					Class<?> clazz = field.getType() ;
+					if( clazz == ArrayList.class || clazz == LinkedList.class ) {
+						Type type = field.getGenericType() ;
+						ParameterizedType pt = (ParameterizedType) type ;
+						Class<?> typeClazz = (Class<?>) pt.getActualTypeArguments()[0] ;
+						Object childObject = typeClazz.newInstance() ;
+						errorCode = stringToObjectProperties( jsonCharArray , childObject ) ;
 						if( errorCode != 0 )
 							return errorCode;
 						
-						
-				} else {
-					
-					
-					
-					
+						((List<Object>) object).add( childObject );
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					return OKJSON_ERROR_EXCEPTION;
 				}
+			} else if( tokenType == TokenType.TOKEN_TYPE_STRING || tokenType == TokenType.TOKEN_TYPE_INTEGER || tokenType == TokenType.TOKEN_TYPE_DECIMAL || tokenType == TokenType.TOKEN_TYPE_BOOL ) {
+				;
+			} else {
+				int beginPos = endOffset - 16 ;
+				if( beginPos < 0 )
+					beginPos = 0 ;
+				errorDesc = "unexpect \""+String.copyValueOf(jsonCharArray,beginOffset,endOffset-beginOffset+1)+"\"" ;
+				return OKJSON_ERROR_UNEXPECT_TOKEN_AFTER_LEFT_BRACE;
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return OKJSON_ERROR_EXCEPTION;
+			
+			valueTokenType = tokenType ;
+			valueBeginOffset = beginOffset ;
+			valueEndOffset = endOffset ;
+			
+			// token ',' or ']'
+			nret = tokenJsonWord( jsonCharArray ) ;
+			if( nret == OKJSON_ERROR_END_OF_BUFFER ) {
+				break;
+			}
+			if( nret != 0 ) {
+				return nret;
+			}
+			
+			if( tokenType == TokenType.TOKEN_TYPE_COMMA || tokenType == TokenType.TOKEN_TYPE_RIGHT_BRACKET ) {
+				errorCode = addListObject( jsonCharArray, valueTokenType, valueBeginOffset, valueEndOffset , object, field ) ;
+				if( errorCode != 0 )
+					return errorCode;
+				
+				if( tokenType == TokenType.TOKEN_TYPE_RIGHT_BRACKET )
+					break;
+			} else {
+				int beginPos = endOffset - 16 ;
+				if( beginPos < 0 )
+					beginPos = 0 ;
+				errorDesc = "unexpect \""+String.copyValueOf(jsonCharArray,beginOffset,endOffset-beginOffset+1)+"\"" ;
+				return OKJSON_ERROR_UNEXPECT_TOKEN_AFTER_LEFT_BRACE;
+			}
 		}
 		
 		return 0;

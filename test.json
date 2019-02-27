@@ -60,7 +60,7 @@
 	] ,
 	
 	"list7" : [
-		{ "str7":"str71" , "int7":"71" } ,
+		{ "str7":"str71" , "int7":71 } ,
 		{ "str7":"str72" } ,
 		{ "str7":null }
 	]
