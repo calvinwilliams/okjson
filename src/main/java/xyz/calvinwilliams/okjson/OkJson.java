@@ -395,9 +395,11 @@ public class OkJson {
 			}
 			
 			if( tokenType == TokenType.TOKEN_TYPE_COMMA || tokenType == TokenType.TOKEN_TYPE_RIGHT_BRACKET ) {
-				errorCode = addListObject( jsonCharArray, valueTokenType, valueBeginOffset, valueEndOffset , object, field ) ;
-				if( errorCode != 0 )
-					return errorCode;
+				if( object != null && field != null ) {
+					errorCode = addListObject( jsonCharArray, valueTokenType, valueBeginOffset, valueEndOffset , object, field ) ;
+					if( errorCode != 0 )
+						return errorCode;
+				}
 				
 				if( tokenType == TokenType.TOKEN_TYPE_RIGHT_BRACKET )
 					break;
