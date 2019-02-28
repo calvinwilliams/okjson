@@ -37,16 +37,16 @@ public class OkJson {
 	private String				errorDesc ;
 	
 	final private static int	OKJSON_ERROR_END_OF_BUFFER = 1 ;
+	final private static int	OKJSON_ERROR_UNEXPECT = -4 ;
+	final private static int	OKJSON_ERROR_EXCEPTION = -8 ;
 	final private static int	OKJSON_ERROR_INVALID_BYTE = -11 ;
-	final private static int	OKJSON_ERROR_NAME_INVALID = -12 ;
-	final private static int	OKJSON_ERROR_EXPECT_COLON_AFTER_NAME = -13 ;
-	final private static int	OKJSON_ERROR_NAME_NOT_FOUND_IN_OBJECT = -14 ;
-	final private static int	OKJSON_ERROR_PORPERTY_TYPE_NOT_MATCH_IN_OBJECT = -15 ;
-	final private static int	OKJSON_ERROR_FIND_FIRST_LEFT_BRACE = -16 ;
-	final private static int	OKJSON_ERROR_EXCEPTION = -17 ;
-	final private static int	OKJSON_ERROR_UNEXPECT = -18 ;
-	final private static int	OKJSON_ERROR_NEW_OBJECT = -19 ;
-	final private static int	OKJSON_ERROR_UNEXPECT_TOKEN_AFTER_LEFT_BRACE = -20 ;
+	final private static int	OKJSON_ERROR_FIND_FIRST_LEFT_BRACE = -21 ;
+	final private static int	OKJSON_ERROR_NAME_INVALID = -22 ;
+	final private static int	OKJSON_ERROR_EXPECT_COLON_AFTER_NAME = -23 ;
+	final private static int	OKJSON_ERROR_UNEXPECT_TOKEN_AFTER_LEFT_BRACE = -24 ;
+	final private static int	OKJSON_ERROR_PORPERTY_TYPE_NOT_MATCH_IN_OBJECT = -26 ;
+	final private static int	OKJSON_ERROR_NAME_NOT_FOUND_IN_OBJECT = -28 ;
+	final private static int	OKJSON_ERROR_NEW_OBJECT = -31 ;
 	
 	/* example >>>
 	 * {
@@ -422,28 +422,23 @@ public class OkJson {
 				try {
 					String value = new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1) ;
 					if( method != null ) {
-						method.setAccessible(true);
 						method.invoke(obj, value);
 					}
 					else if( directSetPropertyEnable == true )
 					{
-						field.setAccessible(true);
 						field.set( obj, value );
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
 					return OKJSON_ERROR_EXCEPTION;
 				}
-			}
-			else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
+			} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
 				try {
 					if( method != null ) {
-						method.setAccessible(true);
 						method.invoke(obj, null);
 					}
 					else if( directSetPropertyEnable == true )
 					{
-						field.setAccessible(true);
 						field.set( obj, null );
 					}
 				} catch (Exception e) {
@@ -451,142 +446,304 @@ public class OkJson {
 					return OKJSON_ERROR_EXCEPTION;
 				}
 			}
-		}
-		else if( field.getType().getName().equals("byte") && valueTokenType == TokenType.TOKEN_TYPE_INTEGER ) {
+		} else if( field.getType() == Byte.class ) {
+			if( valueTokenType == TokenType.TOKEN_TYPE_INTEGER ) {
+				try {
+					Byte	value = Byte.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
+					if( method != null ) {
+						method.invoke(obj, value);
+					}
+					else if( directSetPropertyEnable == true )
+					{
+						field.set( obj, value );
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					return OKJSON_ERROR_EXCEPTION;
+				}
+			} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
+				try {
+					if( method != null ) {
+						method.invoke(obj, null);
+					}
+					else if( directSetPropertyEnable == true )
+					{
+						field.set( obj, null );
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					return OKJSON_ERROR_EXCEPTION;
+				}
+			}
+		} else if( field.getType() == Short.class ) {
+			if( valueTokenType == TokenType.TOKEN_TYPE_INTEGER ) {
+				try {
+					Short	value = Short.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
+					if( method != null ) {
+						method.invoke(obj, value);
+					}
+					else if( directSetPropertyEnable == true )
+					{
+						field.set( obj, value );
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					return OKJSON_ERROR_EXCEPTION;
+				}
+			} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
+				try {
+					if( method != null ) {
+						method.invoke(obj, null);
+					}
+					else if( directSetPropertyEnable == true )
+					{
+						field.set( obj, null );
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					return OKJSON_ERROR_EXCEPTION;
+				}
+			}
+		} else if( field.getType() == Integer.class ) {
+			if( valueTokenType == TokenType.TOKEN_TYPE_INTEGER ) {
+				try {
+					Integer	value = Integer.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
+					if( method != null ) {
+						method.invoke(obj, value);
+					}
+					else if( directSetPropertyEnable == true )
+					{
+						field.set( obj, value );
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					return OKJSON_ERROR_EXCEPTION;
+				}
+			} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
+				try {
+					if( method != null ) {
+						method.invoke(obj, null);
+					}
+					else if( directSetPropertyEnable == true )
+					{
+						field.set( obj, null );
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					return OKJSON_ERROR_EXCEPTION;
+				}
+			}
+		} else if( field.getType() == Long.class ) {
+			if( valueTokenType == TokenType.TOKEN_TYPE_INTEGER ) {
+				try {
+					Long	value = Long.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
+					if( method != null ) {
+						method.invoke(obj, value);
+					}
+					else if( directSetPropertyEnable == true )
+					{
+						field.set( obj, value );
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					return OKJSON_ERROR_EXCEPTION;
+				}
+			} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
+				try {
+					if( method != null ) {
+						method.invoke(obj, null);
+					}
+					else if( directSetPropertyEnable == true )
+					{
+						field.set( obj, null );
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					return OKJSON_ERROR_EXCEPTION;
+				}
+			}
+		} else if( field.getType() == Float.class ) {
+			if( valueTokenType == TokenType.TOKEN_TYPE_DECIMAL ) {
+				try {
+					Float	value = Float.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
+					if( method != null ) {
+						method.invoke(obj, value);
+					}
+					else if( directSetPropertyEnable == true )
+					{
+						field.set( obj, value );
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					return OKJSON_ERROR_EXCEPTION;
+				}
+			} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
+				try {
+					if( method != null ) {
+						method.invoke(obj, null);
+					}
+					else if( directSetPropertyEnable == true )
+					{
+						field.set( obj, null );
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					return OKJSON_ERROR_EXCEPTION;
+				}
+			}
+		} else if( field.getType() == Double.class ) {
+			if( valueTokenType == TokenType.TOKEN_TYPE_DECIMAL ) {
+				try {
+					Double	value = Double.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
+					if( method != null ) {
+						method.invoke(obj, value);
+					}
+					else if( directSetPropertyEnable == true )
+					{
+						field.set( obj, value );
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					return OKJSON_ERROR_EXCEPTION;
+				}
+			} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
+				try {
+					if( method != null ) {
+						method.invoke(obj, null);
+					}
+					else if( directSetPropertyEnable == true )
+					{
+						field.set( obj, null );
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					return OKJSON_ERROR_EXCEPTION;
+				}
+			}
+		} else if( field.getType() == Boolean.class ) {
+			if( valueTokenType == TokenType.TOKEN_TYPE_BOOL ) {
+				try {
+					Boolean	value = Boolean.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
+					if( method != null ) {
+						method.invoke(obj, value);
+					}
+					else if( directSetPropertyEnable == true )
+					{
+						field.set( obj, value );
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					return OKJSON_ERROR_EXCEPTION;
+				}
+			} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
+				try {
+					if( method != null ) {
+						method.invoke(obj, null);
+					}
+					else if( directSetPropertyEnable == true )
+					{
+						field.set( obj, null );
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					return OKJSON_ERROR_EXCEPTION;
+				}
+			}
+		} else if( field.getType().getName().equals("byte") && valueTokenType == TokenType.TOKEN_TYPE_INTEGER ) {
 			try {
 				byte	value = Integer.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)).byteValue() ;
 				if( method != null ) {
-					method.setAccessible(true);
 					method.invoke(obj, value);
-				}
-				else if( directSetPropertyEnable == true )
-				{
-					field.setAccessible(true);
+				} else if( directSetPropertyEnable == true ) {
 					field.setByte( obj, value );
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 				return OKJSON_ERROR_EXCEPTION;
 			}
-		}
-		else if( field.getType().getName().equals("short") && valueTokenType == TokenType.TOKEN_TYPE_INTEGER ) {
+		} else if( field.getType().getName().equals("short") && valueTokenType == TokenType.TOKEN_TYPE_INTEGER ) {
 			try {
 				short	value = Integer.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)).shortValue() ;
 				if( method != null ) {
-					method.setAccessible(true);
 					method.invoke(obj, value);
-				}
-				else if( directSetPropertyEnable == true )
-				{
-					field.setAccessible(true);
+				} else if( directSetPropertyEnable == true ) {
 					field.setShort( obj, value );
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 				return OKJSON_ERROR_EXCEPTION;
 			}
-		}
-		else if( field.getType().getName().equals("int") && valueTokenType == TokenType.TOKEN_TYPE_INTEGER ) {
+		} else if( field.getType().getName().equals("int") && valueTokenType == TokenType.TOKEN_TYPE_INTEGER ) {
 			try {
 				int	value = Integer.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)).intValue() ;
 				if( method != null ) {
-					method.setAccessible(true);
 					method.invoke(obj, value);
-				}
-				else if( directSetPropertyEnable == true )
-				{
-					field.setAccessible(true);
+				} else if( directSetPropertyEnable == true ) {
 					field.setInt( obj, value );
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 				return OKJSON_ERROR_EXCEPTION;
 			}
-		}
-		else if( field.getType().getName().equals("long") && valueTokenType == TokenType.TOKEN_TYPE_INTEGER ) {
+		} else if( field.getType().getName().equals("long") && valueTokenType == TokenType.TOKEN_TYPE_INTEGER ) {
 			try {
 				long	value = Long.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)).longValue() ;
 				if( method != null ) {
-					method.setAccessible(true);
 					method.invoke(obj, value);
-				}
-				else if( directSetPropertyEnable == true )
-				{
-					field.setAccessible(true);
+				} else if( directSetPropertyEnable == true ) {
 					field.setLong( obj, value );
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 				return OKJSON_ERROR_EXCEPTION;
 			}
-		}
-		else if( field.getType().getName().equals("float") && valueTokenType == TokenType.TOKEN_TYPE_DECIMAL ) {
+		} else if( field.getType().getName().equals("float") && valueTokenType == TokenType.TOKEN_TYPE_DECIMAL ) {
 			try {
 				float	value = Float.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)).floatValue() ;
 				if( method != null ) {
-					method.setAccessible(true);
 					method.invoke(obj, value);
-				}
-				else if( directSetPropertyEnable == true )
-				{
-					field.setAccessible(true);
+				} else if( directSetPropertyEnable == true ) {
 					field.setFloat( obj, value );
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 				return OKJSON_ERROR_EXCEPTION;
 			}
-		}
-		else if( field.getType().getName().equals("double") && valueTokenType == TokenType.TOKEN_TYPE_DECIMAL ) {
+		} else if( field.getType().getName().equals("double") && valueTokenType == TokenType.TOKEN_TYPE_DECIMAL ) {
 			try {
 				double	value = Double.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)).doubleValue() ;
 				if( method != null ) {
-					method.setAccessible(true);
 					method.invoke(obj, value);
-				}
-				else if( directSetPropertyEnable == true )
-				{
-					field.setAccessible(true);
+				} else if( directSetPropertyEnable == true ) {
 					field.setDouble( obj, value );
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 				return OKJSON_ERROR_EXCEPTION;
 			}
-		}
-		else if( field.getType().getName().equals("boolean") && valueTokenType == TokenType.TOKEN_TYPE_BOOL ) {
+		} else if( field.getType().getName().equals("boolean") && valueTokenType == TokenType.TOKEN_TYPE_BOOL ) {
 			try {
 				if( method != null ) {
-					method.setAccessible(true);
 					method.invoke(obj, booleanValue);
-				}
-				else if( directSetPropertyEnable == true )
-				{
-					field.setAccessible(true);
+				} else if( directSetPropertyEnable == true ) {
 					field.setBoolean( obj, booleanValue );
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 				return OKJSON_ERROR_EXCEPTION;
 			}
-		}
-		else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
+		} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
 			try {
 				if( method != null ) {
-					method.setAccessible(true);
 					method.invoke(obj, null);
-				}
-				else if( directSetPropertyEnable == true )
-				{
-					field.setAccessible(true);
+				} else if( directSetPropertyEnable == true ) {
 					field.set( obj, null );
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 				return OKJSON_ERROR_EXCEPTION;
 			}
-		}
-		else {
+		} else {
 			if( strictPolicyEnable == true )
 				return OKJSON_ERROR_PORPERTY_TYPE_NOT_MATCH_IN_OBJECT;
 		}
@@ -630,12 +787,15 @@ public class OkJson {
 			if( stringMapFields.isEmpty() ) {
 				fields = clazz.getDeclaredFields() ;
 				for( Field f : fields ) {
+	                f.setAccessible(true);
+	                
 					name = f.getName();
 					
 					stringMapFields.put(name, f);
 					
 					try {
 						method = clazz.getDeclaredMethod( "set" + name.substring(0,1).toUpperCase(Locale.getDefault()) + name.substring(1), f.getType() ) ;
+						method.setAccessible(true);
 						stringMapMethods.put(name, method);
 					} catch (NoSuchMethodException e2) {
 						;
@@ -754,9 +914,8 @@ public class OkJson {
 					e.printStackTrace();
 					return OKJSON_ERROR_EXCEPTION;
 				}
-			}
-			else {
-				if( object != null ) {
+			} else {
+				if( object != null && field != null ) {
 					nret = setObjectProperty( jsonCharArray, valueTokenType, valueBeginOffset, valueEndOffset, object, field, method ) ;
 					if( nret != 0 )
 						return nret;

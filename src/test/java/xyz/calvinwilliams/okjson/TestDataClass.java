@@ -7,8 +7,8 @@ public class TestDataClass {
 	public byte			byte1 ;
 	public short		short1 ;
 	public int			int1 ;
-	public long			long1 ;
-	public float		float1 ;
+	public Long			long1 ;
+	public Float		float1 ;
 	public double		double1 ;
 	public boolean		boolean1 ;
 	public String		null1 ;
@@ -38,11 +38,11 @@ class Branch2 {
 	public String		str2 ;
 	public byte			byte2 ;
 	public short		short2 ;
-	public int			int2 ;
+	public Integer		int2 ;
 	public long			long2 ;
 	public float		float2 ;
-	public double		double2 ;
-	public boolean		boolean2 ;
+	public Double		double2 ;
+	public Boolean		boolean2 ;
 	public String		null2 ;
 }
 

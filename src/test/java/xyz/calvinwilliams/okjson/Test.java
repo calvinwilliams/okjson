@@ -43,8 +43,8 @@ public class Test {
 			System.out.println( "TestDataClass.branch3.byte3["+obj.branch3.byte3+"]" );
 			System.out.println( "TestDataClass.branch3.short3["+obj.branch3.short3+"]" );
 			System.out.println( "TestDataClass.branch3.int3["+obj.branch3.int3+"]" );
-			System.out.println( "TestDataClass.branch3.long3["+obj.branch3.long3+"]" );
-			System.out.println( "TestDataClass.branch3.float3["+obj.branch3.float3+"]" );
+			System.out.println( "TestDataClass.branch3.Long3["+obj.branch3.long3+"]" );
+			System.out.println( "TestDataClass.branch3.Float3["+obj.branch3.float3+"]" );
 			System.out.println( "TestDataClass.branch3.double3["+obj.branch3.double3+"]" );
 			System.out.println( "TestDataClass.branch3.boolean3["+obj.branch3.boolean3+"]" );
 			
@@ -53,11 +53,11 @@ public class Test {
 				System.out.println( "TestDataClass.branch3.branch33.str33["+obj.branch3.branch33.str33+"]" );
 				System.out.println( "TestDataClass.branch3.branch33.byte33["+obj.branch3.branch33.byte33+"]" );
 				System.out.println( "TestDataClass.branch3.branch33.short33["+obj.branch3.branch33.short33+"]" );
-				System.out.println( "TestDataClass.branch3.branch33.int33["+obj.branch3.branch33.int33+"]" );
+				System.out.println( "TestDataClass.branch3.branch33.Int33["+obj.branch3.branch33.int33+"]" );
 				System.out.println( "TestDataClass.branch3.branch33.long33["+obj.branch3.branch33.long33+"]" );
 				System.out.println( "TestDataClass.branch3.branch33.float33["+obj.branch3.branch33.float33+"]" );
-				System.out.println( "TestDataClass.branch3.branch33.double33["+obj.branch3.branch33.double33+"]" );
-				System.out.println( "TestDataClass.branch3.branch33.boolean33["+obj.branch3.branch33.boolean33+"]" );
+				System.out.println( "TestDataClass.branch3.branch33.Double33["+obj.branch3.branch33.double33+"]" );
+				System.out.println( "TestDataClass.branch3.branch33.Boolean33["+obj.branch3.branch33.boolean33+"]" );
 				System.out.println( "TestDataClass.branch3.branch33.name33["+obj.branch3.branch33.name33+"]" );
 			}
 		}

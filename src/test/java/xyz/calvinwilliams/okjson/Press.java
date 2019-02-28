@@ -19,8 +19,8 @@ public class Press {
 		System.out.println( "PressDataClass.byte1["+obj.byte1+"]" );
 		System.out.println( "PressDataClass.short1["+obj.short1+"]" );
 		System.out.println( "PressDataClass.int1["+obj.int1+"]" );
-		System.out.println( "PressDataClass.long1["+obj.long1+"]" );
-		System.out.println( "PressDataClass.float1["+obj.float1+"]" );
+		System.out.println( "PressDataClass.Long1["+obj.long1+"]" );
+		System.out.println( "PressDataClass.Float1["+obj.float1+"]" );
 		System.out.println( "PressDataClass.double1["+obj.double1+"]" );
 		System.out.println( "PressDataClass.boolean1["+obj.boolean1+"]" );
 		System.out.println( "PressDataClass.name1["+obj.name1+"]" );
@@ -30,11 +30,11 @@ public class Press {
 			System.out.println( "PressDataClass.branch2.str2["+obj.press2.str2+"]" );
 			System.out.println( "PressDataClass.branch2.byte2["+obj.press2.byte2+"]" );
 			System.out.println( "PressDataClass.branch2.short2["+obj.press2.short2+"]" );
-			System.out.println( "PressDataClass.branch2.int2["+obj.press2.int2+"]" );
+			System.out.println( "PressDataClass.branch2.Int2["+obj.press2.int2+"]" );
 			System.out.println( "PressDataClass.branch2.long2["+obj.press2.long2+"]" );
 			System.out.println( "PressDataClass.branch2.float2["+obj.press2.float2+"]" );
-			System.out.println( "PressDataClass.branch2.double2["+obj.press2.double2+"]" );
-			System.out.println( "PressDataClass.branch2.boolean2["+obj.press2.boolean2+"]" );
+			System.out.println( "PressDataClass.branch2.Double2["+obj.press2.double2+"]" );
+			System.out.println( "PressDataClass.branch2.Boolean2["+obj.press2.boolean2+"]" );
 		}
 		
 		System.out.println( "------------------------------ dump end" );
