@@ -60,6 +60,12 @@ public class OkJson {
 		boolean	decimalPointFlag ;
 		
 		beginOffset = jsonOffset ;
+		
+		ch = jsonCharArray[jsonOffset] ;
+		if( ch == '-' ) {
+			jsonOffset++;
+		}
+		
 		decimalPointFlag = false ;
 		while( jsonOffset < jsonLength ) {
 			ch = jsonCharArray[jsonOffset] ;
@@ -152,18 +158,9 @@ public class OkJson {
 				endOffset = jsonOffset ;
 				jsonOffset++;
 				return 0;
-			}
-			else if( ch == '-' || ( '0' <= ch && ch <= '9' ) ) {
-				if( ch == '-' )
-					jsonOffset++;
-				
-				nret = tokenJsonNumber( jsonCharArray ) ;
-				if( nret != 0 )
-					return nret;
-				
-				return 0;
-			}
-			else if( ch == 't' ) {
+			} else if( ch == '-' || ( '0' <= ch && ch <= '9' ) ) {
+				return tokenJsonNumber( jsonCharArray ) ;
+			} else if( ch == 't' ) {
 				beginOffset = jsonOffset ;
 				jsonOffset++;
 				ch = jsonCharArray[jsonOffset] ;
@@ -507,6 +504,8 @@ public class OkJson {
 		} else if( field.getType() == Integer.class ) {
 			if( valueTokenType == TokenType.TOKEN_TYPE_INTEGER ) {
 				try {
+String v = new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1) ;
+System.out.println("DEBUG - v["+v+"] valueBeginOffset["+valueBeginOffset+"] valueEndOffset["+valueEndOffset+"]");
 					Integer	value = Integer.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
 					if( method != null ) {
 						method.invoke(obj, value);

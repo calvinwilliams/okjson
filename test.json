@@ -14,9 +14,9 @@
 		"str2" : "str2" ,
 		"byte2" : 2 ,
 		"short2" : 23 ,
-		"int2" : 2345 ,
+		"int2" : -2345 ,
 		"long2" : 23456789 ,
-		"float2" : 2.345 ,
+		"float2" : -2.345 ,
 		"double2" : 2345.6789 ,
 		"boolean2" : false ,
 		"null2" : null
