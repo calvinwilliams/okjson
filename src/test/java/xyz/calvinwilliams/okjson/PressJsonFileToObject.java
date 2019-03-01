@@ -10,7 +10,7 @@ import xyz.calvinwilliams.okjson.PressDataClass;
  * @author calvin
  *
  */
-public class Press {
+public class PressJsonFileToObject {
 	
 	public static void printPressDataClass( PressDataClass obj ) {
 		
@@ -47,7 +47,7 @@ public class Press {
 		
 		for( l = 0 ; l < count ; l++ ) {
 			OkJson okjson = new OkJson() ;
-			okjson.setDirectSetPropertyEnable( true );
+			okjson.setDirectAccessPropertyEnable( true );
 			// OkJson.setStrictPolicy(true);
 			PressDataClass obj = okjson.stringToObject( jsonString, PressDataClass.class ) ;
 			if( obj == null ) {
@@ -69,7 +69,7 @@ public class Press {
 		return;
 	}
 	
-	public static void pressJsonFromFile() {
+	public static void pressJsonFileToObject() {
 		File file = new File( "press.json" ) ;
 		Long fileSize = file.length() ;
 		byte[] json = new byte[fileSize.intValue()] ;
@@ -87,7 +87,7 @@ public class Press {
 	}
 	
 	public static void main(String[] args) {
-		pressJsonFromFile();
+		pressJsonFileToObject();
 		return;
 	}
 }

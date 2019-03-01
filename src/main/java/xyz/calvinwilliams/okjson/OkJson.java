@@ -23,7 +23,8 @@ public class OkJson {
 	private static ThreadLocal<HashMap<String,HashMap<String,Method>>>	stringMapMethodsCache ;
 	
 	private boolean				strictPolicyEnable ;
-	private boolean				directSetPropertyEnable ;
+	private boolean				directAccessPropertyEnable ;
+	private boolean				formatCompactEnable ;
 	
 	private int					jsonOffset ;
 	private int					jsonLength ;
@@ -412,18 +413,18 @@ public class OkJson {
 		return 0;
 	}
 		
-	private int setObjectProperty( char[] jsonCharArray, TokenType valueTokenType, int valueBeginOffset, int valueEndOffset, Object obj, Field field, Method method ) {
+	private int setObjectProperty( char[] jsonCharArray, TokenType valueTokenType, int valueBeginOffset, int valueEndOffset, Object object, Field field, Method method ) {
 		
 		if( field.getType() == String.class ) {
 			if( valueTokenType == TokenType.TOKEN_TYPE_STRING ) {
 				try {
 					String value = new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1) ;
 					if( method != null ) {
-						method.invoke(obj, value);
+						method.invoke(object, value);
 					}
-					else if( directSetPropertyEnable == true )
+					else if( directAccessPropertyEnable == true )
 					{
-						field.set( obj, value );
+						field.set( object, value );
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -432,11 +433,11 @@ public class OkJson {
 			} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
 				try {
 					if( method != null ) {
-						method.invoke(obj, null);
+						method.invoke(object, null);
 					}
-					else if( directSetPropertyEnable == true )
+					else if( directAccessPropertyEnable == true )
 					{
-						field.set( obj, null );
+						field.set( object, null );
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -448,11 +449,11 @@ public class OkJson {
 				try {
 					Byte	value = Byte.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
 					if( method != null ) {
-						method.invoke(obj, value);
+						method.invoke(object, value);
 					}
-					else if( directSetPropertyEnable == true )
+					else if( directAccessPropertyEnable == true )
 					{
-						field.set( obj, value );
+						field.set( object, value );
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -461,11 +462,11 @@ public class OkJson {
 			} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
 				try {
 					if( method != null ) {
-						method.invoke(obj, null);
+						method.invoke(object, null);
 					}
-					else if( directSetPropertyEnable == true )
+					else if( directAccessPropertyEnable == true )
 					{
-						field.set( obj, null );
+						field.set( object, null );
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -477,11 +478,11 @@ public class OkJson {
 				try {
 					Short	value = Short.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
 					if( method != null ) {
-						method.invoke(obj, value);
+						method.invoke(object, value);
 					}
-					else if( directSetPropertyEnable == true )
+					else if( directAccessPropertyEnable == true )
 					{
-						field.set( obj, value );
+						field.set( object, value );
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -490,11 +491,11 @@ public class OkJson {
 			} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
 				try {
 					if( method != null ) {
-						method.invoke(obj, null);
+						method.invoke(object, null);
 					}
-					else if( directSetPropertyEnable == true )
+					else if( directAccessPropertyEnable == true )
 					{
-						field.set( obj, null );
+						field.set( object, null );
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -504,15 +505,13 @@ public class OkJson {
 		} else if( field.getType() == Integer.class ) {
 			if( valueTokenType == TokenType.TOKEN_TYPE_INTEGER ) {
 				try {
-String v = new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1) ;
-System.out.println("DEBUG - v["+v+"] valueBeginOffset["+valueBeginOffset+"] valueEndOffset["+valueEndOffset+"]");
 					Integer	value = Integer.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
 					if( method != null ) {
-						method.invoke(obj, value);
+						method.invoke(object, value);
 					}
-					else if( directSetPropertyEnable == true )
+					else if( directAccessPropertyEnable == true )
 					{
-						field.set( obj, value );
+						field.set( object, value );
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -521,11 +520,11 @@ System.out.println("DEBUG - v["+v+"] valueBeginOffset["+valueBeginOffset+"] valu
 			} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
 				try {
 					if( method != null ) {
-						method.invoke(obj, null);
+						method.invoke(object, null);
 					}
-					else if( directSetPropertyEnable == true )
+					else if( directAccessPropertyEnable == true )
 					{
-						field.set( obj, null );
+						field.set( object, null );
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -537,11 +536,11 @@ System.out.println("DEBUG - v["+v+"] valueBeginOffset["+valueBeginOffset+"] valu
 				try {
 					Long	value = Long.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
 					if( method != null ) {
-						method.invoke(obj, value);
+						method.invoke(object, value);
 					}
-					else if( directSetPropertyEnable == true )
+					else if( directAccessPropertyEnable == true )
 					{
-						field.set( obj, value );
+						field.set( object, value );
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -550,11 +549,11 @@ System.out.println("DEBUG - v["+v+"] valueBeginOffset["+valueBeginOffset+"] valu
 			} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
 				try {
 					if( method != null ) {
-						method.invoke(obj, null);
+						method.invoke(object, null);
 					}
-					else if( directSetPropertyEnable == true )
+					else if( directAccessPropertyEnable == true )
 					{
-						field.set( obj, null );
+						field.set( object, null );
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -566,11 +565,11 @@ System.out.println("DEBUG - v["+v+"] valueBeginOffset["+valueBeginOffset+"] valu
 				try {
 					Float	value = Float.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
 					if( method != null ) {
-						method.invoke(obj, value);
+						method.invoke(object, value);
 					}
-					else if( directSetPropertyEnable == true )
+					else if( directAccessPropertyEnable == true )
 					{
-						field.set( obj, value );
+						field.set( object, value );
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -579,11 +578,11 @@ System.out.println("DEBUG - v["+v+"] valueBeginOffset["+valueBeginOffset+"] valu
 			} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
 				try {
 					if( method != null ) {
-						method.invoke(obj, null);
+						method.invoke(object, null);
 					}
-					else if( directSetPropertyEnable == true )
+					else if( directAccessPropertyEnable == true )
 					{
-						field.set( obj, null );
+						field.set( object, null );
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -595,11 +594,11 @@ System.out.println("DEBUG - v["+v+"] valueBeginOffset["+valueBeginOffset+"] valu
 				try {
 					Double	value = Double.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
 					if( method != null ) {
-						method.invoke(obj, value);
+						method.invoke(object, value);
 					}
-					else if( directSetPropertyEnable == true )
+					else if( directAccessPropertyEnable == true )
 					{
-						field.set( obj, value );
+						field.set( object, value );
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -608,11 +607,11 @@ System.out.println("DEBUG - v["+v+"] valueBeginOffset["+valueBeginOffset+"] valu
 			} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
 				try {
 					if( method != null ) {
-						method.invoke(obj, null);
+						method.invoke(object, null);
 					}
-					else if( directSetPropertyEnable == true )
+					else if( directAccessPropertyEnable == true )
 					{
-						field.set( obj, null );
+						field.set( object, null );
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -624,11 +623,11 @@ System.out.println("DEBUG - v["+v+"] valueBeginOffset["+valueBeginOffset+"] valu
 				try {
 					Boolean	value = Boolean.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
 					if( method != null ) {
-						method.invoke(obj, value);
+						method.invoke(object, value);
 					}
-					else if( directSetPropertyEnable == true )
+					else if( directAccessPropertyEnable == true )
 					{
-						field.set( obj, value );
+						field.set( object, value );
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -637,11 +636,11 @@ System.out.println("DEBUG - v["+v+"] valueBeginOffset["+valueBeginOffset+"] valu
 			} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
 				try {
 					if( method != null ) {
-						method.invoke(obj, null);
+						method.invoke(object, null);
 					}
-					else if( directSetPropertyEnable == true )
+					else if( directAccessPropertyEnable == true )
 					{
-						field.set( obj, null );
+						field.set( object, null );
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -652,9 +651,9 @@ System.out.println("DEBUG - v["+v+"] valueBeginOffset["+valueBeginOffset+"] valu
 			try {
 				byte	value = Integer.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)).byteValue() ;
 				if( method != null ) {
-					method.invoke(obj, value);
-				} else if( directSetPropertyEnable == true ) {
-					field.setByte( obj, value );
+					method.invoke(object, value);
+				} else if( directAccessPropertyEnable == true ) {
+					field.setByte( object, value );
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -664,9 +663,9 @@ System.out.println("DEBUG - v["+v+"] valueBeginOffset["+valueBeginOffset+"] valu
 			try {
 				short	value = Integer.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)).shortValue() ;
 				if( method != null ) {
-					method.invoke(obj, value);
-				} else if( directSetPropertyEnable == true ) {
-					field.setShort( obj, value );
+					method.invoke(object, value);
+				} else if( directAccessPropertyEnable == true ) {
+					field.setShort( object, value );
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -676,9 +675,9 @@ System.out.println("DEBUG - v["+v+"] valueBeginOffset["+valueBeginOffset+"] valu
 			try {
 				int	value = Integer.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)).intValue() ;
 				if( method != null ) {
-					method.invoke(obj, value);
-				} else if( directSetPropertyEnable == true ) {
-					field.setInt( obj, value );
+					method.invoke(object, value);
+				} else if( directAccessPropertyEnable == true ) {
+					field.setInt( object, value );
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -688,9 +687,9 @@ System.out.println("DEBUG - v["+v+"] valueBeginOffset["+valueBeginOffset+"] valu
 			try {
 				long	value = Long.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)).longValue() ;
 				if( method != null ) {
-					method.invoke(obj, value);
-				} else if( directSetPropertyEnable == true ) {
-					field.setLong( obj, value );
+					method.invoke(object, value);
+				} else if( directAccessPropertyEnable == true ) {
+					field.setLong( object, value );
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -700,9 +699,9 @@ System.out.println("DEBUG - v["+v+"] valueBeginOffset["+valueBeginOffset+"] valu
 			try {
 				float	value = Float.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)).floatValue() ;
 				if( method != null ) {
-					method.invoke(obj, value);
-				} else if( directSetPropertyEnable == true ) {
-					field.setFloat( obj, value );
+					method.invoke(object, value);
+				} else if( directAccessPropertyEnable == true ) {
+					field.setFloat( object, value );
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -712,9 +711,9 @@ System.out.println("DEBUG - v["+v+"] valueBeginOffset["+valueBeginOffset+"] valu
 			try {
 				double	value = Double.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)).doubleValue() ;
 				if( method != null ) {
-					method.invoke(obj, value);
-				} else if( directSetPropertyEnable == true ) {
-					field.setDouble( obj, value );
+					method.invoke(object, value);
+				} else if( directAccessPropertyEnable == true ) {
+					field.setDouble( object, value );
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -723,9 +722,9 @@ System.out.println("DEBUG - v["+v+"] valueBeginOffset["+valueBeginOffset+"] valu
 		} else if( field.getType().getName().equals("boolean") && valueTokenType == TokenType.TOKEN_TYPE_BOOL ) {
 			try {
 				if( method != null ) {
-					method.invoke(obj, booleanValue);
-				} else if( directSetPropertyEnable == true ) {
-					field.setBoolean( obj, booleanValue );
+					method.invoke(object, booleanValue);
+				} else if( directAccessPropertyEnable == true ) {
+					field.setBoolean( object, booleanValue );
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -734,9 +733,9 @@ System.out.println("DEBUG - v["+v+"] valueBeginOffset["+valueBeginOffset+"] valu
 		} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
 			try {
 				if( method != null ) {
-					method.invoke(obj, null);
-				} else if( directSetPropertyEnable == true ) {
-					field.set( obj, null );
+					method.invoke(object, null);
+				} else if( directAccessPropertyEnable == true ) {
+					field.set( object, null );
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -951,15 +950,9 @@ System.out.println("DEBUG - v["+v+"] valueBeginOffset["+valueBeginOffset+"] valu
 		return 0;
 	}
 	
-	@SuppressWarnings("unused")
-	public <T> T stringToObject( String jsonString, Class<T> clazz ) {
-		
-		HashMap<String,Object>	stringMapFields ;
-		HashMap<String,Object>	stringMapMethods ;
+	private <T> T prepareStringToObject( String jsonString, T object ) {
 		
 		char[]	jsonCharArray = jsonString.toCharArray() ;
-		
-		T		obj ;
 		
 		if( stringMapFieldsCache == null ) {
 			stringMapFieldsCache = new ThreadLocal<HashMap<String,HashMap<String,Field>>>() ;
@@ -994,32 +987,251 @@ System.out.println("DEBUG - v["+v+"] valueBeginOffset["+valueBeginOffset+"] valu
 			return null;
 		}
 		
+		errorCode = stringToObjectProperties( jsonCharArray, object ) ;
+		if( errorCode != 0 )
+			return null;
+		
+		return object;
+	}
+	
+	public <T> T stringToObject( String jsonString, Class<T> clazz ) {
+		
+		T		object ;
+		
 		try {
-			obj = clazz.newInstance();
+			object = clazz.newInstance();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
 		
-		errorCode = stringToObjectProperties( jsonCharArray, obj ) ;
-		if( errorCode != 0 )
+		return prepareStringToObject( jsonString, object );
+	}
+	
+	private void appendBuilderTabs( StringBuilder builder, int depth ) {
+		
+		for( int i = 1 ; i < depth ; i++ ) {
+			builder.append( '\t' );
+		}
+		
+		return;
+	}
+	
+	private int objectToPropertiesString( Object object, StringBuilder builder, int depth ) {
+		
+		Class		clazz ;
+		Field[]		fields ;
+		Method		method ;
+		String		name ;
+		int			fieldIndex ;
+		int			fieldCount ;
+		
+		clazz = object.getClass();
+		fields = clazz.getDeclaredFields() ;
+		fieldIndex = 0 ;
+		fieldCount = fields.length ;
+		for( Field f : fields ) {
+			fieldIndex++;
+			
+			f.setAccessible(true);
+			
+			name = f.getName();
+			
+			try {
+				method = clazz.getDeclaredMethod( "get" + name.substring(0,1).toUpperCase(Locale.getDefault()) + name.substring(1), f.getType() ) ;
+				method.setAccessible(true);
+				
+				if( f.getType() == String.class
+						|| f.getType() == Byte.class || f.getType() == Short.class || f.getType() == Integer.class || f.getType() == Long.class
+						|| f.getType() == Float.class || f.getType() == Double.class
+						|| f.getType() == Boolean.class
+						|| f.getType().isPrimitive() ) {
+					Object value = method.invoke( object ) ;
+					
+					if( formatCompactEnable ) {
+						builder.append( "\""+name+"\":\""+value+"\"" );
+						if( fieldIndex < fieldCount ) {
+							builder.append( "," );
+						}
+					} else {
+						appendBuilderTabs( builder, depth ); builder.append( "\""+name+"\" : \""+value+"\"" );
+						if( fieldIndex < fieldCount ) {
+							builder.append( " ," );
+						}
+						builder.append( '\n' );
+					}
+				} else if ( f.getType() == ArrayList.class || f.getType() == LinkedList.class ) {
+					
+				} else {
+					if( formatCompactEnable ) {
+						builder.append("\""+name+"\":"); builder.append( "{" );
+					} else {
+						appendBuilderTabs( builder, depth+1 ); builder.append("\""+name+"\" : "); builder.append( "{\n" );
+					}
+					
+					Object value = method.invoke( object ) ;
+					errorCode = objectToPropertiesString( value, builder, depth+1 ) ;
+					if( errorCode != 0 )
+						return errorCode;
+					
+					if( formatCompactEnable ) {
+						builder.append( "}" );
+					} else {
+						appendBuilderTabs( builder, depth+1 ); builder.append( "}\n" );
+					}
+				}
+				
+				/*
+				if( f.getType() == String.class ) {
+					String value = (String)method.invoke( object );
+					System.out.println(value);
+				} else if( f.getType() == Byte.class ) {
+					Byte value = (Byte)method.invoke( object );
+					System.out.println(value);
+				} else if( f.getType() == Short.class ) {
+					Short value = (Short)method.invoke( object );
+					System.out.println(value);
+				} else if( f.getType() == Integer.class ) {
+					Integer value = (Integer)method.invoke( object );
+					System.out.println(value);
+				} else if( f.getType() == Long.class ) {
+					Long value = (Long)method.invoke( object );
+					System.out.println(value);
+				} else if( f.getType() == Float.class ) {
+					Float value = (Float)method.invoke( object );
+					System.out.println(value);
+				} else if( f.getType() == Double.class ) {
+					Double value = (Double)method.invoke( object );
+					System.out.println(value);
+				} else if( f.getType() == Boolean.class ) {
+					Boolean value = (Boolean)method.invoke( object );
+					System.out.println(value);
+				} else if( f.getType().getName().equals("byte") ) {
+					byte value = (byte)method.invoke( object );
+					System.out.println(value);
+				} else if( f.getType().getName().equals("short") ) {
+					String value = method.invoke( object );
+					System.out.println(value);
+				} else if( f.getType().getName().equals("int") ) {
+					String value = method.invoke( object );
+					System.out.println(value);
+				} else if( f.getType().getName().equals("long") ) {
+					String value = method.invoke( object );
+					System.out.println(value);
+				} else if( f.getType().getName().equals("float") ) {
+					String value = method.invoke( object );
+					System.out.println(value);
+				} else if( f.getType().getName().equals("double") ) {
+					String value = method.invoke( object );
+					System.out.println(value);
+				} else if( f.getType().getName().equals("boolean") ) {
+					String value = method.invoke( object );
+					System.out.println(value);
+				}
+				*/
+			} catch (NoSuchMethodException e) {
+				if( directAccessPropertyEnable == true ) {
+					if( f.getType() == String.class
+							|| f.getType() == Byte.class || f.getType() == Short.class || f.getType() == Integer.class || f.getType() == Long.class
+							|| f.getType() == Float.class || f.getType() == Double.class
+							|| f.getType() == Boolean.class
+							|| f.getType().isPrimitive() ) {
+						try {
+							Object value = f.get( object );
+							if( formatCompactEnable ) {
+								builder.append( "\""+name+"\":\""+value+"\"" );
+								if( fieldIndex < fieldCount ) {
+									builder.append( "," );
+								}
+							} else {
+								appendBuilderTabs( builder, depth+1 ); builder.append( "\""+name+"\" : \""+value+"\"" );
+								if( fieldIndex < fieldCount ) {
+									builder.append( " ," );
+								}
+								builder.append( '\n' );
+							}
+						} catch (Exception e2) {
+							e.printStackTrace();
+							errorCode = OKJSON_ERROR_UNEXPECT ;
+							return errorCode;
+						}
+					} else if ( f.getType() == ArrayList.class || f.getType() == LinkedList.class ) {
+						
+					} else {
+						try {
+							Object value = f.get( object );
+							if( value != null  ) {
+								if( formatCompactEnable ) {
+									builder.append("\""+name+"\":"); builder.append( "{" );
+								} else {
+									appendBuilderTabs( builder, depth+1 ); builder.append("\""+name+"\" : "); builder.append( "{\n" );
+								}
+								
+								errorCode = objectToPropertiesString( value, builder, depth+1 ) ;
+								if( errorCode != 0 )
+									return errorCode;
+								
+								if( formatCompactEnable ) {
+									builder.append( "}" );
+								} else {
+									appendBuilderTabs( builder, depth+1 ); builder.append( "}\n" );
+								}
+							}
+						} catch (Exception e1) {
+							e1.printStackTrace();
+							errorCode = OKJSON_ERROR_UNEXPECT ;
+							return errorCode;
+						}
+					}
+					
+					
+				}
+			} catch (Exception e) {
+				errorCode = OKJSON_ERROR_UNEXPECT ;
+				return errorCode;
+			}
+		}
+		
+		return 0;
+	}
+	
+	public String objectToString( Object object ) {
+		
+		StringBuilder	builder = new StringBuilder() ;
+		
+		int				nret = 0 ;
+		
+		if( formatCompactEnable ) {
+			builder.append( "{" );
+		} else {
+			builder.append( "{\n" );
+		}
+		
+		nret = objectToPropertiesString( object, builder, 1 );
+		if( nret != 0 )
 			return null;
 		
-		return obj;
+		if( formatCompactEnable ) {
+			builder.append( "}" );
+		} else {
+			builder.append( "}\n" );
+		}
+		
+		return builder.toString();
 	}
 	
-	public String objectToString() {
-		return "";
-	}
-	
-	public void setDirectSetPropertyEnable( boolean b ) {
-		directSetPropertyEnable = b ;
+	public void setDirectAccessPropertyEnable( boolean b ) {
+		this.directAccessPropertyEnable = b ;
 	}
 	
 	public void setStrictPolicy( boolean b ) {
-		strictPolicyEnable = b ;
+		this.strictPolicyEnable = b ;
 	}
 	
+	public void setFormatCompactEnable( boolean b ) {
+		this.formatCompactEnable = b;
+	}
+
 	public int getErrorCode() {
 		return errorCode;
 	}

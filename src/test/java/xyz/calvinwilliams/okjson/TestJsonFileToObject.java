@@ -10,7 +10,7 @@ import xyz.calvinwilliams.okjson.TestDataClass;
  * @author calvin
  *
  */
-public class Test {
+public class TestJsonFileToObject {
 	
 	public static void printTestDataClass( TestDataClass obj ) {
 		
@@ -104,7 +104,7 @@ public class Test {
 	public static void testStringToObject( String jsonString ) {
 		
 		OkJson okjson = new OkJson() ;
-		okjson.setDirectSetPropertyEnable( true );
+		okjson.setDirectAccessPropertyEnable( true );
 		// OkJson.setStrictPolicy(true);
 		TestDataClass obj = okjson.stringToObject( jsonString, TestDataClass.class ) ;
 		if( obj == null ) {
@@ -119,17 +119,7 @@ public class Test {
 		return;
 	}
 	
-	public static void testJsonFromString() {
-		String jsonString = "{\n"
-						+ "	\"str1\" : \"value1\" ,\n"
-						+ "	\"int1\" : 123 ,\n"
-						+ "	\"double1\" : 456.789\n"
-						+ "}\n" ;
-		testStringToObject(jsonString);
-		return;
-	}
-	
-	public static void testJsonFromFile() {
+	public static void testJsonFileToObject() {
 		File file = new File( "test.json" ) ;
 		Long fileSize = file.length() ;
 		byte[] json = new byte[fileSize.intValue()] ;
@@ -147,7 +137,7 @@ public class Test {
 	}
 	
 	public static void main(String[] args) {
-		testJsonFromFile();
+		testJsonFileToObject();
 		return;
 	}
 }
