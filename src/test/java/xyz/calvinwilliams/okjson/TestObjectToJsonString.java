@@ -77,7 +77,7 @@ public class TestObjectToJsonString {
 		
 		OkJson okjson = new OkJson() ;
 		okjson.setDirectAccessPropertyEnable( true );
-		// okjson.setFormatCompactEnable(true);
+		okjson.setPrettyFormatEnable(true);
 		String jsonString = okjson.objectToString( object ) ;
 		if( jsonString == null ) {
 			System.out.println( "objectToString failed["+okjson.getErrorCode()+"]["+okjson.getErrorDesc()+"]" );
