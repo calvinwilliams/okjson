@@ -72,13 +72,10 @@ public class OkJson {
 			ch = jsonCharArray[jsonOffset] ;
 			if( '0' <= ch && ch <= '9' ) {
 				jsonOffset++;
-			}
-			else if( ch == '.' ) {
+			} else if( ch == '.' ) {
 				decimalPointFlag = true ;
 				jsonOffset++;
-			}
-			else
-			{
+			} else {
 				if( decimalPointFlag == true )
 					tokenType = TokenType.TOKEN_TYPE_DECIMAL ;
 				else
@@ -99,36 +96,31 @@ public class OkJson {
 			ch = jsonCharArray[jsonOffset] ;
 			if( ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n' ) {
 				jsonOffset++;
-			}
-			else if( ch == '{' ) {
+			} else if( ch == '{' ) {
 				tokenType = TokenType.TOKEN_TYPE_LEFT_BRACE ;
 				beginOffset = jsonOffset ;
 				endOffset = jsonOffset ;
 				jsonOffset++;
 				return 0;
-			}
-			else if( ch == '}'  ) {
+			} else if( ch == '}'  ) {
 				tokenType = TokenType.TOKEN_TYPE_RIGHT_BRACE ;
 				beginOffset = jsonOffset ;
 				endOffset = jsonOffset ;
 				jsonOffset++;
 				return 0;
-			}
-			else if( ch == '['  ) {
+			} else if( ch == '['  ) {
 				tokenType = TokenType.TOKEN_TYPE_LEFT_BRACKET ;
 				beginOffset = jsonOffset ;
 				endOffset = jsonOffset ;
 				jsonOffset++;
 				return 0;
-			}
-			else if( ch == ']'  ) {
+			} else if( ch == ']'  ) {
 				tokenType = TokenType.TOKEN_TYPE_RIGHT_BRACKET ;
 				beginOffset = jsonOffset ;
 				endOffset = jsonOffset ;
 				jsonOffset++;
 				return 0;
-			}
-			else if( ch == '"'  ) {
+			} else if( ch == '"'  ) {
 				jsonOffset++;
 				beginOffset = jsonOffset ;
 				while( jsonOffset < jsonLength ) {
@@ -145,15 +137,13 @@ public class OkJson {
 					return OKJSON_ERROR_END_OF_BUFFER;
 				
 				return 0;
-			}
-			else if( ch == ':'  ) {
+			} else if( ch == ':'  ) {
 				tokenType = TokenType.TOKEN_TYPE_COLON ;
 				beginOffset = jsonOffset ;
 				endOffset = jsonOffset ;
 				jsonOffset++;
 				return 0;
-			}
-			else if( ch == ','  ) {
+			} else if( ch == ','  ) {
 				tokenType = TokenType.TOKEN_TYPE_COMMA ;
 				beginOffset = jsonOffset ;
 				endOffset = jsonOffset ;
@@ -180,8 +170,7 @@ public class OkJson {
 						}
 					}
 				}
-			}
-			else if( ch == 'f' ) {
+			} else if( ch == 'f' ) {
 				beginOffset = jsonOffset ;
 				jsonOffset++;
 				ch = jsonCharArray[jsonOffset] ;
@@ -204,8 +193,7 @@ public class OkJson {
 						}
 					}
 				}
-			}
-			else if( ch == 'n' ) {
+			} else if( ch == 'n' ) {
 				beginOffset = jsonOffset ;
 				jsonOffset++;
 				ch = jsonCharArray[jsonOffset] ;
@@ -224,9 +212,7 @@ public class OkJson {
 						}
 					}
 				}
-			}
-			else
-			{
+			} else {
 				errorDesc = "Invalid byte '" + ch + "'" ;
 				return OKJSON_ERROR_INVALID_BYTE;
 			}
@@ -247,77 +233,60 @@ public class OkJson {
 					if( valueTokenType == TokenType.TOKEN_TYPE_STRING ) {
 						String value = new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1) ;
 						((List<Object>) object).add( value );
-					}
-					else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
+					} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
 						;
 					}
-				}
-				else if( typeClass == Byte.class ) {
+				} else if( typeClass == Byte.class ) {
 					if( valueTokenType == TokenType.TOKEN_TYPE_INTEGER ) {
 						Byte value = Byte.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
 						((List<Object>) object).add( value );
-					}
-					else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
+					} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
 						;
 					}
-				}
-				else if( typeClass == Short.class ) {
+				} else if( typeClass == Short.class ) {
 					if( valueTokenType == TokenType.TOKEN_TYPE_INTEGER ) {
 						Short value = Short.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
 						((List<Object>) object).add( value );
-					}
-					else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
+					} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
 						;
 					}
-				}
-				else if( typeClass == Integer.class ) {
+				} else if( typeClass == Integer.class ) {
 					if( valueTokenType == TokenType.TOKEN_TYPE_INTEGER ) {
 						Integer value = Integer.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
 						((List<Object>) object).add( value );
-					}
-					else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
+					} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
 						;
 					}
-				}
-				else if( typeClass == Long.class ) {
+				} else if( typeClass == Long.class ) {
 					if( valueTokenType == TokenType.TOKEN_TYPE_INTEGER ) {
 						Long value = Long.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
 						((List<Object>) object).add( value );
-					}
-					else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
+					} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
 						;
 					}
-				}
-				else if( typeClass == Float.class ) {
+				} else if( typeClass == Float.class ) {
 					if( valueTokenType == TokenType.TOKEN_TYPE_DECIMAL ) {
 						Float value = Float.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
 						((List<Object>) object).add( value );
-					}
-					else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
+					} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
 						;
 					}
-				}
-				else if( typeClass == Double.class ) {
+				} else if( typeClass == Double.class ) {
 					if( valueTokenType == TokenType.TOKEN_TYPE_DECIMAL ) {
 						Double value = Double.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
 						((List<Object>) object).add( value );
-					}
-					else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
+					} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
 						;
 					}
-				}
-				else if( typeClass == Boolean.class ) {
+				} else if( typeClass == Boolean.class ) {
 					if( valueTokenType == TokenType.TOKEN_TYPE_BOOL ) {
 						((List<Object>) object).add( booleanValue );
-					}
-					else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
+					} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
 						;
 					}
-				}
-				else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
+				} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
 					;
-				}
-				else {
+				} else {
 					if( strictPolicyEnable == true )
 						return OKJSON_ERROR_PORPERTY_TYPE_NOT_MATCH_IN_OBJECT;
 				}
@@ -421,9 +390,7 @@ public class OkJson {
 					String value = new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1) ;
 					if( method != null ) {
 						method.invoke(object, value);
-					}
-					else if( directAccessPropertyEnable == true )
-					{
+					} else if( directAccessPropertyEnable == true ) {
 						field.set( object, value );
 					}
 				} catch (Exception e) {
@@ -434,9 +401,7 @@ public class OkJson {
 				try {
 					if( method != null ) {
 						method.invoke(object, null);
-					}
-					else if( directAccessPropertyEnable == true )
-					{
+					} else if( directAccessPropertyEnable == true ) {
 						field.set( object, null );
 					}
 				} catch (Exception e) {
@@ -450,9 +415,7 @@ public class OkJson {
 					Byte	value = Byte.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
 					if( method != null ) {
 						method.invoke(object, value);
-					}
-					else if( directAccessPropertyEnable == true )
-					{
+					} else if( directAccessPropertyEnable == true ) {
 						field.set( object, value );
 					}
 				} catch (Exception e) {
@@ -463,9 +426,7 @@ public class OkJson {
 				try {
 					if( method != null ) {
 						method.invoke(object, null);
-					}
-					else if( directAccessPropertyEnable == true )
-					{
+					} else if( directAccessPropertyEnable == true ) {
 						field.set( object, null );
 					}
 				} catch (Exception e) {
@@ -479,9 +440,7 @@ public class OkJson {
 					Short	value = Short.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
 					if( method != null ) {
 						method.invoke(object, value);
-					}
-					else if( directAccessPropertyEnable == true )
-					{
+					} else if( directAccessPropertyEnable == true ) {
 						field.set( object, value );
 					}
 				} catch (Exception e) {
@@ -492,9 +451,7 @@ public class OkJson {
 				try {
 					if( method != null ) {
 						method.invoke(object, null);
-					}
-					else if( directAccessPropertyEnable == true )
-					{
+					} else if( directAccessPropertyEnable == true ) {
 						field.set( object, null );
 					}
 				} catch (Exception e) {
@@ -508,9 +465,7 @@ public class OkJson {
 					Integer	value = Integer.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
 					if( method != null ) {
 						method.invoke(object, value);
-					}
-					else if( directAccessPropertyEnable == true )
-					{
+					} else if( directAccessPropertyEnable == true ) {
 						field.set( object, value );
 					}
 				} catch (Exception e) {
@@ -521,9 +476,7 @@ public class OkJson {
 				try {
 					if( method != null ) {
 						method.invoke(object, null);
-					}
-					else if( directAccessPropertyEnable == true )
-					{
+					} else if( directAccessPropertyEnable == true ) {
 						field.set( object, null );
 					}
 				} catch (Exception e) {
@@ -537,9 +490,7 @@ public class OkJson {
 					Long	value = Long.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
 					if( method != null ) {
 						method.invoke(object, value);
-					}
-					else if( directAccessPropertyEnable == true )
-					{
+					} else if( directAccessPropertyEnable == true ) {
 						field.set( object, value );
 					}
 				} catch (Exception e) {
@@ -550,9 +501,7 @@ public class OkJson {
 				try {
 					if( method != null ) {
 						method.invoke(object, null);
-					}
-					else if( directAccessPropertyEnable == true )
-					{
+					} else if( directAccessPropertyEnable == true ) {
 						field.set( object, null );
 					}
 				} catch (Exception e) {
@@ -566,9 +515,7 @@ public class OkJson {
 					Float	value = Float.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
 					if( method != null ) {
 						method.invoke(object, value);
-					}
-					else if( directAccessPropertyEnable == true )
-					{
+					} else if( directAccessPropertyEnable == true ) {
 						field.set( object, value );
 					}
 				} catch (Exception e) {
@@ -579,9 +526,7 @@ public class OkJson {
 				try {
 					if( method != null ) {
 						method.invoke(object, null);
-					}
-					else if( directAccessPropertyEnable == true )
-					{
+					} else if( directAccessPropertyEnable == true ) {
 						field.set( object, null );
 					}
 				} catch (Exception e) {
@@ -595,9 +540,7 @@ public class OkJson {
 					Double	value = Double.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
 					if( method != null ) {
 						method.invoke(object, value);
-					}
-					else if( directAccessPropertyEnable == true )
-					{
+					} else if( directAccessPropertyEnable == true ) {
 						field.set( object, value );
 					}
 				} catch (Exception e) {
@@ -608,9 +551,7 @@ public class OkJson {
 				try {
 					if( method != null ) {
 						method.invoke(object, null);
-					}
-					else if( directAccessPropertyEnable == true )
-					{
+					} else if( directAccessPropertyEnable == true ) {
 						field.set( object, null );
 					}
 				} catch (Exception e) {
@@ -624,9 +565,7 @@ public class OkJson {
 					Boolean	value = Boolean.valueOf(new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1)) ;
 					if( method != null ) {
 						method.invoke(object, value);
-					}
-					else if( directAccessPropertyEnable == true )
-					{
+					} else if( directAccessPropertyEnable == true ) {
 						field.set( object, value );
 					}
 				} catch (Exception e) {
@@ -637,9 +576,7 @@ public class OkJson {
 				try {
 					if( method != null ) {
 						method.invoke(object, null);
-					}
-					else if( directAccessPropertyEnable == true )
-					{
+					} else if( directAccessPropertyEnable == true ) {
 						field.set( object, null );
 					}
 				} catch (Exception e) {
@@ -863,8 +800,7 @@ public class OkJson {
 				}
 			} else if( tokenType == TokenType.TOKEN_TYPE_RIGHT_BRACKET ) {
 				break;
-			}
-			else {
+			} else {
 				int beginPos = endOffset - 16 ;
 				if( beginPos < 0 )
 					beginPos = 0 ;
@@ -931,14 +867,11 @@ public class OkJson {
 			
 			if( tokenType == TokenType.TOKEN_TYPE_COMMA ) {
 				;
-			}
-			else if( tokenType == TokenType.TOKEN_TYPE_RIGHT_BRACE ) {
+			} else if( tokenType == TokenType.TOKEN_TYPE_RIGHT_BRACE ) {
 				break;
-			}
-			else if( tokenType == TokenType.TOKEN_TYPE_RIGHT_BRACKET ) {
+			} else if( tokenType == TokenType.TOKEN_TYPE_RIGHT_BRACKET ) {
 				break;
-			}
-			else {
+			} else {
 				int beginPos = endOffset - 16 ;
 				if( beginPos < 0 )
 					beginPos = 0 ;
@@ -1017,6 +950,77 @@ public class OkJson {
 		return;
 	}
 	
+	private int objectToListString( List<Object> array, int arrayCount, Field field, StringBuilder builder, int depth ) {
+		
+		int				arrayIndex ;
+		
+		try {
+				Type type = field.getGenericType() ;
+				ParameterizedType pt = (ParameterizedType) type ;
+				Class<?> typeClazz = (Class<?>) pt.getActualTypeArguments()[0] ;
+				if(		typeClazz == String.class
+						|| typeClazz == Byte.class || typeClazz == Short.class || typeClazz == Integer.class || typeClazz == Long.class
+						|| typeClazz == Float.class || typeClazz == Double.class
+						|| typeClazz == Boolean.class ) {
+					
+						if( ! formatCompactEnable ) {
+							appendBuilderTabs( builder, depth+1 );
+						}
+						
+						arrayIndex = 0 ;
+						for( Object object : array ) {
+							arrayIndex++;
+							if( formatCompactEnable ) {
+								if( arrayIndex < arrayCount ) {
+									builder.append( object+"," );
+								} else {
+									builder.append( object );
+								}
+							} else {
+								if( arrayIndex < arrayCount ) {
+									builder.append( object+" , " );
+								} else {
+									builder.append( object );
+								}
+							}
+						}
+						
+						if( ! formatCompactEnable )
+							builder.append( "\n" );
+				} else {
+					arrayIndex = 0 ;
+					for( Object object : array ) {
+						arrayIndex++;
+						if( object != null ) {
+							if( formatCompactEnable ) {
+								builder.append( "{" );
+							} else {
+								appendBuilderTabs( builder, depth+1 ); builder.append( "{\n" );
+							}
+							
+							errorCode = objectToPropertiesString( object, builder, depth+1 ) ;
+							if( errorCode != 0 )
+								return errorCode;
+							
+							if( formatCompactEnable ) {
+								builder.append( "}" );
+							} else {
+								appendBuilderTabs( builder, depth+1 ); builder.append( "}" );
+								if( arrayIndex < arrayCount )
+									builder.append( " ," );
+								builder.append( '\n' );
+							}
+						}
+					}
+				}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return OKJSON_ERROR_EXCEPTION;
+		}
+		
+		return 0;
+	}
+	
 	private int objectToPropertiesString( Object object, StringBuilder builder, int depth ) {
 		
 		Class		clazz ;
@@ -1049,19 +1053,58 @@ public class OkJson {
 					Object value = method.invoke( object ) ;
 					
 					if( formatCompactEnable ) {
+						if( f.getType() == String.class && value != null ) {
+							builder.append( "\""+name+"\":\""+value+"\"" );
+						} else {
+							builder.append( "\""+name+"\":"+value );
+						}
 						builder.append( "\""+name+"\":\""+value+"\"" );
 						if( fieldIndex < fieldCount ) {
 							builder.append( "," );
 						}
 					} else {
-						appendBuilderTabs( builder, depth ); builder.append( "\""+name+"\" : \""+value+"\"" );
+						if( f.getType() == String.class && value != null ) {
+							appendBuilderTabs( builder, depth ); builder.append( "\""+name+"\" : \""+value+"\"" );
+						} else {
+							appendBuilderTabs( builder, depth ); builder.append( "\""+name+"\" : "+value );
+						}
 						if( fieldIndex < fieldCount ) {
 							builder.append( " ," );
 						}
 						builder.append( '\n' );
 					}
 				} else if ( f.getType() == ArrayList.class || f.getType() == LinkedList.class ) {
-					
+					try {
+						List<Object> array = (List<Object>)f.get(object);
+						if( array != null ) {
+							int arrayCount = array.size() ;
+							if( arrayCount > 0 ) {
+								if( formatCompactEnable ) {
+									builder.append("\""+name+"\":"); builder.append( "[" );
+								} else {
+									appendBuilderTabs( builder, depth+1 ); builder.append("\""+name+"\" : "); builder.append( "[\n" );
+								}
+								
+								errorCode = objectToListString( array, arrayCount, f, builder, depth+1 ) ;
+								if( errorCode != 0 )
+									return errorCode;
+								
+								if( formatCompactEnable ) {
+									builder.append( "]" );
+								} else {
+									appendBuilderTabs( builder, depth+1 ); builder.append( "]" );
+								}
+								if( fieldIndex < fieldCount ) {
+									builder.append( " ," );
+								}
+								builder.append( '\n' );
+							}
+						}
+					} catch (Exception e1) {
+						e1.printStackTrace();
+						errorCode = OKJSON_ERROR_UNEXPECT ;
+						return errorCode;
+					}
 				} else {
 					if( formatCompactEnable ) {
 						builder.append("\""+name+"\":"); builder.append( "{" );
@@ -1077,58 +1120,13 @@ public class OkJson {
 					if( formatCompactEnable ) {
 						builder.append( "}" );
 					} else {
-						appendBuilderTabs( builder, depth+1 ); builder.append( "}\n" );
+						appendBuilderTabs( builder, depth+1 ); builder.append( "}" );
 					}
+					if( fieldIndex < fieldCount ) {
+						builder.append( " ," );
+					}
+					builder.append( '\n' );
 				}
-				
-				/*
-				if( f.getType() == String.class ) {
-					String value = (String)method.invoke( object );
-					System.out.println(value);
-				} else if( f.getType() == Byte.class ) {
-					Byte value = (Byte)method.invoke( object );
-					System.out.println(value);
-				} else if( f.getType() == Short.class ) {
-					Short value = (Short)method.invoke( object );
-					System.out.println(value);
-				} else if( f.getType() == Integer.class ) {
-					Integer value = (Integer)method.invoke( object );
-					System.out.println(value);
-				} else if( f.getType() == Long.class ) {
-					Long value = (Long)method.invoke( object );
-					System.out.println(value);
-				} else if( f.getType() == Float.class ) {
-					Float value = (Float)method.invoke( object );
-					System.out.println(value);
-				} else if( f.getType() == Double.class ) {
-					Double value = (Double)method.invoke( object );
-					System.out.println(value);
-				} else if( f.getType() == Boolean.class ) {
-					Boolean value = (Boolean)method.invoke( object );
-					System.out.println(value);
-				} else if( f.getType().getName().equals("byte") ) {
-					byte value = (byte)method.invoke( object );
-					System.out.println(value);
-				} else if( f.getType().getName().equals("short") ) {
-					String value = method.invoke( object );
-					System.out.println(value);
-				} else if( f.getType().getName().equals("int") ) {
-					String value = method.invoke( object );
-					System.out.println(value);
-				} else if( f.getType().getName().equals("long") ) {
-					String value = method.invoke( object );
-					System.out.println(value);
-				} else if( f.getType().getName().equals("float") ) {
-					String value = method.invoke( object );
-					System.out.println(value);
-				} else if( f.getType().getName().equals("double") ) {
-					String value = method.invoke( object );
-					System.out.println(value);
-				} else if( f.getType().getName().equals("boolean") ) {
-					String value = method.invoke( object );
-					System.out.println(value);
-				}
-				*/
 			} catch (NoSuchMethodException e) {
 				if( directAccessPropertyEnable == true ) {
 					if( f.getType() == String.class
@@ -1139,12 +1137,20 @@ public class OkJson {
 						try {
 							Object value = f.get( object );
 							if( formatCompactEnable ) {
-								builder.append( "\""+name+"\":\""+value+"\"" );
+								if( f.getType() == String.class && value != null ) {
+									builder.append( "\""+name+"\":\""+value+"\"" );
+								} else {
+									builder.append( "\""+name+"\":"+value );
+								}
 								if( fieldIndex < fieldCount ) {
 									builder.append( "," );
 								}
 							} else {
-								appendBuilderTabs( builder, depth+1 ); builder.append( "\""+name+"\" : \""+value+"\"" );
+								if( f.getType() == String.class && value != null ) {
+									appendBuilderTabs( builder, depth+1 ); builder.append( "\""+name+"\" : \""+value+"\"" );
+								} else {
+									appendBuilderTabs( builder, depth+1 ); builder.append( "\""+name+"\" : "+value );
+								}
 								if( fieldIndex < fieldCount ) {
 									builder.append( " ," );
 								}
@@ -1156,7 +1162,37 @@ public class OkJson {
 							return errorCode;
 						}
 					} else if ( f.getType() == ArrayList.class || f.getType() == LinkedList.class ) {
-						
+						try {
+							List<Object> array = (List<Object>)f.get(object);
+							if( array != null ) {
+								int arrayCount = array.size() ;
+								if( arrayCount > 0 ) {
+									if( formatCompactEnable ) {
+										builder.append("\""+name+"\":"); builder.append( "[" );
+									} else {
+										appendBuilderTabs( builder, depth+1 ); builder.append("\""+name+"\" : "); builder.append( "[\n" );
+									}
+									
+									errorCode = objectToListString( array, arrayCount, f, builder, depth+1 ) ;
+									if( errorCode != 0 )
+										return errorCode;
+
+									if( formatCompactEnable ) {
+										builder.append( "]" );
+									} else {
+										appendBuilderTabs( builder, depth+1 ); builder.append( "]" );
+									}
+									if( fieldIndex < fieldCount ) {
+										builder.append( " ," );
+									}
+									builder.append( '\n' );
+								}
+							}
+						} catch (Exception e1) {
+							e1.printStackTrace();
+							errorCode = OKJSON_ERROR_UNEXPECT ;
+							return errorCode;
+						}
 					} else {
 						try {
 							Object value = f.get( object );
@@ -1174,8 +1210,12 @@ public class OkJson {
 								if( formatCompactEnable ) {
 									builder.append( "}" );
 								} else {
-									appendBuilderTabs( builder, depth+1 ); builder.append( "}\n" );
+									appendBuilderTabs( builder, depth+1 ); builder.append( "}" );
 								}
+								if( fieldIndex < fieldCount ) {
+									builder.append( " ," );
+								}
+								builder.append( '\n' );
 							}
 						} catch (Exception e1) {
 							e1.printStackTrace();

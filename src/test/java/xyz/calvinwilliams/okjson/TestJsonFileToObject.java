@@ -89,6 +89,15 @@ public class TestJsonFileToObject {
 			}
 		}
 		
+		System.out.println( "------------------------------ dump TestDataClass.list65" );
+		if( obj.list65 != null ) {
+			Iterator<String> iterList65 = obj.list65.iterator() ;
+			while( iterList65.hasNext() ) {
+				String value = iterList65.next() ;
+				System.out.println( "TestDataClass.list6.<Boolean>.["+value+"]" );
+			}
+		}
+		
 		System.out.println( "------------------------------ dump TestDataClass.list7" );
 		if( obj.list7 != null ) {
 			Iterator<Branch7> iterList7 = obj.list7.iterator() ;

@@ -30,8 +30,10 @@ public class TestDataClass {
 	public LinkedList<String>	list4 ;
 	public ArrayList<Integer>	list5 ;
 	public LinkedList<Boolean>	list6 ;
+	public LinkedList<String>	list65 ;
 	
 	public ArrayList<Branch7>	list7 ;
+	
 }
 
 class Branch2 {
