@@ -52,6 +52,18 @@ public class OkJson {
 	final private static int	OKJSON_ERROR_NAME_NOT_FOUND_IN_OBJECT = -28 ;
 	final private static int	OKJSON_ERROR_NEW_OBJECT = -31 ;
 	
+	final private static String	TABS = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" ;
+	
+	final private static String	STRING_AFTER_ARRAY_PRETTYFORMAT = "] ,\n" ;
+	final private static String	STRING_AFTER_ARRAY_PRETTYFORMAT_ENDLINE = "]\n" ;
+	final private static String	STRING_AFTER_ARRAY = "]," ;
+	final private static String	STRING_AFTER_ARRAY_ENDLINE = "]," ;
+	
+	final private static String	STRING_AFTER_OBJECT_PRETTYFORMAT = "} ,\n" ;
+	final private static String	STRING_AFTER_OBJECT_PRETTYFORMAT_ENDLINE = "}\n" ;
+	final private static String	STRING_AFTER_OBJECT = "}," ;
+	final private static String	STRING_AFTER_OBJECT_ENDLINE = "}" ;
+	
 	private int tokenJsonString( char[] jsonCharArray ) {
 		char	ch ;
 		
@@ -1089,16 +1101,20 @@ public class OkJson {
 		return prepareStringToObject( jsonString, object );
 	}
 	
-	private void appendBuilderTabs( StringBuilder builder, int depth ) {
+	private void appendBuilderTabs( int depth ) {
 		
-		for( int i = 1 ; i < depth ; i++ ) {
-			builder.append( '\t' );
+		if( depth <= 16 ) {
+			stringBuilderValue.append( TABS, 0, depth );
+		} else {
+			for( int i = 1 ; i < depth ; i++ ) {
+				stringBuilderValue.append( '\t' );
+			}
 		}
 		
 		return;
 	}
 	
-	private int objectToListString( List<Object> array, int arrayCount, Field field, StringBuilder builder, int depth ) {
+	private int objectToListString( List<Object> array, int arrayCount, Field field, int depth ) {
 		
 		int				arrayIndex ;
 		int				nret ;
@@ -1113,7 +1129,7 @@ public class OkJson {
 						|| typeClazz == Boolean.class ) {
 					
 						if( prettyFormatEnable ) {
-							appendBuilderTabs( builder, depth+1 );
+							appendBuilderTabs( depth+1 );
 						}
 						
 						arrayIndex = 0 ;
@@ -1121,43 +1137,43 @@ public class OkJson {
 							arrayIndex++;
 							if( prettyFormatEnable ) {
 								if( arrayIndex < arrayCount ) {
-									builder.append( object+" , " );
+									stringBuilderValue.append( object+" , " );
 								} else {
-									builder.append( object );
+									stringBuilderValue.append( object );
 								}
 							} else {
 								if( arrayIndex < arrayCount ) {
-									builder.append( object+"," );
+									stringBuilderValue.append( object+"," );
 								} else {
-									builder.append( object );
+									stringBuilderValue.append( object );
 								}
 							}
 						}
 						
 						if( prettyFormatEnable )
-							builder.append( "\n" );
+							stringBuilderValue.append( "\n" );
 				} else {
 					arrayIndex = 0 ;
 					for( Object object : array ) {
 						arrayIndex++;
 						if( object != null ) {
 							if( prettyFormatEnable ) {
-								appendBuilderTabs( builder, depth+1 ); builder.append( "{\n" );
+								appendBuilderTabs( depth+1 ); stringBuilderValue.append( "{\n" );
 							} else {
-								builder.append( "{" );
+								stringBuilderValue.append( "{" );
 							}
 							
-							nret = objectToPropertiesString( object, builder, depth+1 ) ;
+							nret = objectToPropertiesString( object, depth+1 ) ;
 							if( nret != 0 )
 								return nret;
 							
 							if( prettyFormatEnable ) {
-								appendBuilderTabs( builder, depth+1 ); builder.append( "}" );
+								appendBuilderTabs( depth+1 ); stringBuilderValue.append( "}" );
 								if( arrayIndex < arrayCount )
-									builder.append( " ," );
-								builder.append( '\n' );
+									stringBuilderValue.append( " ," );
+								stringBuilderValue.append( '\n' );
 							} else {
-								builder.append( "}" );
+								stringBuilderValue.append( "}" );
 							}
 						}
 					}
@@ -1246,7 +1262,7 @@ public class OkJson {
 			return stringBuilderValue.toString();
 	}
 	
-	private int objectToPropertiesString( Object object, StringBuilder builder, int depth ) {
+	private int objectToPropertiesString( Object object, int depth ) {
 		
 		Class<?>				clazz ;
 		LinkedList<Field>		fieldsList ;
@@ -1255,10 +1271,11 @@ public class OkJson {
 		String					methodName ;
 		Method					method ;
 		String					fieldName ;
+		StringBuilder			QmfieldNameQm = new StringBuilder(256) ;
 		int						fieldIndex ;
 		int						fieldCount ;
 		
-		int						nret ;
+		int						nret = 0 ;
 		
 		clazz = object.getClass();
 		
@@ -1304,10 +1321,14 @@ public class OkJson {
 		fieldIndex = 0 ;
 		fieldCount = fieldsList.size() ;
 		for( Field field : fieldsList ) {
-		// for( Entry<String,Field> entry : stringMapFields.entrySet() ) {
 			fieldIndex++;
 			
 			fieldName = field.getName();
+			
+			QmfieldNameQm.delete( 0, QmfieldNameQm.length() );
+			QmfieldNameQm.append( '\"' );
+			QmfieldNameQm.append( fieldName );
+			QmfieldNameQm.append( '\"' );
 			
 			try {
 				method = stringMapMethods.get(fieldName) ;
@@ -1332,23 +1353,23 @@ public class OkJson {
 					if( prettyFormatEnable ) {
 						if( field.getType() == String.class && value != null ) {
 							String fieldValue = unfoldEscape( (String)value ) ;
-							appendBuilderTabs( builder, depth+1 ); builder.append( "\""+fieldName+"\" : \""+fieldValue+"\"" );
+							appendBuilderTabs( depth+1 ); stringBuilderValue.append( QmfieldNameQm ); stringBuilderValue.append( " : \"" ); stringBuilderValue.append( fieldValue ); stringBuilderValue.append( "\"" );
 						} else {
-							appendBuilderTabs( builder, depth+1 ); builder.append( "\""+fieldName+"\" : "+value );
+							appendBuilderTabs( depth+1 ); stringBuilderValue.append( QmfieldNameQm ); stringBuilderValue.append( " : " ); stringBuilderValue.append( value );
 						}
 						if( fieldIndex < fieldCount ) {
-							builder.append( " ," );
+							stringBuilderValue.append( " ," );
 						}
-						builder.append( '\n' );
+						stringBuilderValue.append( '\n' );
 					} else {
 						if( field.getType() == String.class && value != null ) {
 							String fieldValue = unfoldEscape( (String)value ) ;
-							builder.append( "\""+fieldName+"\":\""+fieldValue+"\"" );
+							stringBuilderValue.append( QmfieldNameQm ); stringBuilderValue.append( ":\"" ); stringBuilderValue.append( fieldValue ); stringBuilderValue.append( "\"" );
 						} else {
-							builder.append( "\""+fieldName+"\":"+value );
+							stringBuilderValue.append( QmfieldNameQm ); stringBuilderValue.append( ":" ); stringBuilderValue.append( value );
 						}
 						if( fieldIndex < fieldCount )
-							builder.append( ',' );
+							stringBuilderValue.append( ',' );
 					}
 				} else if ( field.getType() == ArrayList.class || field.getType() == LinkedList.class ) {
 					try {
@@ -1357,24 +1378,28 @@ public class OkJson {
 							int arrayCount = array.size() ;
 							if( arrayCount > 0 ) {
 								if( prettyFormatEnable ) {
-									appendBuilderTabs( builder, depth+1 ); builder.append("\""+fieldName+"\" : "); builder.append( "[\n" );
+									appendBuilderTabs( depth+1 ); stringBuilderValue.append( QmfieldNameQm ); stringBuilderValue.append( " : [\n");
 								} else {
-									builder.append("\""+fieldName+"\":"); builder.append( "[" );
+									stringBuilderValue.append( QmfieldNameQm ); stringBuilderValue.append( ':' ); stringBuilderValue.append( QmfieldNameQm ); stringBuilderValue.append( "[" );
 								}
 								
-								nret = objectToListString( array, arrayCount, field, builder, depth+1 ) ;
+								nret = objectToListString( array, arrayCount, field, depth+1 ) ;
 								if( nret != 0 )
 									return nret;
 								
 								if( prettyFormatEnable ) {
-									appendBuilderTabs( builder, depth+1 ); builder.append( "]" );
-									if( fieldIndex < fieldCount )
-										builder.append( " ," );
-									builder.append( '\n' );
+									appendBuilderTabs( depth+1 );
+									if( fieldIndex < fieldCount ) {
+										stringBuilderValue.append( STRING_AFTER_ARRAY_PRETTYFORMAT );
+									} else {
+										stringBuilderValue.append( STRING_AFTER_ARRAY_PRETTYFORMAT_ENDLINE );
+									}
 								} else {
-									builder.append( "]" );
-									if( fieldIndex < fieldCount )
-										builder.append( ',' );
+									if( fieldIndex < fieldCount ) {
+										stringBuilderValue.append( STRING_AFTER_ARRAY );
+									} else {
+										stringBuilderValue.append( STRING_AFTER_ARRAY_ENDLINE );
+									}
 								}
 							}
 						}
@@ -1384,25 +1409,29 @@ public class OkJson {
 					}
 				} else {
 					if( prettyFormatEnable ) {
-						appendBuilderTabs( builder, depth+1 ); builder.append("\""+fieldName+"\" : "); builder.append( "{\n" );
+						appendBuilderTabs( depth+1 ); stringBuilderValue.append( QmfieldNameQm ); stringBuilderValue.append( " : {\n");
 					} else {
-						builder.append("\""+fieldName+"\":"); builder.append( "{" );
+						stringBuilderValue.append( QmfieldNameQm ); stringBuilderValue.append( ":{" );
 					}
 					
 					Object value = method.invoke( object ) ;
-					nret = objectToPropertiesString( value, builder, depth+1 ) ;
+					nret = objectToPropertiesString( value, depth+1 ) ;
 					if( nret != 0 )
 						return nret;
 					
 					if( prettyFormatEnable ) {
-						appendBuilderTabs( builder, depth+1 ); builder.append( "}" );
-						if( fieldIndex < fieldCount )
-							builder.append( " ," );
-						builder.append( '\n' );
+						appendBuilderTabs( depth+1 );
+						if( fieldIndex < fieldCount ) {
+							stringBuilderValue.append( STRING_AFTER_OBJECT_PRETTYFORMAT );
+						} else {
+							stringBuilderValue.append( STRING_AFTER_OBJECT_PRETTYFORMAT_ENDLINE );
+						}
 					} else {
-						builder.append( "}" );
-						if( fieldIndex < fieldCount )
-							builder.append( ',' );
+						if( fieldIndex < fieldCount ) {
+							stringBuilderValue.append( STRING_AFTER_OBJECT );
+						} else {
+							stringBuilderValue.append( STRING_AFTER_OBJECT_ENDLINE );
+						}
 					}
 				}
 			} catch (NoSuchMethodException e) {
@@ -1417,23 +1446,23 @@ public class OkJson {
 							if( prettyFormatEnable ) {
 								if( field.getType() == String.class && value != null ) {
 									String fieldValue = unfoldEscape( (String)value ) ;
-									appendBuilderTabs( builder, depth+1 ); builder.append( "\""+fieldName+"\" : \""+fieldValue+"\"" );
+									appendBuilderTabs( depth+1 ); stringBuilderValue.append( QmfieldNameQm ); stringBuilderValue.append( " : \"" ); stringBuilderValue.append( fieldValue ); stringBuilderValue.append( "\"" );
 								} else {
-									appendBuilderTabs( builder, depth+1 ); builder.append( "\""+fieldName+"\" : "+value );
+									appendBuilderTabs( depth+1 ); stringBuilderValue.append( QmfieldNameQm ); stringBuilderValue.append( " : " ); stringBuilderValue.append( value );
 								}
 								if( fieldIndex < fieldCount ) {
-									builder.append( " ," );
+									stringBuilderValue.append( " ," );
 								}
-								builder.append( '\n' );
+								stringBuilderValue.append( '\n' );
 							} else {
 								if( field.getType() == String.class && value != null ) {
 									String fieldValue = unfoldEscape( (String)value ) ;
-									builder.append( "\""+fieldName+"\":\""+fieldValue+"\"" );
+									stringBuilderValue.append( QmfieldNameQm ); stringBuilderValue.append( ":\"" ); stringBuilderValue.append( fieldValue ); stringBuilderValue.append( "\"" );
 								} else {
-									builder.append( "\""+fieldName+"\":"+value );
+									stringBuilderValue.append( QmfieldNameQm ); stringBuilderValue.append( ":" ); stringBuilderValue.append( value );
 								}
 								if( fieldIndex < fieldCount )
-									builder.append( ',' );
+									stringBuilderValue.append( ',' );
 							}
 						} catch (Exception e2) {
 							e.printStackTrace();
@@ -1446,24 +1475,28 @@ public class OkJson {
 								int arrayCount = array.size() ;
 								if( arrayCount > 0 ) {
 									if( prettyFormatEnable ) {
-										appendBuilderTabs( builder, depth+1 ); builder.append("\""+fieldName+"\" : "); builder.append( "[\n" );
+										appendBuilderTabs( depth+1 ); stringBuilderValue.append( QmfieldNameQm ); stringBuilderValue.append( " : [\n");
 									} else {
-										builder.append("\""+fieldName+"\":"); builder.append( "[" );
+										stringBuilderValue.append( QmfieldNameQm ); stringBuilderValue.append( ":[");
 									}
 									
-									nret = objectToListString( array, arrayCount, field, builder, depth+1 ) ;
+									nret = objectToListString( array, arrayCount, field, depth+1 ) ;
 									if( nret != 0 )
 										return nret;
 
 									if( prettyFormatEnable ) {
-										appendBuilderTabs( builder, depth+1 ); builder.append( "]" );
-										if( fieldIndex < fieldCount )
-											builder.append( " ," );
-										builder.append( '\n' );
+										appendBuilderTabs( depth+1 );
+										if( fieldIndex < fieldCount ) {
+											stringBuilderValue.append( STRING_AFTER_ARRAY_PRETTYFORMAT );
+										} else {
+											stringBuilderValue.append( STRING_AFTER_ARRAY_PRETTYFORMAT_ENDLINE );
+										}
 									} else {
-										builder.append( "]" );
-										if( fieldIndex < fieldCount )
-											builder.append( ',' );
+										if( fieldIndex < fieldCount ) {
+											stringBuilderValue.append( STRING_AFTER_ARRAY );
+										} else {
+											stringBuilderValue.append( STRING_AFTER_ARRAY_ENDLINE );
+										}
 									}
 								}
 							}
@@ -1476,24 +1509,28 @@ public class OkJson {
 							Object value = field.get( object );
 							if( value != null  ) {
 								if( prettyFormatEnable ) {
-									appendBuilderTabs( builder, depth+1 ); builder.append("\""+fieldName+"\" : "); builder.append( "{\n" );
+									appendBuilderTabs( depth+1 ); stringBuilderValue.append( QmfieldNameQm ); stringBuilderValue.append( " : {\n");
 								} else {
-									builder.append("\""+fieldName+"\":"); builder.append( "{" );
+									stringBuilderValue.append( QmfieldNameQm ); stringBuilderValue.append( ":{");
 								}
 								
-								nret = objectToPropertiesString( value, builder, depth+1 ) ;
+								nret = objectToPropertiesString( value, depth+1 ) ;
 								if( nret != 0 )
 									return nret;
 								
 								if( prettyFormatEnable ) {
-									appendBuilderTabs( builder, depth+1 ); builder.append( "}" );
-									if( fieldIndex < fieldCount )
-										builder.append( " ," );
-									builder.append( '\n' );
+									appendBuilderTabs( depth+1 );
+									if( fieldIndex < fieldCount ) {
+										stringBuilderValue.append( STRING_AFTER_OBJECT_PRETTYFORMAT );
+									} else {
+										stringBuilderValue.append( STRING_AFTER_OBJECT_PRETTYFORMAT_ENDLINE );
+									}
 								} else {
-									builder.append( "}" );
-									if( fieldIndex < fieldCount )
-										builder.append( ',' );
+									if( fieldIndex < fieldCount ) {
+										stringBuilderValue.append( STRING_AFTER_OBJECT );
+									} else {
+										stringBuilderValue.append( STRING_AFTER_OBJECT_ENDLINE );
+									}
 								}
 							}
 						} catch (Exception e1) {
@@ -1513,8 +1550,6 @@ public class OkJson {
 	}
 	
 	public String objectToString( Object object ) {
-		
-		StringBuilder	builder = new StringBuilder(1024) ;
 		
 		int				nret = 0 ;
 		
@@ -1539,22 +1574,22 @@ public class OkJson {
 		}
 		
 		if( prettyFormatEnable ) {
-			builder.append( "{\n" );
+			stringBuilderValue.append( "{\n" );
 		} else {
-			builder.append( "{" );
+			stringBuilderValue.append( "{" );
 		}
 		
-		errorCode = objectToPropertiesString( object, builder, 1 );
+		errorCode = objectToPropertiesString( object, 1 );
 		if( errorCode != 0 )
 			return null;
 		
 		if( prettyFormatEnable ) {
-			builder.append( "}\n" );
+			stringBuilderValue.append( "}\n" );
 		} else {
-			builder.append( "}" );
+			stringBuilderValue.append( "}" );
 		}
 		
-		return builder.toString();
+		return stringBuilderValue.toString();
 	}
 	
 	public void setDirectAccessPropertyEnable( boolean b ) {
@@ -1580,6 +1615,6 @@ public class OkJson {
 	public OkJson() {
 		strictPolicyEnable = false ;
 		errorCode = 0 ;
-		stringBuilderValue = new StringBuilder() ;
+		stringBuilderValue = new StringBuilder(64) ;
 	}
 }
