@@ -1,5 +1,5 @@
 {
-	"str1" : "value1" ,
+	"str1" : "str1" ,
 	"byte1" : 1 ,
 	"short1" : 12 ,
 	"int1" : 1234 ,
@@ -8,21 +8,22 @@
 	"double1" : 1.2345678 ,
 	"boolean1" : true ,
 	"null1" : null ,
+	"name1" : "value1" , 
 	
 	"branch2" : {
-		"str2" : "value2" ,
+		"str2" : "str2" ,
 		"byte2" : 2 ,
 		"short2" : 23 ,
-		"int2" : 2345 ,
+		"int2" : -2345 ,
 		"long2" : 23456789 ,
-		"float2" : 2.345 ,
+		"float2" : -2.345 ,
 		"double2" : 2345.6789 ,
 		"boolean2" : false ,
 		"null2" : null
 	} ,
 	
 	"branch3" : {
-		"str3" : "value3" ,
+		"str3" : "str3" ,
 		"byte3" : 3 ,
 		"short3" : 34 ,
 		"int3" : 3456 ,
@@ -33,7 +34,7 @@
 		"null3" : null ,
 		
 		"branch33" : {
-			"str33" : "value33" ,
+			"str33" : "str33" ,
 			"byte33" : 33 ,
 			"short33" : 33 ,
 			"int33" : 3345 ,
@@ -41,7 +42,8 @@
 			"float33" : 33.45 ,
 			"double33" : 3345.6789 ,
 			"boolean33" : false ,
-			"null33" : null
+			"null33" : null ,
+			"name33" : "value33"
 		}
 	} ,
 	
@@ -55,8 +57,35 @@
 	
 	"list6" : [
 		true , false , true
-	]
+	] ,
 	
+	"list7" : [
+		{ "str7":"str71" , "int7":71 } ,
+		{ "str7":"str72" } ,
+		{ "str7":null }
+	] ,
 	
+	"strings8" : {
+		"string81" : "\"\\\/\b\f\n\r\t" ,
+		"string82" : "ABC\"\\\/\b\f\n\r\t" ,
+		"string83" : "\"\\\/\b\f\n\r\tABC" ,
+		"string84" : "A\"\\\/B\b\f\n\r\tC" ,
+		"string85" : "\u8BA1\u7B97\u673A\u5B66\u9662" ,
+		"string86" : "ABC\u8BA1\u7B97\u673A\u5B66\u9662" ,
+		"string87" : "\u8BA1\u7B97\u673A\u5B66\u9662ABC" ,
+		"string88" : "\u8\u7B97\u67\u5B66\u966" ,
+		"string89" : "\u8BA1\u7\u673A\u5B6\u9662"
+	} ,
 	
+	"numbers9" : {
+		"long91" : 123 ,
+		"long92" : -123 ,
+		"long93" : 1234567890 ,
+		"floatE94" : 12.34E2 ,
+		"floatE95" : -12.34E-2 ,
+		"floatE96" : -0.1234E2 ,
+		"doubleE97" : 1234.5678 ,
+		"doubleE98" : 1234.5678E+2 ,
+		"doubleE99" : 1234.5678E-2
+	}
 }

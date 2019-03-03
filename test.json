@@ -63,6 +63,29 @@
 		{ "str7":"str71" , "int7":71 } ,
 		{ "str7":"str72" } ,
 		{ "str7":null }
-	]
+	] ,
 	
+	"strings8" : {
+		"string81" : "\"\\\/\b\f\n\r\t" ,
+		"string82" : "ABC\"\\\/\b\f\n\r\t" ,
+		"string83" : "\"\\\/\b\f\n\r\tABC" ,
+		"string84" : "A\"\\\/B\b\f\n\r\tC" ,
+		"string85" : "\u8BA1\u7B97\u673A\u5B66\u9662" ,
+		"string86" : "ABC\u8BA1\u7B97\u673A\u5B66\u9662" ,
+		"string87" : "\u8BA1\u7B97\u673A\u5B66\u9662ABC" ,
+		"string88" : "\u8\u7B97\u67\u5B66\u966" ,
+		"string89" : "\u8BA1\u7\u673A\u5B6\u9662"
+	} ,
+	
+	"numbers9" : {
+		"long91" : 123 ,
+		"long92" : -123 ,
+		"long93" : 1234567890 ,
+		"floatE94" : 12.34E2 ,
+		"floatE95" : -12.34E-2 ,
+		"floatE96" : -0.1234E2 ,
+		"doubleE97" : 1234.5678 ,
+		"doubleE98" : 1234.5678E+2 ,
+		"doubleE99" : 1234.5678E-2
+	}
 }

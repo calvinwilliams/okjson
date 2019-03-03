@@ -62,49 +62,75 @@ public class TestJsonFileToObject {
 			}
 		}
 		
-		System.out.println( "------------------------------ dump TestDataClass.list4" );
-		if( obj.list4 != null ) {
-			Iterator<String> iterList4 = obj.list4.iterator() ;
-			while( iterList4.hasNext() ) {
-				String value = iterList4.next() ;
-				System.out.println( "TestDataClass.list4.<String>.["+value+"]" );
+		System.out.println( "------------------------------ dump TestDataClass.array4" );
+		if( obj.array4 != null ) {
+			Iterator<String> iterArray4 = obj.array4.iterator() ;
+			while( iterArray4.hasNext() ) {
+				String value = iterArray4.next() ;
+				System.out.println( "TestDataClass.array4.<String>.["+value+"]" );
 			}
 		}
 		
-		System.out.println( "------------------------------ dump TestDataClass.list5" );
-		if( obj.list5 != null ) {
-			Iterator<Integer> iterList5 = obj.list5.iterator() ;
-			while( iterList5.hasNext() ) {
-				Integer value = iterList5.next() ;
-				System.out.println( "TestDataClass.list5.<Integer>.["+value+"]" );
+		System.out.println( "------------------------------ dump TestDataClass.array5" );
+		if( obj.array5 != null ) {
+			Iterator<Integer> iterArray5 = obj.array5.iterator() ;
+			while( iterArray5.hasNext() ) {
+				Integer value = iterArray5.next() ;
+				System.out.println( "TestDataClass.array5.<Integer>.["+value+"]" );
 			}
 		}
 		
-		System.out.println( "------------------------------ dump TestDataClass.list6" );
-		if( obj.list6 != null ) {
-			Iterator<Boolean> iterList6 = obj.list6.iterator() ;
-			while( iterList6.hasNext() ) {
-				Boolean value = iterList6.next() ;
-				System.out.println( "TestDataClass.list6.<Boolean>.["+value+"]" );
+		System.out.println( "------------------------------ dump TestDataClass.array6" );
+		if( obj.array6 != null ) {
+			Iterator<Boolean> iterArray6 = obj.array6.iterator() ;
+			while( iterArray6.hasNext() ) {
+				Boolean value = iterArray6.next() ;
+				System.out.println( "TestDataClass.array6.<Boolean>.["+value+"]" );
 			}
 		}
 		
-		System.out.println( "------------------------------ dump TestDataClass.list65" );
-		if( obj.list65 != null ) {
-			Iterator<String> iterList65 = obj.list65.iterator() ;
-			while( iterList65.hasNext() ) {
-				String value = iterList65.next() ;
-				System.out.println( "TestDataClass.list6.<Boolean>.["+value+"]" );
+		System.out.println( "------------------------------ dump TestDataClass.array65" );
+		if( obj.array65 != null ) {
+			Iterator<String> iterArray65 = obj.array65.iterator() ;
+			while( iterArray65.hasNext() ) {
+				String value = iterArray65.next() ;
+				System.out.println( "TestDataClass.array6.<Boolean>.["+value+"]" );
 			}
 		}
 		
-		System.out.println( "------------------------------ dump TestDataClass.list7" );
-		if( obj.list7 != null ) {
-			Iterator<Branch7> iterList7 = obj.list7.iterator() ;
-			while( iterList7.hasNext() ) {
-				Branch7 value = iterList7.next() ;
-				System.out.println( "TestDataClass.list6.<Branch7>.str7["+value.str7+"] .int7["+value.int7+"]" );
+		System.out.println( "------------------------------ dump TestDataClass.array7" );
+		if( obj.array7 != null ) {
+			Iterator<Branch7> iterArray7 = obj.array7.iterator() ;
+			while( iterArray7.hasNext() ) {
+				Branch7 value = iterArray7.next() ;
+				System.out.println( "TestDataClass.array6.<Branch7>.str7["+value.str7+"] .int7["+value.int7+"]" );
 			}
+		}
+		
+		System.out.println( "------------------------------ dump TestDataClass.strings8" );
+		if( obj.strings8 != null ) {
+			System.out.println( "TestDataClass.strings8.string81["+obj.strings8.getString81()+"]" );
+			System.out.println( "TestDataClass.strings8.string82["+obj.strings8.getString82()+"]" );
+			System.out.println( "TestDataClass.strings8.string83["+obj.strings8.getString83()+"]" );
+			System.out.println( "TestDataClass.strings8.string84["+obj.strings8.getString84()+"]" );
+			System.out.println( "TestDataClass.strings8.string85["+obj.strings8.getString85()+"]" );
+			System.out.println( "TestDataClass.strings8.string86["+obj.strings8.getString86()+"]" );
+			System.out.println( "TestDataClass.strings8.string87["+obj.strings8.getString87()+"]" );
+			System.out.println( "TestDataClass.strings8.string88["+obj.strings8.getString88()+"]" );
+			System.out.println( "TestDataClass.strings8.string89["+obj.strings8.getString89()+"]" );
+		}
+		
+		System.out.println( "------------------------------ dump TestDataClass.numbers9" );
+		if( obj.numbers9 != null ) {
+			System.out.println( "TestDataClass.numbers9.long91["+obj.numbers9.getLong91()+"]" );
+			System.out.println( "TestDataClass.numbers9.long92["+obj.numbers9.getLong92()+"]" );
+			System.out.println( "TestDataClass.numbers9.long93["+obj.numbers9.getLong93()+"]" );
+			System.out.println( "TestDataClass.numbers9.floatE94["+obj.numbers9.getFloatE94()+"]" );
+			System.out.println( "TestDataClass.numbers9.floatE95["+obj.numbers9.getFloatE95()+"]" );
+			System.out.println( "TestDataClass.numbers9.floatE96["+obj.numbers9.getFloatE96()+"]" );
+			System.out.println( "TestDataClass.numbers9.doubleE97["+obj.numbers9.getDoubleE97()+"]" );
+			System.out.println( "TestDataClass.numbers9.doubleE98["+obj.numbers9.getDoubleE98()+"]" );
+			System.out.println( "TestDataClass.numbers9.doubleE99["+obj.numbers9.getDoubleE99()+"]" );
 		}
 		
 		System.out.println( "------------------------------ dump end" );
