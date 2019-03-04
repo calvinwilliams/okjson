@@ -1213,6 +1213,8 @@ public class OkJson {
 		int				segmentLen ;
 		char			ch ;
 		
+		fieldStringBuffer.setLength(0);
+		
 		segmentBeginOffset = 0 ;
 		for( jsonCharArrayIndex = 0 ; jsonCharArrayIndex < jsonCharArrayLength ; jsonCharArrayIndex++ ) {
 			ch = jsonCharArray[jsonCharArrayIndex] ;
@@ -1287,6 +1289,7 @@ public class OkJson {
 		String					methodName ;
 		Method					method ;
 		String					fieldName ;
+		byte[]					fieldName2 ;
 		StringBuilder			QmfieldNameQm = new StringBuilder(256) ;
 		int						fieldIndex ;
 		int						fieldCount ;
@@ -1339,12 +1342,10 @@ public class OkJson {
 		for( Field field : fieldsList ) {
 			fieldIndex++;
 			
-			fieldName = field.getName();
+			fieldName = field.getName() ;
 			
-			QmfieldNameQm.delete( 0, QmfieldNameQm.length() );
-			QmfieldNameQm.append( '\"' );
-			QmfieldNameQm.append( fieldName );
-			QmfieldNameQm.append( '\"' );
+			QmfieldNameQm.setLength(0);
+			QmfieldNameQm.append( '\"' ).append( fieldName ).append( '\"' );
 			
 			try {
 				method = stringMapMethods.get(fieldName) ;
@@ -1369,9 +1370,9 @@ public class OkJson {
 					if( prettyFormatEnable ) {
 						if( field.getType() == String.class && value != null ) {
 							String fieldValue = unfoldEscape( (String)value, fieldStringBuffer ) ;
-							appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( QmfieldNameQm ); jsonStringBuffer.append( " : \"" ); jsonStringBuffer.append( fieldValue ); jsonStringBuffer.append( "\"" );
+							appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( QmfieldNameQm ).append( " : \"" ).append( fieldValue ).append( "\"" );
 						} else {
-							appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( QmfieldNameQm ); jsonStringBuffer.append( " : " ); jsonStringBuffer.append( value );
+							appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( QmfieldNameQm ).append( " : " ).append( value );
 						}
 						if( fieldIndex < fieldCount ) {
 							jsonStringBuffer.append( " ," );
@@ -1380,9 +1381,9 @@ public class OkJson {
 					} else {
 						if( field.getType() == String.class && value != null ) {
 							String fieldValue = unfoldEscape( (String)value, fieldStringBuffer ) ;
-							jsonStringBuffer.append( QmfieldNameQm ); jsonStringBuffer.append( ":\"" ); jsonStringBuffer.append( fieldValue ); jsonStringBuffer.append( "\"" );
+							jsonStringBuffer.append( QmfieldNameQm ).append( ":\"" ).append( fieldValue ).append( "\"" );
 						} else {
-							jsonStringBuffer.append( QmfieldNameQm ); jsonStringBuffer.append( ":" ); jsonStringBuffer.append( value );
+							jsonStringBuffer.append( QmfieldNameQm ).append( ":" ).append( value );
 						}
 						if( fieldIndex < fieldCount )
 							jsonStringBuffer.append( ',' );
@@ -1394,9 +1395,9 @@ public class OkJson {
 							int arrayCount = array.size() ;
 							if( arrayCount > 0 ) {
 								if( prettyFormatEnable ) {
-									appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( QmfieldNameQm ); jsonStringBuffer.append( " : [\n");
+									appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( QmfieldNameQm ).append( " : [\n");
 								} else {
-									jsonStringBuffer.append( QmfieldNameQm ); jsonStringBuffer.append( ':' ); jsonStringBuffer.append( QmfieldNameQm ); jsonStringBuffer.append( "[" );
+									jsonStringBuffer.append( QmfieldNameQm ).append( ':' ).append( QmfieldNameQm ).append( "[" );
 								}
 								
 								nret = objectToListString( array, arrayCount, field, jsonStringBuffer, fieldStringBuffer, depth+1 ) ;
@@ -1425,9 +1426,9 @@ public class OkJson {
 					}
 				} else {
 					if( prettyFormatEnable ) {
-						appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( QmfieldNameQm ); jsonStringBuffer.append( " : {\n");
+						appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( QmfieldNameQm ).append( " : {\n");
 					} else {
-						jsonStringBuffer.append( QmfieldNameQm ); jsonStringBuffer.append( ":{" );
+						jsonStringBuffer.append( QmfieldNameQm ).append( ":{" );
 					}
 					
 					Object value = method.invoke( object ) ;
@@ -1462,9 +1463,9 @@ public class OkJson {
 							if( prettyFormatEnable ) {
 								if( field.getType() == String.class && value != null ) {
 									String fieldValue = unfoldEscape( (String)value, fieldStringBuffer ) ;
-									appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( QmfieldNameQm ); jsonStringBuffer.append( " : \"" ); jsonStringBuffer.append( fieldValue ); jsonStringBuffer.append( "\"" );
+									appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( QmfieldNameQm ).append( " : \"" ).append( fieldValue ).append( "\"" );
 								} else {
-									appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( QmfieldNameQm ); jsonStringBuffer.append( " : " ); jsonStringBuffer.append( value );
+									appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( QmfieldNameQm ).append( " : " ).append( value );
 								}
 								if( fieldIndex < fieldCount ) {
 									jsonStringBuffer.append( " ," );
@@ -1473,9 +1474,9 @@ public class OkJson {
 							} else {
 								if( field.getType() == String.class && value != null ) {
 									String fieldValue = unfoldEscape( (String)value, fieldStringBuffer ) ;
-									jsonStringBuffer.append( QmfieldNameQm ); jsonStringBuffer.append( ":\"" ); jsonStringBuffer.append( fieldValue ); jsonStringBuffer.append( "\"" );
+									jsonStringBuffer.append( QmfieldNameQm ).append( ":\"" ).append( fieldValue ).append( "\"" );
 								} else {
-									jsonStringBuffer.append( QmfieldNameQm ); jsonStringBuffer.append( ":" ); jsonStringBuffer.append( value );
+									jsonStringBuffer.append( QmfieldNameQm ).append( ":" ).append( value );
 								}
 								if( fieldIndex < fieldCount )
 									jsonStringBuffer.append( ',' );
@@ -1491,9 +1492,9 @@ public class OkJson {
 								int arrayCount = array.size() ;
 								if( arrayCount > 0 ) {
 									if( prettyFormatEnable ) {
-										appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( QmfieldNameQm ); jsonStringBuffer.append( " : [\n");
+										appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( QmfieldNameQm ).append( " : [\n");
 									} else {
-										jsonStringBuffer.append( QmfieldNameQm ); jsonStringBuffer.append( ":[");
+										jsonStringBuffer.append( QmfieldNameQm ).append( ":[");
 									}
 									
 									nret = objectToListString( array, arrayCount, field, jsonStringBuffer, fieldStringBuffer, depth+1 ) ;
@@ -1525,9 +1526,9 @@ public class OkJson {
 							Object value = field.get( object );
 							if( value != null  ) {
 								if( prettyFormatEnable ) {
-									appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( QmfieldNameQm ); jsonStringBuffer.append( " : {\n");
+									appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( QmfieldNameQm ).append( " : {\n");
 								} else {
-									jsonStringBuffer.append( QmfieldNameQm ); jsonStringBuffer.append( ":{");
+									jsonStringBuffer.append( QmfieldNameQm ).append( ":{");
 								}
 								
 								nret = objectToPropertiesString( value, jsonStringBuffer, fieldStringBuffer, depth+1 ) ;
@@ -1598,7 +1599,7 @@ public class OkJson {
 				errorCode = OKJSON_ERROR_NEW_OBJECT;
 				return null;
 			}
-			jsonStringBuffer = new StringBuilder(64) ;
+			jsonStringBuffer = new StringBuilder(1024) ;
 			if( jsonStringBuffer == null ) {
 				errorDesc = "New object failed for clazz" ;
 				errorCode = OKJSON_ERROR_NEW_OBJECT;
@@ -1608,6 +1609,7 @@ public class OkJson {
 		} else {
 			jsonStringBuffer = jsonStringBufferCache.get() ;
 		}
+		jsonStringBuffer.setLength(0);
 		
 		if( fieldStringBufferCache == null ) {
 			fieldStringBufferCache = new ThreadLocal<StringBuilder>() ;
@@ -1616,7 +1618,7 @@ public class OkJson {
 				errorCode = OKJSON_ERROR_NEW_OBJECT;
 				return null;
 			}
-			fieldStringBuffer = new StringBuilder(64) ;
+			fieldStringBuffer = new StringBuilder(1024) ;
 			if( fieldStringBuffer == null ) {
 				errorDesc = "New object failed for clazz" ;
 				errorCode = OKJSON_ERROR_NEW_OBJECT;
