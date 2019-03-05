@@ -25,6 +25,7 @@ public class OkJson {
 	private static ThreadLocal<HashMap<String,HashMap<String,Method>>>		stringMapMethodsCache ;
 	private static ThreadLocal<StringBuilder>								jsonStringBufferCache ;
 	private static ThreadLocal<StringBuilder>								fieldStringBufferCache ;
+	private static ThreadLocal<HashMap<Class,Boolean>>						basicTypeClassMapBooleanCache ;
 	
 	private boolean				strictPolicyEnable ;
 	private boolean				directAccessPropertyEnable ;
@@ -1132,20 +1133,20 @@ public class OkJson {
 		return;
 	}
 	
-	private int objectToListString( List<Object> array, int arrayCount, Field field, StringBuilder jsonStringBuffer, StringBuilder fieldStringBuffer, int depth ) {
+	private int objectToListString( List<Object> array, int arrayCount, Field field, StringBuilder jsonStringBuffer, int depth ) {
 		
-		int				arrayIndex ;
-		int				nret ;
+		HashMap<Class,Boolean>	basicTypeClassMapBoolean = basicTypeClassMapBooleanCache.get();
+		int						arrayIndex ;
+		int						nret ;
 		
 		try {
 				Type type = field.getGenericType() ;
 				ParameterizedType pt = (ParameterizedType) type ;
 				Class<?> typeClazz = (Class<?>) pt.getActualTypeArguments()[0] ;
-				if(		typeClazz == String.class
-						|| typeClazz == Byte.class || typeClazz == Short.class || typeClazz == Integer.class || typeClazz == Long.class
-						|| typeClazz == Float.class || typeClazz == Double.class
-						|| typeClazz == Boolean.class ) {
-					
+				Boolean b = basicTypeClassMapBoolean.get( typeClazz ) ;
+				if( b == null )
+					b = false ;
+				if(	b ) {
 						if( prettyFormatEnable ) {
 							appendBuilderTabs( jsonStringBuffer, depth+1 );
 						}
@@ -1155,13 +1156,13 @@ public class OkJson {
 							arrayIndex++;
 							if( prettyFormatEnable ) {
 								if( arrayIndex < arrayCount ) {
-									jsonStringBuffer.append( object+" , " );
+									jsonStringBuffer.append( object ).append( " , " );
 								} else {
 									jsonStringBuffer.append( object );
 								}
 							} else {
 								if( arrayIndex < arrayCount ) {
-									jsonStringBuffer.append( object+"," );
+									jsonStringBuffer.append( object ).append( ',' );
 								} else {
 									jsonStringBuffer.append( object );
 								}
@@ -1169,7 +1170,7 @@ public class OkJson {
 						}
 						
 						if( prettyFormatEnable )
-							jsonStringBuffer.append( "\n" );
+							jsonStringBuffer.append( '\n' );
 				} else {
 					arrayIndex = 0 ;
 					for( Object object : array ) {
@@ -1181,7 +1182,7 @@ public class OkJson {
 								jsonStringBuffer.append( "{" );
 							}
 							
-							nret = objectToPropertiesString( object, jsonStringBuffer, fieldStringBuffer, depth+1 ) ;
+							nret = objectToPropertiesString( object, jsonStringBuffer, depth+1 ) ;
 							if( nret != 0 )
 								return nret;
 							
@@ -1204,8 +1205,9 @@ public class OkJson {
 		return 0;
 	}
 	
-	private String unfoldEscape( String value, StringBuilder fieldStringBuffer ) {
+	private String unfoldEscape( String value ) {
 		
+		StringBuilder	fieldStringBuffer = fieldStringBufferCache.get() ;
 		char[]			jsonCharArray = value.toCharArray() ;
 		int				jsonCharArrayLength = value.length() ;
 		int				jsonCharArrayIndex ;
@@ -1280,8 +1282,9 @@ public class OkJson {
 			return fieldStringBuffer.toString();
 	}
 	
-	private int objectToPropertiesString( Object object, StringBuilder jsonStringBuffer, StringBuilder fieldStringBuffer, int depth ) {
+	private int objectToPropertiesString( Object object, StringBuilder jsonStringBuffer, int depth ) {
 		
+		HashMap<Class,Boolean>	basicTypeClassMapBoolean = basicTypeClassMapBooleanCache.get();
 		Class<?>				clazz ;
 		LinkedList<Field>		fieldsList ;
 		HashMap<String,Method>	stringMapMethods ;
@@ -1356,33 +1359,33 @@ public class OkJson {
 					stringMapMethods.put(fieldName, method);
 				}
 				
-				if( field.getType() == String.class
-						|| field.getType() == Byte.class || field.getType() == Short.class || field.getType() == Integer.class || field.getType() == Long.class
-						|| field.getType() == Float.class || field.getType() == Double.class
-						|| field.getType() == Boolean.class
-						|| field.getType().isPrimitive() ) {
+				Boolean b = basicTypeClassMapBoolean.get( field.getType() ) ;
+				if( b == null )
+					b = false ;
+				if( b || field.getType().isPrimitive() ) {
 					Object value = method.invoke( object ) ;
 					
 					if( prettyFormatEnable ) {
 						if( field.getType() == String.class && value != null ) {
-							String fieldValue = unfoldEscape( (String)value, fieldStringBuffer ) ;
-							appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( '"' ).append( fieldName ).append( '"' ).append( " : \"" ).append( fieldValue ).append( "\"" );
+							String fieldValue = unfoldEscape( (String)value ) ;
+							appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( '"' ).append( fieldName ).append( "\" : \"" ).append( fieldValue ).append( "\"" );
 						} else {
-							appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( '"' ).append( fieldName ).append( '"' ).append( " : " ).append( value );
+							appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( '"' ).append( fieldName ).append( "\" : " ).append( value );
 						}
 						if( fieldIndex < fieldCount ) {
-							jsonStringBuffer.append( " ," );
+							jsonStringBuffer.append( " ,\n" );
+						} else {
+							jsonStringBuffer.append( '\n' );
 						}
-						jsonStringBuffer.append( '\n' );
 					} else {
-//						if( field.getType() == String.class && value != null ) {
-//							String fieldValue = unfoldEscape( (String)value, fieldStringBuffer ) ;
-//							jsonStringBuffer.append( '"' ).append( fieldName ).append( '"' ).append( ":\"" ).append( fieldValue ).append( "\"" );
-//						} else {
-//							jsonStringBuffer.append( '"' ).append( fieldName ).append( '"' ).append( ":" ).append( value );
-//						}
-//						if( fieldIndex < fieldCount )
-//							jsonStringBuffer.append( ',' );
+						if( field.getType() == String.class && value != null ) {
+							String fieldValue = unfoldEscape( (String)value ) ;
+							jsonStringBuffer.append( '"' ).append( fieldName ).append( "\":\"" ).append( fieldValue ).append( "\"" );
+						} else {
+							jsonStringBuffer.append( '"' ).append( fieldName ).append( "\":" ).append( value );
+						}
+						if( fieldIndex < fieldCount )
+							jsonStringBuffer.append( ',' );
 					}
 				} else if ( field.getType() == ArrayList.class || field.getType() == LinkedList.class ) {
 					try {
@@ -1391,12 +1394,12 @@ public class OkJson {
 							int arrayCount = array.size() ;
 							if( arrayCount > 0 ) {
 								if( prettyFormatEnable ) {
-									appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( '"' ).append( fieldName ).append( '"' ).append( " : [\n");
+									appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( '"' ).append( fieldName ).append( "\" : [\n");
 								} else {
-//									jsonStringBuffer.append( '"' ).append( fieldName ).append( '"' ).append( ':' ).append( '"' ).append( fieldName ).append( '"' ).append( "[" );
+									jsonStringBuffer.append( '"' ).append( fieldName ).append( "\":\"" ).append( fieldName ).append( "\"[" );
 								}
 								
-								nret = objectToListString( array, arrayCount, field, jsonStringBuffer, fieldStringBuffer, depth+1 ) ;
+								nret = objectToListString( array, arrayCount, field, jsonStringBuffer, depth+1 ) ;
 								if( nret != 0 )
 									return nret;
 								
@@ -1408,11 +1411,11 @@ public class OkJson {
 										jsonStringBuffer.append( STRING_AFTER_ARRAY_PRETTYFORMAT_ENDLINE );
 									}
 								} else {
-//									if( fieldIndex < fieldCount ) {
-//										jsonStringBuffer.append( STRING_AFTER_ARRAY );
-//									} else {
-//										jsonStringBuffer.append( STRING_AFTER_ARRAY_ENDLINE );
-//									}
+									if( fieldIndex < fieldCount ) {
+										jsonStringBuffer.append( STRING_AFTER_ARRAY );
+									} else {
+										jsonStringBuffer.append( STRING_AFTER_ARRAY_ENDLINE );
+									}
 								}
 							}
 						}
@@ -1422,13 +1425,13 @@ public class OkJson {
 					}
 				} else {
 					if( prettyFormatEnable ) {
-						appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( '"' ).append( fieldName ).append( '"' ).append( " : {\n");
+						appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( '"' ).append( fieldName ).append( "\" : {\n");
 					} else {
-//						jsonStringBuffer.append( '"' ).append( fieldName ).append( '"' ).append( ":{" );
+						jsonStringBuffer.append( '"' ).append( fieldName ).append( "\":{" );
 					}
 					
 					Object value = method.invoke( object ) ;
-					nret = objectToPropertiesString( value, jsonStringBuffer, fieldStringBuffer, depth+1 ) ;
+					nret = objectToPropertiesString( value, jsonStringBuffer, depth+1 ) ;
 					if( nret != 0 )
 						return nret;
 					
@@ -1440,11 +1443,11 @@ public class OkJson {
 							jsonStringBuffer.append( STRING_AFTER_OBJECT_PRETTYFORMAT_ENDLINE );
 						}
 					} else {
-//						if( fieldIndex < fieldCount ) {
-//							jsonStringBuffer.append( STRING_AFTER_OBJECT );
-//						} else {
-//							jsonStringBuffer.append( STRING_AFTER_OBJECT_ENDLINE );
-//						}
+						if( fieldIndex < fieldCount ) {
+							jsonStringBuffer.append( STRING_AFTER_OBJECT );
+						} else {
+							jsonStringBuffer.append( STRING_AFTER_OBJECT_ENDLINE );
+						}
 					}
 				}
 			} catch (NoSuchMethodException e) {
@@ -1458,21 +1461,22 @@ public class OkJson {
 							Object value = field.get( object );
 							if( prettyFormatEnable ) {
 								if( field.getType() == String.class && value != null ) {
-									String fieldValue = unfoldEscape( (String)value, fieldStringBuffer ) ;
-									appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( '"' ).append( fieldName ).append( '"' ).append( " : \"" ).append( fieldValue ).append( "\"" );
+									String fieldValue = unfoldEscape( (String)value ) ;
+									appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( '"' ).append( fieldName ).append( "\" : \"" ).append( fieldValue ).append( "\"" );
 								} else {
-									appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( '"' ).append( fieldName ).append( '"' ).append( " : " ).append( value );
+									appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( '"' ).append( fieldName ).append( "\" : " ).append( value );
 								}
 								if( fieldIndex < fieldCount ) {
-									jsonStringBuffer.append( " ," );
+									jsonStringBuffer.append( " ,\n" );
+								} else {
+									jsonStringBuffer.append( '\n' );
 								}
-								jsonStringBuffer.append( '\n' );
 							} else {
 								if( field.getType() == String.class && value != null ) {
-									String fieldValue = unfoldEscape( (String)value, fieldStringBuffer ) ;
-									jsonStringBuffer.append( '"' ).append( fieldName ).append( '"' ).append( ":\"" ).append( fieldValue ).append( "\"" );
+									String fieldValue = unfoldEscape( (String)value ) ;
+									jsonStringBuffer.append( '"' ).append( fieldName ).append( "\":\"" ).append( fieldValue ).append( "\"" );
 								} else {
-									jsonStringBuffer.append( '"' ).append( fieldName ).append( '"' ).append( ":" ).append( value );
+									jsonStringBuffer.append( '"' ).append( fieldName ).append( "\":" ).append( value );
 								}
 								if( fieldIndex < fieldCount )
 									jsonStringBuffer.append( ',' );
@@ -1488,12 +1492,12 @@ public class OkJson {
 								int arrayCount = array.size() ;
 								if( arrayCount > 0 ) {
 									if( prettyFormatEnable ) {
-										appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( '"' ).append( fieldName ).append( '"' ).append( " : [\n");
+										appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( '"' ).append( fieldName ).append( "\" : [\n");
 									} else {
-										jsonStringBuffer.append( '"' ).append( fieldName ).append( '"' ).append( ":[");
+										jsonStringBuffer.append( '"' ).append( fieldName ).append( "\":[");
 									}
 									
-									nret = objectToListString( array, arrayCount, field, jsonStringBuffer, fieldStringBuffer, depth+1 ) ;
+									nret = objectToListString( array, arrayCount, field, jsonStringBuffer, depth+1 ) ;
 									if( nret != 0 )
 										return nret;
 
@@ -1522,12 +1526,12 @@ public class OkJson {
 							Object value = field.get( object );
 							if( value != null  ) {
 								if( prettyFormatEnable ) {
-									appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( '"' ).append( fieldName ).append( '"' ).append( " : {\n");
+									appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( '"' ).append( fieldName ).append( "\" : {\n");
 								} else {
-									jsonStringBuffer.append( '"' ).append( fieldName ).append( '"' ).append( ":{");
+									jsonStringBuffer.append( '"' ).append( fieldName ).append( "\":{");
 								}
 								
-								nret = objectToPropertiesString( value, jsonStringBuffer, fieldStringBuffer, depth+1 ) ;
+								nret = objectToPropertiesString( value, jsonStringBuffer, depth+1 ) ;
 								if( nret != 0 )
 									return nret;
 								
@@ -1564,9 +1568,10 @@ public class OkJson {
 	
 	public String objectToString( Object object ) {
 		
-		StringBuilder	jsonStringBuffer ;
-		StringBuilder	fieldStringBuffer ;
-		int				nret = 0 ;
+		StringBuilder			jsonStringBuffer ;
+		StringBuilder			fieldStringBuffer ;
+		HashMap<Class,Boolean>	basicTypeClassMapString ;
+		int						nret = 0 ;
 		
 		if( fieldsListCache == null ) {
 			fieldsListCache = new ThreadLocal<HashMap<String,LinkedList<Field>>>() ;
@@ -1621,8 +1626,30 @@ public class OkJson {
 				return null;
 			}
 			fieldStringBufferCache.set(fieldStringBuffer);
-		} else {
-			fieldStringBuffer = fieldStringBufferCache.get();
+		}
+		
+		if( basicTypeClassMapBooleanCache == null ) {
+			basicTypeClassMapBooleanCache = new ThreadLocal<HashMap<Class,Boolean>>() ;
+			if( basicTypeClassMapBooleanCache == null ) {
+				errorDesc = "New object failed for clazz" ;
+				errorCode = OKJSON_ERROR_NEW_OBJECT;
+				return null;
+			}
+			basicTypeClassMapString = new HashMap<Class,Boolean>() ;
+			if( basicTypeClassMapString == null ) {
+				errorDesc = "New object failed for clazz" ;
+				errorCode = OKJSON_ERROR_NEW_OBJECT;
+				return null;
+			}
+			basicTypeClassMapString.put( String.class, new Boolean(true) );
+			basicTypeClassMapString.put( Byte.class, new Boolean(true) );
+			basicTypeClassMapString.put( Short.class, new Boolean(true) );
+			basicTypeClassMapString.put( Integer.class, new Boolean(true) );
+			basicTypeClassMapString.put( Long.class, new Boolean(true) );
+			basicTypeClassMapString.put( Float.class, new Boolean(true) );
+			basicTypeClassMapString.put( Double.class, new Boolean(true) );
+			basicTypeClassMapString.put( Boolean.class, new Boolean(true) );
+			basicTypeClassMapBooleanCache.set(basicTypeClassMapString);
 		}
 		
 		if( prettyFormatEnable ) {
@@ -1631,7 +1658,7 @@ public class OkJson {
 //			jsonStringBuffer.append( "{" );
 		}
 		
-		errorCode = objectToPropertiesString( object, jsonStringBuffer, fieldStringBuffer, 1 );
+		errorCode = objectToPropertiesString( object, jsonStringBuffer, 1 );
 		if( errorCode != 0 )
 			return null;
 		
