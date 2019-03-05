@@ -1290,7 +1290,6 @@ public class OkJson {
 		Method					method ;
 		String					fieldName ;
 		byte[]					fieldName2 ;
-		StringBuilder			QmfieldNameQm = new StringBuilder(256) ;
 		int						fieldIndex ;
 		int						fieldCount ;
 		
@@ -1344,9 +1343,6 @@ public class OkJson {
 			
 			fieldName = field.getName() ;
 			
-			QmfieldNameQm.setLength(0);
-			QmfieldNameQm.append( '\"' ).append( fieldName ).append( '\"' );
-			
 			try {
 				method = stringMapMethods.get(fieldName) ;
 				if( method == null ) {
@@ -1370,23 +1366,23 @@ public class OkJson {
 					if( prettyFormatEnable ) {
 						if( field.getType() == String.class && value != null ) {
 							String fieldValue = unfoldEscape( (String)value, fieldStringBuffer ) ;
-							appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( QmfieldNameQm ).append( " : \"" ).append( fieldValue ).append( "\"" );
+							appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( '"' ).append( fieldName ).append( '"' ).append( " : \"" ).append( fieldValue ).append( "\"" );
 						} else {
-							appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( QmfieldNameQm ).append( " : " ).append( value );
+							appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( '"' ).append( fieldName ).append( '"' ).append( " : " ).append( value );
 						}
 						if( fieldIndex < fieldCount ) {
 							jsonStringBuffer.append( " ," );
 						}
 						jsonStringBuffer.append( '\n' );
 					} else {
-						if( field.getType() == String.class && value != null ) {
-							String fieldValue = unfoldEscape( (String)value, fieldStringBuffer ) ;
-							jsonStringBuffer.append( QmfieldNameQm ).append( ":\"" ).append( fieldValue ).append( "\"" );
-						} else {
-							jsonStringBuffer.append( QmfieldNameQm ).append( ":" ).append( value );
-						}
-						if( fieldIndex < fieldCount )
-							jsonStringBuffer.append( ',' );
+//						if( field.getType() == String.class && value != null ) {
+//							String fieldValue = unfoldEscape( (String)value, fieldStringBuffer ) ;
+//							jsonStringBuffer.append( '"' ).append( fieldName ).append( '"' ).append( ":\"" ).append( fieldValue ).append( "\"" );
+//						} else {
+//							jsonStringBuffer.append( '"' ).append( fieldName ).append( '"' ).append( ":" ).append( value );
+//						}
+//						if( fieldIndex < fieldCount )
+//							jsonStringBuffer.append( ',' );
 					}
 				} else if ( field.getType() == ArrayList.class || field.getType() == LinkedList.class ) {
 					try {
@@ -1395,9 +1391,9 @@ public class OkJson {
 							int arrayCount = array.size() ;
 							if( arrayCount > 0 ) {
 								if( prettyFormatEnable ) {
-									appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( QmfieldNameQm ).append( " : [\n");
+									appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( '"' ).append( fieldName ).append( '"' ).append( " : [\n");
 								} else {
-									jsonStringBuffer.append( QmfieldNameQm ).append( ':' ).append( QmfieldNameQm ).append( "[" );
+//									jsonStringBuffer.append( '"' ).append( fieldName ).append( '"' ).append( ':' ).append( '"' ).append( fieldName ).append( '"' ).append( "[" );
 								}
 								
 								nret = objectToListString( array, arrayCount, field, jsonStringBuffer, fieldStringBuffer, depth+1 ) ;
@@ -1412,11 +1408,11 @@ public class OkJson {
 										jsonStringBuffer.append( STRING_AFTER_ARRAY_PRETTYFORMAT_ENDLINE );
 									}
 								} else {
-									if( fieldIndex < fieldCount ) {
-										jsonStringBuffer.append( STRING_AFTER_ARRAY );
-									} else {
-										jsonStringBuffer.append( STRING_AFTER_ARRAY_ENDLINE );
-									}
+//									if( fieldIndex < fieldCount ) {
+//										jsonStringBuffer.append( STRING_AFTER_ARRAY );
+//									} else {
+//										jsonStringBuffer.append( STRING_AFTER_ARRAY_ENDLINE );
+//									}
 								}
 							}
 						}
@@ -1426,9 +1422,9 @@ public class OkJson {
 					}
 				} else {
 					if( prettyFormatEnable ) {
-						appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( QmfieldNameQm ).append( " : {\n");
+						appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( '"' ).append( fieldName ).append( '"' ).append( " : {\n");
 					} else {
-						jsonStringBuffer.append( QmfieldNameQm ).append( ":{" );
+//						jsonStringBuffer.append( '"' ).append( fieldName ).append( '"' ).append( ":{" );
 					}
 					
 					Object value = method.invoke( object ) ;
@@ -1444,11 +1440,11 @@ public class OkJson {
 							jsonStringBuffer.append( STRING_AFTER_OBJECT_PRETTYFORMAT_ENDLINE );
 						}
 					} else {
-						if( fieldIndex < fieldCount ) {
-							jsonStringBuffer.append( STRING_AFTER_OBJECT );
-						} else {
-							jsonStringBuffer.append( STRING_AFTER_OBJECT_ENDLINE );
-						}
+//						if( fieldIndex < fieldCount ) {
+//							jsonStringBuffer.append( STRING_AFTER_OBJECT );
+//						} else {
+//							jsonStringBuffer.append( STRING_AFTER_OBJECT_ENDLINE );
+//						}
 					}
 				}
 			} catch (NoSuchMethodException e) {
@@ -1463,9 +1459,9 @@ public class OkJson {
 							if( prettyFormatEnable ) {
 								if( field.getType() == String.class && value != null ) {
 									String fieldValue = unfoldEscape( (String)value, fieldStringBuffer ) ;
-									appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( QmfieldNameQm ).append( " : \"" ).append( fieldValue ).append( "\"" );
+									appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( '"' ).append( fieldName ).append( '"' ).append( " : \"" ).append( fieldValue ).append( "\"" );
 								} else {
-									appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( QmfieldNameQm ).append( " : " ).append( value );
+									appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( '"' ).append( fieldName ).append( '"' ).append( " : " ).append( value );
 								}
 								if( fieldIndex < fieldCount ) {
 									jsonStringBuffer.append( " ," );
@@ -1474,9 +1470,9 @@ public class OkJson {
 							} else {
 								if( field.getType() == String.class && value != null ) {
 									String fieldValue = unfoldEscape( (String)value, fieldStringBuffer ) ;
-									jsonStringBuffer.append( QmfieldNameQm ).append( ":\"" ).append( fieldValue ).append( "\"" );
+									jsonStringBuffer.append( '"' ).append( fieldName ).append( '"' ).append( ":\"" ).append( fieldValue ).append( "\"" );
 								} else {
-									jsonStringBuffer.append( QmfieldNameQm ).append( ":" ).append( value );
+									jsonStringBuffer.append( '"' ).append( fieldName ).append( '"' ).append( ":" ).append( value );
 								}
 								if( fieldIndex < fieldCount )
 									jsonStringBuffer.append( ',' );
@@ -1492,9 +1488,9 @@ public class OkJson {
 								int arrayCount = array.size() ;
 								if( arrayCount > 0 ) {
 									if( prettyFormatEnable ) {
-										appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( QmfieldNameQm ).append( " : [\n");
+										appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( '"' ).append( fieldName ).append( '"' ).append( " : [\n");
 									} else {
-										jsonStringBuffer.append( QmfieldNameQm ).append( ":[");
+										jsonStringBuffer.append( '"' ).append( fieldName ).append( '"' ).append( ":[");
 									}
 									
 									nret = objectToListString( array, arrayCount, field, jsonStringBuffer, fieldStringBuffer, depth+1 ) ;
@@ -1526,9 +1522,9 @@ public class OkJson {
 							Object value = field.get( object );
 							if( value != null  ) {
 								if( prettyFormatEnable ) {
-									appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( QmfieldNameQm ).append( " : {\n");
+									appendBuilderTabs( jsonStringBuffer, depth+1 ); jsonStringBuffer.append( '"' ).append( fieldName ).append( '"' ).append( " : {\n");
 								} else {
-									jsonStringBuffer.append( QmfieldNameQm ).append( ":{");
+									jsonStringBuffer.append( '"' ).append( fieldName ).append( '"' ).append( ":{");
 								}
 								
 								nret = objectToPropertiesString( value, jsonStringBuffer, fieldStringBuffer, depth+1 ) ;
@@ -1632,7 +1628,7 @@ public class OkJson {
 		if( prettyFormatEnable ) {
 			jsonStringBuffer.append( "{\n" );
 		} else {
-			jsonStringBuffer.append( "{" );
+//			jsonStringBuffer.append( "{" );
 		}
 		
 		errorCode = objectToPropertiesString( object, jsonStringBuffer, fieldStringBuffer, 1 );
@@ -1642,7 +1638,7 @@ public class OkJson {
 		if( prettyFormatEnable ) {
 			jsonStringBuffer.append( "}\n" );
 		} else {
-			jsonStringBuffer.append( "}" );
+//			jsonStringBuffer.append( "}" );
 		}
 		
 		return jsonStringBuffer.toString();
