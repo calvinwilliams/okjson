@@ -20,8 +20,21 @@ public class OkJson {
 		TOKEN_TYPE_NULL // null
 	}
 	
+	enum ClassFieldType {
+		CLASSFIELDTYPE_STRING ,
+		CLASSFIELDTYPE_NUMBER ,
+		CLASSFIELDTYPE_LIST ,
+		CLASSFIELDTYPE_SUBCLASS
+	}
+	
+	class ClassField {
+		Field			field ;
+		ClassFieldType	classFieldType ;
+	}
+	
 	private static ThreadLocal<HashMap<String,HashMap<String,Field>>>		stringMapFieldsCache ;
 	private static ThreadLocal<HashMap<String,LinkedList<Field>>>			fieldsListCache ;
+	private static ThreadLocal<HashMap<String,LinkedList<ClassFieldType>>>	classMapFieldTypeListCache ;
 	private static ThreadLocal<HashMap<String,HashMap<String,Method>>>		stringMapMethodsCache ;
 	private static ThreadLocal<StringBuilder>								jsonStringBuilderCache ;
 	private static ThreadLocal<StringBuilder>								fieldStringBuilderCache ;
@@ -1281,27 +1294,27 @@ public class OkJson {
 	
 	private int objectToPropertiesString( Object object, OkJsonCharArrayBuilder jsonCharArrayBuilder, int depth ) {
 		
-		HashMap<Class,Boolean>	basicTypeClassMapBoolean = basicTypeClassMapBooleanCache.get();
-		Class<?>				clazz ;
-		LinkedList<Field>		fieldsList ;
-		HashMap<String,Method>	stringMapMethods ;
-		Field[]					fields ;
-		String					methodName ;
-		Method					method ;
-		String					fieldName ;
-		char[]					fieldName2 ;
-		int						fieldIndex ;
-		int						fieldCount ;
-		boolean					isNotLastLine ;
+		HashMap<Class,Boolean>		basicTypeClassMapBoolean = basicTypeClassMapBooleanCache.get();
+		Class<?>					clazz ;
+		LinkedList<ClassFieldType>	classFieldTypeList ;
+		HashMap<String,Method>		stringMapMethods ;
+		Field[]						fields ;
+		String						methodName ;
+		Method						method ;
+		String						fieldName ;
+		char[]						fieldName2 ;
+		int							fieldIndex ;
+		int							fieldCount ;
+		boolean						isNotLastLine ;
 		
-		int						nret = 0 ;
+		int							nret = 0 ;
 		
 		clazz = object.getClass();
 		
-		fieldsList = fieldsListCache.get().get( clazz.getName() ) ;
-		if( fieldsList == null ) {
-			fieldsList = new LinkedList<Field>() ;
-			fieldsListCache.get().put( clazz.getName(), fieldsList ) ;
+		classFieldTypeList = classMapFieldTypeListCache.get().get( clazz.getName() ) ;
+		if( classFieldTypeList == null ) {
+			classFieldTypeList = new LinkedList<ClassFieldType>() ;
+			classMapFieldTypeListCache.get().put( clazz.getName(), ClassFieldTypeList ) ;
 		}
 		
 		stringMapMethods = stringMapMethodsCache.get().get( clazz.getName() ) ;
@@ -1310,7 +1323,7 @@ public class OkJson {
 			stringMapMethodsCache.get().put( clazz.getName(), stringMapMethods ) ;
 		}
 		
-		if( fieldsList.isEmpty() ) {
+		if( classFieldTypeList.isEmpty() ) {
 			fields = clazz.getDeclaredFields() ;
 			for( Field f : fields ) {
 				f.setAccessible(true);
@@ -1525,14 +1538,14 @@ public class OkJson {
 		HashMap<Class,Boolean>	basicTypeClassMapString ;
 		int						nret = 0 ;
 		
-		if( fieldsListCache == null ) {
-			fieldsListCache = new ThreadLocal<HashMap<String,LinkedList<Field>>>() ;
-			if( fieldsListCache == null ) {
+		if( classMapFieldListCache == null ) {
+			classMapFieldListCache = new ThreadLocal<HashMap<String,LinkedList<ClassFieldType>>>() ;
+			if( classMapFieldListCache == null ) {
 				errorDesc = "New object failed for clazz" ;
 				errorCode = OKJSON_ERROR_NEW_OBJECT;
 				return null;
 			}
-			fieldsListCache.set(new HashMap<String,LinkedList<Field>>());
+			classMapFieldListCache.set(new HashMap<String,LinkedList<ClassFieldType>>());
 		}
 		
 		if( stringMapMethodsCache == null ) {
