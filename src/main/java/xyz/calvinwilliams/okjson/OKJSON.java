@@ -1,11 +1,72 @@
 package xyz.calvinwilliams.okjson;
 
 import java.util.*;
-import java.util.Map.Entry;
 import java.lang.reflect.*;
 
-public class OkJson {
+public class OKJSON {
+	final public static int	OKJSON_OTIONS_DIRECT_ACCESS_PROPERTY_ENABLE = 1 ;
+	final public static int	OKJSON_OTIONS_PRETTY_FORMAT_ENABLE = 2 ;
+	final public static int	OKJSON_OTIONS_STRICT_POLICY = 4 ;
+	
+	public static String objectToString( Object object, int options ) {
+		OkJsonGenerator okjsonGenerator = new OkJsonGenerator() ;
+		if( (options&OKJSON_OTIONS_DIRECT_ACCESS_PROPERTY_ENABLE) != 0 )
+			okjsonGenerator.setDirectAccessPropertyEnable(true);
+		if( (options&OKJSON_OTIONS_PRETTY_FORMAT_ENABLE) != 0 )
+			okjsonGenerator.setPrettyFormatEnable(true);
+		
+		String string = okjsonGenerator.objectToString(object) ;
+		
+		errorCode.set(okjsonGenerator.getErrorCode());
+		errorDesc.set(okjsonGenerator.getErrorDesc());
+		
+		return string;
+	}
+	
+	public static <T> T stringToObject( String string, Class<T> clazz, int options ) {
+		OkJsonParser okjsonParser = new OkJsonParser() ;
+		if( (options&OKJSON_OTIONS_DIRECT_ACCESS_PROPERTY_ENABLE) != 0 )
+			okjsonParser.setDirectAccessPropertyEnable(true);
+		if( (options&OKJSON_OTIONS_STRICT_POLICY) != 0 )
+			okjsonParser.setStrictPolicyEnable(true);
+		
+		T object ;
+		try {
+			object = clazz.newInstance();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+		object = okjsonParser.stringToObject(string, object);
+		
+		errorCode.set(okjsonParser.getErrorCode());
+		errorDesc.set(okjsonParser.getErrorDesc());
+		
+		return object;
+	}
+	
+	private static ThreadLocal<Integer>	errorCode = new ThreadLocal<Integer>() ;
+	private static ThreadLocal<String>	errorDesc = new ThreadLocal<String>() ;
+	
+	public static Integer getErrorCode() {
+		return errorCode.get();
+	}
+	
+	public static String getErrorDesc() {
+		return errorDesc.get();
+	}
+}
 
+class OkJsonParser {
+
+	private boolean				strictPolicyEnable ;
+	private boolean				directAccessPropertyEnable ;
+	private boolean				prettyFormatEnable ;
+	
+	private Integer				errorCode ;
+	private String				errorDesc ;
+	
 	enum TokenType {
 		TOKEN_TYPE_LEFT_BRACE , // {
 		TOKEN_TYPE_RIGHT_BRACE , // }
@@ -20,31 +81,9 @@ public class OkJson {
 		TOKEN_TYPE_NULL // null
 	}
 	
-	enum ClassFieldType {
-		CLASSFIELDTYPE_STRING ,
-		CLASSFIELDTYPE_NUMBER ,
-		CLASSFIELDTYPE_LIST ,
-		CLASSFIELDTYPE_SUBCLASS
-	}
-	
-	class ClassField {
-		Field			field ;
-		ClassFieldType	classFieldType ;
-	}
-	
-	private static ThreadLocal<HashMap<String,HashMap<String,Field>>>		stringMapFieldsCache ;
-	private static ThreadLocal<HashMap<String,LinkedList<Field>>>			fieldsListCache ;
-	private static ThreadLocal<HashMap<String,LinkedList<ClassFieldType>>>	classMapFieldTypeListCache ;
-	private static ThreadLocal<HashMap<String,HashMap<String,Method>>>		stringMapMethodsCache ;
-	private static ThreadLocal<StringBuilder>								jsonStringBuilderCache ;
-	private static ThreadLocal<StringBuilder>								fieldStringBuilderCache ;
-	private static ThreadLocal<OkJsonCharArrayBuilder>						jsonByteArrayBuilderCache ;
-	private static ThreadLocal<OkJsonCharArrayBuilder>						fieldByteArrayBuilderCache ;
-	private static ThreadLocal<HashMap<Class,Boolean>>						basicTypeClassMapBooleanCache ;
-	
-	private boolean				strictPolicyEnable ;
-	private boolean				directAccessPropertyEnable ;
-	private boolean				prettyFormatEnable ;
+	private static ThreadLocal<HashMap<String,HashMap<String,Field>>>			stringMapFieldsCache ;
+	private static ThreadLocal<HashMap<String,HashMap<String,Method>>>			stringMapMethodsCache ;
+	private static ThreadLocal<StringBuilder>									fieldStringBuilderCache ;
 	
 	private int					jsonOffset ;
 	private int					jsonLength ;
@@ -53,9 +92,6 @@ public class OkJson {
 	private int					beginOffset ;
 	private int					endOffset ;
 	private boolean				booleanValue ;
-	
-	private int					errorCode ;
-	private String				errorDesc ;
 	
 	final private static int	OKJSON_ERROR_END_OF_BUFFER = 1 ;
 	final private static int	OKJSON_ERROR_UNEXPECT = -4 ;
@@ -68,16 +104,6 @@ public class OkJson {
 	final private static int	OKJSON_ERROR_PORPERTY_TYPE_NOT_MATCH_IN_OBJECT = -26 ;
 	final private static int	OKJSON_ERROR_NAME_NOT_FOUND_IN_OBJECT = -28 ;
 	final private static int	OKJSON_ERROR_NEW_OBJECT = -31 ;
-	
-	final private static String	STRING_AFTER_ARRAY_PRETTYFORMAT = "] ,\n" ;
-	final private static String	STRING_AFTER_ARRAY_PRETTYFORMAT_ENDLINE = "]\n" ;
-	final private static String	STRING_AFTER_ARRAY = "]," ;
-	final private static String	STRING_AFTER_ARRAY_ENDLINE = "]," ;
-	
-	final private static String	STRING_AFTER_OBJECT_PRETTYFORMAT = "} ,\n" ;
-	final private static String	STRING_AFTER_OBJECT_PRETTYFORMAT_ENDLINE = "}\n" ;
-	final private static String	STRING_AFTER_OBJECT = "}," ;
-	final private static String	STRING_AFTER_OBJECT_ENDLINE = "}" ;
 	
 	private int tokenJsonString( char[] jsonCharArray ) {
 		
@@ -251,7 +277,6 @@ public class OkJson {
 	
 	private int tokenJsonWord( char[] jsonCharArray ) {
 		char	ch ;
-		int		nret = 0 ;
 		
 		while( jsonOffset < jsonLength ) {
 			ch = jsonCharArray[jsonOffset] ;
@@ -585,17 +610,17 @@ public class OkJson {
 					e.printStackTrace();
 					return OKJSON_ERROR_EXCEPTION;
 				}
-			} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
-				try {
-					if( method != null ) {
-						method.invoke(object, null);
-					} else if( directAccessPropertyEnable == true ) {
-						field.set( object, null );
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-					return OKJSON_ERROR_EXCEPTION;
-				}
+//			} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
+//				try {
+//					if( method != null ) {
+//						method.invoke(object, null);
+//					} else if( directAccessPropertyEnable == true ) {
+//						field.set( object, null );
+//					}
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//					return OKJSON_ERROR_EXCEPTION;
+//				}
 			}
 		} else if( field.getType() == Byte.class ) {
 			if( valueTokenType == TokenType.TOKEN_TYPE_INTEGER ) {
@@ -610,17 +635,17 @@ public class OkJson {
 					e.printStackTrace();
 					return OKJSON_ERROR_EXCEPTION;
 				}
-			} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
-				try {
-					if( method != null ) {
-						method.invoke(object, null);
-					} else if( directAccessPropertyEnable == true ) {
-						field.set( object, null );
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-					return OKJSON_ERROR_EXCEPTION;
-				}
+//			} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
+//				try {
+//					if( method != null ) {
+//						method.invoke(object, null);
+//					} else if( directAccessPropertyEnable == true ) {
+//						field.set( object, null );
+//					}
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//					return OKJSON_ERROR_EXCEPTION;
+//				}
 			}
 		} else if( field.getType() == Short.class ) {
 			if( valueTokenType == TokenType.TOKEN_TYPE_INTEGER ) {
@@ -635,17 +660,17 @@ public class OkJson {
 					e.printStackTrace();
 					return OKJSON_ERROR_EXCEPTION;
 				}
-			} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
-				try {
-					if( method != null ) {
-						method.invoke(object, null);
-					} else if( directAccessPropertyEnable == true ) {
-						field.set( object, null );
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-					return OKJSON_ERROR_EXCEPTION;
-				}
+//			} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
+//				try {
+//					if( method != null ) {
+//						method.invoke(object, null);
+//					} else if( directAccessPropertyEnable == true ) {
+//						field.set( object, null );
+//					}
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//					return OKJSON_ERROR_EXCEPTION;
+//				}
 			}
 		} else if( field.getType() == Integer.class ) {
 			if( valueTokenType == TokenType.TOKEN_TYPE_INTEGER ) {
@@ -660,17 +685,17 @@ public class OkJson {
 					e.printStackTrace();
 					return OKJSON_ERROR_EXCEPTION;
 				}
-			} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
-				try {
-					if( method != null ) {
-						method.invoke(object, null);
-					} else if( directAccessPropertyEnable == true ) {
-						field.set( object, null );
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-					return OKJSON_ERROR_EXCEPTION;
-				}
+//			} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
+//				try {
+//					if( method != null ) {
+//						method.invoke(object, null);
+//					} else if( directAccessPropertyEnable == true ) {
+//						field.set( object, null );
+//					}
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//					return OKJSON_ERROR_EXCEPTION;
+//				}
 			}
 		} else if( field.getType() == Long.class ) {
 			if( valueTokenType == TokenType.TOKEN_TYPE_INTEGER ) {
@@ -685,17 +710,17 @@ public class OkJson {
 					e.printStackTrace();
 					return OKJSON_ERROR_EXCEPTION;
 				}
-			} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
-				try {
-					if( method != null ) {
-						method.invoke(object, null);
-					} else if( directAccessPropertyEnable == true ) {
-						field.set( object, null );
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-					return OKJSON_ERROR_EXCEPTION;
-				}
+//			} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
+//				try {
+//					if( method != null ) {
+//						method.invoke(object, null);
+//					} else if( directAccessPropertyEnable == true ) {
+//						field.set( object, null );
+//					}
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//					return OKJSON_ERROR_EXCEPTION;
+//				}
 			}
 		} else if( field.getType() == Float.class ) {
 			if( valueTokenType == TokenType.TOKEN_TYPE_DECIMAL ) {
@@ -710,17 +735,17 @@ public class OkJson {
 					e.printStackTrace();
 					return OKJSON_ERROR_EXCEPTION;
 				}
-			} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
-				try {
-					if( method != null ) {
-						method.invoke(object, null);
-					} else if( directAccessPropertyEnable == true ) {
-						field.set( object, null );
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-					return OKJSON_ERROR_EXCEPTION;
-				}
+//			} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
+//				try {
+//					if( method != null ) {
+//						method.invoke(object, null);
+//					} else if( directAccessPropertyEnable == true ) {
+//						field.set( object, null );
+//					}
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//					return OKJSON_ERROR_EXCEPTION;
+//				}
 			}
 		} else if( field.getType() == Double.class ) {
 			if( valueTokenType == TokenType.TOKEN_TYPE_DECIMAL ) {
@@ -735,17 +760,17 @@ public class OkJson {
 					e.printStackTrace();
 					return OKJSON_ERROR_EXCEPTION;
 				}
-			} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
-				try {
-					if( method != null ) {
-						method.invoke(object, null);
-					} else if( directAccessPropertyEnable == true ) {
-						field.set( object, null );
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-					return OKJSON_ERROR_EXCEPTION;
-				}
+//			} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
+//				try {
+//					if( method != null ) {
+//						method.invoke(object, null);
+//					} else if( directAccessPropertyEnable == true ) {
+//						field.set( object, null );
+//					}
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//					return OKJSON_ERROR_EXCEPTION;
+//				}
 			}
 		} else if( field.getType() == Boolean.class ) {
 			if( valueTokenType == TokenType.TOKEN_TYPE_BOOL ) {
@@ -760,17 +785,17 @@ public class OkJson {
 					e.printStackTrace();
 					return OKJSON_ERROR_EXCEPTION;
 				}
-			} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
-				try {
-					if( method != null ) {
-						method.invoke(object, null);
-					} else if( directAccessPropertyEnable == true ) {
-						field.set( object, null );
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-					return OKJSON_ERROR_EXCEPTION;
-				}
+//			} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
+//				try {
+//					if( method != null ) {
+//						method.invoke(object, null);
+//					} else if( directAccessPropertyEnable == true ) {
+//						field.set( object, null );
+//					}
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//					return OKJSON_ERROR_EXCEPTION;
+//				}
 			}
 		} else if( field.getType().getName().equals("byte") && valueTokenType == TokenType.TOKEN_TYPE_INTEGER ) {
 			try {
@@ -1119,21 +1144,101 @@ public class OkJson {
 		return object;
 	}
 	
-	public <T> T stringToObject( String jsonString, Class<T> clazz ) {
-		
-		T		object ;
-		
-		try {
-			object = clazz.newInstance();
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-		
-		return stringToObject( jsonString, object );
+	public boolean isStrictPolicyEnable() {
+		return strictPolicyEnable;
+	}
+
+	public void setStrictPolicyEnable(boolean strictPolicyEnable) {
+		this.strictPolicyEnable = strictPolicyEnable;
+	}
+
+	public boolean isDirectAccessPropertyEnable() {
+		return directAccessPropertyEnable;
+	}
+
+	public void setDirectAccessPropertyEnable(boolean directAccessPropertyEnable) {
+		this.directAccessPropertyEnable = directAccessPropertyEnable;
+	}
+
+	public boolean isPrettyFormatEnable() {
+		return prettyFormatEnable;
+	}
+
+	public void setPrettyFormatEnable(boolean prettyFormatEnable) {
+		this.prettyFormatEnable = prettyFormatEnable;
+	}
+
+	public Integer getErrorCode() {
+		return errorCode;
+	}
+
+	public void setErrorCode(Integer errorCode) {
+		this.errorCode = errorCode;
+	}
+
+	public String getErrorDesc() {
+		return errorDesc;
+	}
+
+	public void setErrorDesc(String errorDesc) {
+		this.errorDesc = errorDesc;
+	}
+
+	public OkJsonParser() {
+		this.strictPolicyEnable = false ;
+		this.directAccessPropertyEnable = false ;
+		this.prettyFormatEnable = false ;
+		this.errorCode = 0 ;
+		this.errorDesc = null ;
+	}
+}
+
+class OkJsonGenerator {
+	
+	enum ClassFieldType {
+		CLASSFIELDTYPE_STRING ,
+		CLASSFIELDTYPE_NOT_STRING ,
+		CLASSFIELDTYPE_LIST ,
+		CLASSFIELDTYPE_SUBCLASS
 	}
 	
-	/* ------------------------------ blablabla ------------------------------ */
+	class OkJsonClassField {
+		char[]			fieldName ;
+		char[]			fieldNameQM ;
+		ClassFieldType	type ;
+		Field			field ;
+		Method			getMethod ;
+	}
+	
+	private static ThreadLocal<HashMap<String,LinkedList<OkJsonClassField>>>	classMapFieldListCache ;
+	private static ThreadLocal<OkJsonCharArrayBuilder>							jsonByteArrayBuilderCache ;
+	private static ThreadLocal<OkJsonCharArrayBuilder>							fieldByteArrayBuilderCache ;
+	private static ThreadLocal<HashMap<Class,Boolean>>							basicTypeClassMapBooleanCache ;
+	
+	private boolean				strictPolicyEnable ;
+	private boolean				directAccessPropertyEnable ;
+	private boolean				prettyFormatEnable ;
+	
+	private Integer				errorCode ;
+	private String				errorDesc ;
+	
+	final private static int	OKJSON_ERROR_END_OF_BUFFER = 1 ;
+	final private static int	OKJSON_ERROR_UNEXPECT = -4 ;
+	final private static int	OKJSON_ERROR_EXCEPTION = -8 ;
+	final private static int	OKJSON_ERROR_INVALID_BYTE = -11 ;
+	final private static int	OKJSON_ERROR_FIND_FIRST_LEFT_BRACE = -21 ;
+	final private static int	OKJSON_ERROR_NAME_INVALID = -22 ;
+	final private static int	OKJSON_ERROR_EXPECT_COLON_AFTER_NAME = -23 ;
+	final private static int	OKJSON_ERROR_UNEXPECT_TOKEN_AFTER_LEFT_BRACE = -24 ;
+	final private static int	OKJSON_ERROR_PORPERTY_TYPE_NOT_MATCH_IN_OBJECT = -26 ;
+	final private static int	OKJSON_ERROR_NAME_NOT_FOUND_IN_OBJECT = -28 ;
+	final private static int	OKJSON_ERROR_NEW_OBJECT = -31 ;
+	
+	final private static char[] FIELD_SEPCHAR = ",".toCharArray() ;
+	final private static char[] FIELD_SEPCHAR_PRETTY = " , \n".toCharArray() ;
+	
+	final private static char[]	STRING_NULL = "null".toCharArray() ;
+	final private static char[]	STRING_QM_NULL_QM = "\"null\"".toCharArray() ;
 	
 	private int objectToListString( List<Object> array, int arrayCount, Field field, OkJsonCharArrayBuilder jsonCharArrayBuilder, int depth ) {
 		
@@ -1150,59 +1255,58 @@ public class OkJson {
 				if( b == null )
 					b = false ;
 				if(	b ) {
-						if( prettyFormatEnable ) {
-							jsonCharArrayBuilder.appendTabs(depth+1);
-						}
-						
 						arrayIndex = 0 ;
 						for( Object object : array ) {
 							arrayIndex++;
-							if( arrayIndex < arrayCount )
-								isNotLastLine = false ;
-							else
-								isNotLastLine = true ;
-							if( prettyFormatEnable ) {
-								if( field.getType() == String.class && object != null ) {
-									String str = (String)object ;
-									jsonCharArrayBuilder.appendJsonStringPretty(str.toCharArray(),isNotLastLine);
+							if( arrayIndex > 1 ) {
+								if( prettyFormatEnable ) {
+									jsonCharArrayBuilder.appendCharArray(FIELD_SEPCHAR_PRETTY);
 								} else {
-									jsonCharArrayBuilder.appendJsonValuePretty(object.toString().toCharArray(),isNotLastLine);
+									jsonCharArrayBuilder.appendCharArray(FIELD_SEPCHAR);
+								}
+							}
+							
+							if( prettyFormatEnable ) {
+								if( typeClazz == String.class && object != null ) {
+									String str = (String)object ;
+									jsonCharArrayBuilder.appendTabs(depth+1).appendJsonStringPretty(str.toCharArray());
+								} else {
+									jsonCharArrayBuilder.appendTabs(depth+1).appendJsonValuePretty(object.toString().toCharArray());
 								}
 							} else {
-								if( field.getType() == String.class && object != null ) {
+								if( typeClazz == String.class && object != null ) {
 									String str = (String)object ;
-									jsonCharArrayBuilder.appendJsonString(str.toCharArray(),isNotLastLine);
+									jsonCharArrayBuilder.appendTabs(depth+1).appendJsonString(str.toCharArray());
 								} else {
-									jsonCharArrayBuilder.appendJsonValue(object.toString().toCharArray(),isNotLastLine);
+									jsonCharArrayBuilder.appendTabs(depth+1).appendJsonValue(object.toString().toCharArray());
 								}
 							}
 						}
-						
-						if( prettyFormatEnable )
-							jsonCharArrayBuilder.appendChar( '\n' );
 				} else {
 					arrayIndex = 0 ;
 					for( Object object : array ) {
 						arrayIndex++;
-						if( arrayIndex < arrayCount )
-							isNotLastLine = false ;
-						else
-							isNotLastLine = true ;
+						if( arrayIndex > 1 ) {
+							if( prettyFormatEnable ) {
+								jsonCharArrayBuilder.appendCharArray(FIELD_SEPCHAR_PRETTY);
+							} else {
+								jsonCharArrayBuilder.appendCharArray(FIELD_SEPCHAR);
+							}
+						}
+						
 						if( object != null ) {
 							if( prettyFormatEnable ) {
-								jsonCharArrayBuilder.appendTabs(depth+1).appendCloseBytePretty('{',isNotLastLine);
+								jsonCharArrayBuilder.appendTabs(depth+1).appendCharArray("{\n".toCharArray());
 							} else {
-								jsonCharArrayBuilder.appendCloseByte('{',isNotLastLine);
+								jsonCharArrayBuilder.appendChar('{');
 							}
-							
 							nret = objectToPropertiesString( object, jsonCharArrayBuilder, depth+1 ) ;
 							if( nret != 0 )
 								return nret;
-							
 							if( prettyFormatEnable ) {
-								jsonCharArrayBuilder.appendTabs(depth+1).appendCloseBytePretty('}',isNotLastLine);
+								jsonCharArrayBuilder.appendTabs(depth+1).appendCharArray("}".toCharArray());
 							} else {
-								jsonCharArrayBuilder.appendCloseByte('}',isNotLastLine);
+								jsonCharArrayBuilder.appendTabs(depth+1).appendChar('}');
 							}
 						}
 					}
@@ -1212,18 +1316,26 @@ public class OkJson {
 			return OKJSON_ERROR_EXCEPTION;
 		}
 		
+		jsonCharArrayBuilder.appendChar('\n');
+		
 		return 0;
 	}
 	
 	private String unfoldEscape( String value ) {
 		
 		OkJsonCharArrayBuilder	fieldCharArrayBuilder = fieldByteArrayBuilderCache.get() ;
-		char[]					jsonCharArrayBuilder = value.toCharArray() ;
-		int						jsonCharArrayLength = value.length() ;
+		char[]					jsonCharArrayBuilder ;
+		int						jsonCharArrayLength ;
 		int						jsonCharArrayIndex ;
 		int						segmentBeginOffset ;
 		int						segmentLen ;
 		char					c ;
+		
+		if( value == null )
+			return null;
+		
+		jsonCharArrayBuilder = value.toCharArray() ;
+		jsonCharArrayLength = value.length() ;
 		
 		fieldCharArrayBuilder.setLength(0);
 		
@@ -1294,238 +1406,227 @@ public class OkJson {
 	
 	private int objectToPropertiesString( Object object, OkJsonCharArrayBuilder jsonCharArrayBuilder, int depth ) {
 		
-		HashMap<Class,Boolean>		basicTypeClassMapBoolean = basicTypeClassMapBooleanCache.get();
-		Class<?>					clazz ;
-		LinkedList<ClassFieldType>	classFieldTypeList ;
-		HashMap<String,Method>		stringMapMethods ;
-		Field[]						fields ;
-		String						methodName ;
-		Method						method ;
-		String						fieldName ;
-		char[]						fieldName2 ;
-		int							fieldIndex ;
-		int							fieldCount ;
-		boolean						isNotLastLine ;
+		HashMap<Class,Boolean>			basicTypeClassMapBoolean = basicTypeClassMapBooleanCache.get();
+		Class<?>						clazz ;
+		LinkedList<OkJsonClassField>	classFieldList ;
+		Field[]							fields ;
+		String							methodName ;
+		int								fieldIndex ;
 		
-		int							nret = 0 ;
+		int								nret = 0 ;
 		
 		clazz = object.getClass();
 		
-		classFieldTypeList = classMapFieldTypeListCache.get().get( clazz.getName() ) ;
-		if( classFieldTypeList == null ) {
-			classFieldTypeList = new LinkedList<ClassFieldType>() ;
-			classMapFieldTypeListCache.get().put( clazz.getName(), ClassFieldTypeList ) ;
+		classFieldList = classMapFieldListCache.get().get( clazz.getName() ) ;
+		if( classFieldList == null ) {
+			classFieldList = new LinkedList<OkJsonClassField>() ;
+			classMapFieldListCache.get().put( clazz.getName(), classFieldList ) ;
 		}
 		
-		stringMapMethods = stringMapMethodsCache.get().get( clazz.getName() ) ;
-		if( stringMapMethods == null ) {
-			stringMapMethods = new HashMap<String,Method>() ;
-			stringMapMethodsCache.get().put( clazz.getName(), stringMapMethods ) ;
-		}
-		
-		if( classFieldTypeList.isEmpty() ) {
+		if( classFieldList.isEmpty() ) {
+			OkJsonClassField classField ;
+			
 			fields = clazz.getDeclaredFields() ;
 			for( Field f : fields ) {
 				f.setAccessible(true);
-				fieldName = f.getName();
-				fieldsList.add(f);
+				
+				classField = new OkJsonClassField() ;
+				classField.fieldName = f.getName().toCharArray() ;
+				classField.fieldNameQM = ('\"'+f.getName()+'\"').toCharArray() ;
+				classField.field = f ;
+				if( f.getType() == String.class )
+					classField.type = ClassFieldType.CLASSFIELDTYPE_STRING ;
+				else if( basicTypeClassMapBoolean.get( f.getType() ) != null || f.getType().isPrimitive() )
+					classField.type = ClassFieldType.CLASSFIELDTYPE_NOT_STRING ;
+				else if( f.getType() == ArrayList.class || f.getType() == LinkedList.class )
+					classField.type = ClassFieldType.CLASSFIELDTYPE_LIST ;
+				else
+					classField.type = ClassFieldType.CLASSFIELDTYPE_SUBCLASS ;
 				
 				try {
-					method = stringMapMethods.get(fieldName) ;
-					if( method == null ) {
 						if( f.getType() == Boolean.class || f.getType().getName().equals("boolean") ) {
-							methodName = "is" + fieldName.substring(0,1).toUpperCase(Locale.getDefault()) + fieldName.substring(1) ;
+							methodName = "is" + f.getName().substring(0,1).toUpperCase(Locale.getDefault()) + f.getName().substring(1) ;
 						} else {
-							methodName = "get" + fieldName.substring(0,1).toUpperCase(Locale.getDefault()) + fieldName.substring(1) ;
+							methodName = "get" + f.getName().substring(0,1).toUpperCase(Locale.getDefault()) + f.getName().substring(1) ;
 						}
-						method = clazz.getDeclaredMethod( methodName ) ;
-						method.setAccessible(true);
-						stringMapMethods.put(fieldName, method);
-					}
+						classField.getMethod = clazz.getDeclaredMethod( methodName ) ;
+						classField.getMethod.setAccessible(true);
 				} catch (NoSuchMethodException e) {
 					;
 				} catch (Exception e) {
 					e.printStackTrace();
 					return OKJSON_ERROR_UNEXPECT;
 				}
+				
+// System.out.println("save classField - fieldName["+new String(classField.fieldName)+"] fieldNameQM["+new String(classField.fieldNameQM)+"] field["+classField.field+"] method["+classField.getMethod+"]");
+				classFieldList.add(classField);
 			}
 		}
 		
 		fieldIndex = 0 ;
-		fieldCount = fieldsList.size() ;
-		for( Field field : fieldsList ) {
+		for( OkJsonClassField classField : classFieldList ) {
 			fieldIndex++;
-			if( fieldIndex < fieldCount )
-				isNotLastLine = false ;
-			else
-				isNotLastLine = true ;
 			
-			fieldName = field.getName() ;
+// System.out.println("fieldName["+new String(classField.fieldName)+"] type["+classField.type+"]");
 			
-			try {
-				method = stringMapMethods.get(fieldName) ;
-				if( method == null ) {
-					if( field.getType() == Boolean.class || field.getType().getName().equals("boolean") ) {
-						methodName = "is" + fieldName.substring(0,1).toUpperCase(Locale.getDefault()) + fieldName.substring(1) ;
-					} else {
-						methodName = "get" + fieldName.substring(0,1).toUpperCase(Locale.getDefault()) + fieldName.substring(1) ;
-					}
-					method = clazz.getDeclaredMethod( methodName ) ;
-					method.setAccessible(true);
-					stringMapMethods.put(fieldName, method);
-				}
-				
-				Boolean b = basicTypeClassMapBoolean.get( field.getType() ) ;
-				if( b == null )
-					b = false ;
-				if( b || field.getType().isPrimitive() ) {
-					Object value = method.invoke( object ) ;
-					
-					if( prettyFormatEnable ) {
-						if( field.getType() == String.class && value != null ) {
-							String fieldValue = unfoldEscape( (String)value ) ;
-							jsonCharArrayBuilder.appendTabs(depth+1).appendJsonNameAndColonAndStringPretty(fieldName.toCharArray(),fieldValue.toCharArray(),isNotLastLine);
-						} else {
-							jsonCharArrayBuilder.appendTabs(depth+1).appendJsonNameAndColonAndValuePretty(fieldName.toCharArray(),value.toString().toCharArray(),isNotLastLine);
-						}
-					} else {
-						if( field.getType() == String.class && value != null ) {
-							String fieldValue = unfoldEscape( (String)value ) ;
-							jsonCharArrayBuilder.appendJsonNameAndColonAndStringPretty(fieldName.toCharArray(),fieldValue.toCharArray(),isNotLastLine);
-						} else {
-							jsonCharArrayBuilder.appendJsonNameAndColonAndStringPretty(fieldName.toCharArray(),value.toString().toCharArray(),isNotLastLine);
-						}
-					}
-				} else if ( field.getType() == ArrayList.class || field.getType() == LinkedList.class ) {
-					try {
-						List<Object> array = (List<Object>)field.get(object);
-						if( array != null ) {
-							int arrayCount = array.size() ;
-							if( arrayCount > 0 ) {
-								if( prettyFormatEnable ) {
-									jsonCharArrayBuilder.appendTabs(depth+1).appendJsonNameAndColonAndOpenBytePretty(fieldName.toCharArray(),'[');
-								} else {
-									jsonCharArrayBuilder.appendJsonNameAndColonAndOpenByte(fieldName.toCharArray(),'[');
-								}
-								
-								nret = objectToListString( array, arrayCount, field, jsonCharArrayBuilder, depth+1 ) ;
-								if( nret != 0 )
-									return nret;
-								
-								if( prettyFormatEnable ) {
-									jsonCharArrayBuilder.appendTabs(depth+1).appendCloseBytePretty(']',isNotLastLine);
-								} else {
-									jsonCharArrayBuilder.appendCloseByte(']',isNotLastLine);
-								}
-							}
-						}
-					} catch (Exception e1) {
-						e1.printStackTrace();
-						return OKJSON_ERROR_UNEXPECT;
-					}
+			if( fieldIndex > 1 ) {
+				if( prettyFormatEnable ) {
+					jsonCharArrayBuilder.appendCharArray( FIELD_SEPCHAR_PRETTY );
 				} else {
-					if( prettyFormatEnable ) {
-						jsonCharArrayBuilder.appendTabs(depth+1).appendJsonNameAndColonAndOpenBytePretty(fieldName.toCharArray(),'{');
-					} else {
-						jsonCharArrayBuilder.appendJsonNameAndColonAndOpenByte(fieldName.toCharArray(),'{');
-					}
-					
-					Object value = method.invoke( object ) ;
-					nret = objectToPropertiesString( value, jsonCharArrayBuilder, depth+1 ) ;
-					if( nret != 0 )
-						return nret;
-					
-					if( prettyFormatEnable ) {
-						jsonCharArrayBuilder.appendTabs(depth+1).appendCloseBytePretty('}',isNotLastLine);
-					} else {
-						jsonCharArrayBuilder.appendTabs(depth+1).appendCloseByte('}',isNotLastLine);
-					}
+					jsonCharArrayBuilder.appendCharArray( FIELD_SEPCHAR );
 				}
-			} catch (NoSuchMethodException e) {
-				if( directAccessPropertyEnable == true ) {
-					if( field.getType() == String.class
-							|| field.getType() == Byte.class || field.getType() == Short.class || field.getType() == Integer.class || field.getType() == Long.class
-							|| field.getType() == Float.class || field.getType() == Double.class
-							|| field.getType() == Boolean.class
-							|| field.getType().isPrimitive() ) {
+			}
+			
+			switch( classField.type ) {
+				case CLASSFIELDTYPE_STRING :
+					String string = null ;
+					if( classField.getMethod != null ) {
 						try {
-							Object value = field.get( object );
-							if( prettyFormatEnable ) {
-								if( field.getType() == String.class && value != null ) {
-									String fieldValue = unfoldEscape( (String)value ) ;
-									jsonCharArrayBuilder.appendTabs(depth+1).appendJsonNameAndColonAndStringPretty(fieldName.toCharArray(),fieldValue.toCharArray(),isNotLastLine);
-								} else {
-									jsonCharArrayBuilder.appendTabs(depth+1).appendJsonNameAndColonAndValuePretty(fieldName.toCharArray(),value.toString().toCharArray(),isNotLastLine);
-								}
-							} else {
-								if( field.getType() == String.class && value != null ) {
-									String fieldValue = unfoldEscape( (String)value ) ;
-									jsonCharArrayBuilder.appendTabs(depth+1).appendJsonNameAndColonAndString(fieldName.toCharArray(),fieldValue.toCharArray(),isNotLastLine);
-								} else {
-									jsonCharArrayBuilder.appendTabs(depth+1).appendJsonNameAndColonAndValue(fieldName.toCharArray(),value.toString().toCharArray(),isNotLastLine);
-								}
-							}
-						} catch (Exception e2) {
+							string = (String)(classField.getMethod.invoke( object )) ;
+						} catch (Exception e) {
 							e.printStackTrace();
-							return OKJSON_ERROR_UNEXPECT;
-						}
-					} else if ( field.getType() == ArrayList.class || field.getType() == LinkedList.class ) {
-						try {
-							List<Object> array = (List<Object>)field.get(object);
-							if( array != null ) {
-								int arrayCount = array.size() ;
-								if( arrayCount > 0 ) {
-									if( prettyFormatEnable ) {
-										jsonCharArrayBuilder.appendTabs(depth+1).appendJsonNameAndColonAndOpenBytePretty(fieldName.toCharArray(),'[');
-									} else {
-										jsonCharArrayBuilder.appendJsonNameAndColonAndOpenByte(fieldName.toCharArray(),'[');
-									}
-									
-									nret = objectToListString( array, arrayCount, field, jsonCharArrayBuilder, depth+1 ) ;
-									if( nret != 0 )
-										return nret;
-
-									if( prettyFormatEnable ) {
-										jsonCharArrayBuilder.appendTabs(depth+1).appendCloseBytePretty(']',isNotLastLine);
-									} else {
-										jsonCharArrayBuilder.appendCloseByte(']',isNotLastLine);
-									}
-								}
-							}
-						} catch (Exception e1) {
-							e1.printStackTrace();
-							return OKJSON_ERROR_UNEXPECT;
+							return OKJSON_ERROR_EXCEPTION;
 						}
 					} else {
 						try {
-							Object value = field.get( object );
-							if( value != null  ) {
-								if( prettyFormatEnable ) {
-									jsonCharArrayBuilder.appendTabs(depth+1).appendJsonNameAndColonAndOpenBytePretty(fieldName.toCharArray(),'{');
-								} else {
-									jsonCharArrayBuilder.appendJsonNameAndColonAndOpenByte(fieldName.toCharArray(),'{');
-								}
-								
-								nret = objectToPropertiesString( value, jsonCharArrayBuilder, depth+1 ) ;
+							string = (String)(classField.field.get( object ));
+						} catch (Exception e) {
+							e.printStackTrace();
+							return OKJSON_ERROR_EXCEPTION;
+						}
+					}
+					string = unfoldEscape( (String)string ) ;
+					char[] stringCharArray ;
+					if( string != null ) {
+						stringCharArray = string.toCharArray() ;
+						if( prettyFormatEnable ) {
+							jsonCharArrayBuilder.appendTabs(depth+1).appendJsonNameAndColonAndStringPretty(classField.fieldName,stringCharArray);
+						} else {
+							jsonCharArrayBuilder.appendJsonNameAndColonAndString(classField.fieldName,stringCharArray);
+						}
+					} else {
+						if( prettyFormatEnable ) {
+							jsonCharArrayBuilder.appendTabs(depth+1).appendJsonNameAndColonAndValuePretty(classField.fieldName,STRING_NULL);
+						} else {
+							jsonCharArrayBuilder.appendJsonNameAndColonAndValue(classField.fieldName,STRING_NULL);
+						}
+					}
+					break;
+				case CLASSFIELDTYPE_NOT_STRING :
+					Object value = null ;
+					if( classField.getMethod != null ) {
+						try {
+							value = classField.getMethod.invoke( object );
+						} catch (Exception e) {
+							e.printStackTrace();
+							return OKJSON_ERROR_EXCEPTION;
+						}
+					} else {
+						try {
+							value = classField.field.get( object );
+						} catch (Exception e) {
+							e.printStackTrace();
+							return OKJSON_ERROR_EXCEPTION;
+						}
+					}
+					char[] valueCharArray ;
+					if( value != null )
+						valueCharArray = value.toString().toCharArray() ;
+					else
+						valueCharArray = STRING_NULL ;
+					if( prettyFormatEnable ) {
+						jsonCharArrayBuilder.appendTabs(depth+1).appendJsonNameAndColonAndValuePretty(classField.fieldName,valueCharArray);
+					} else {
+						jsonCharArrayBuilder.appendJsonNameAndColonAndValue(classField.fieldName,valueCharArray);
+					}
+					break;
+				case CLASSFIELDTYPE_LIST :
+					List<Object> array ;
+					if( classField.getMethod != null ) {
+						try {
+							array = (List<Object>)(classField.getMethod.invoke(object)) ;
+						} catch (Exception e) {
+							e.printStackTrace();
+							return OKJSON_ERROR_EXCEPTION;
+						}
+					} else {
+						try {
+							array = (List<Object>)(classField.field.get(object));
+						} catch (Exception e) {
+							e.printStackTrace();
+							return OKJSON_ERROR_EXCEPTION;
+						}
+					}
+					if( array != null ) {
+						int arrayCount = array.size() ;
+						if( arrayCount > 0 ) {
+							if( prettyFormatEnable ) {
+								jsonCharArrayBuilder.appendTabs(depth+1).appendJsonNameAndColonAndOpenBytePretty(classField.fieldName,'[');
+								nret = objectToListString( array, arrayCount, classField.field, jsonCharArrayBuilder, depth+1 ) ;
 								if( nret != 0 )
 									return nret;
-								
-								if( prettyFormatEnable ) {
-									jsonCharArrayBuilder.appendTabs(depth+1).appendCloseBytePretty('}',isNotLastLine);
-								} else {
-									jsonCharArrayBuilder.appendTabs(depth+1).appendCloseByte('}',isNotLastLine);
-								}
+								jsonCharArrayBuilder.appendTabs(depth+1).appendChar(']');
+							} else {
+								jsonCharArrayBuilder.appendJsonNameAndColonAndOpenByte(classField.fieldName,'[');
+								nret = objectToListString( array, arrayCount, classField.field, jsonCharArrayBuilder, depth+1 ) ;
+								if( nret != 0 )
+									return nret;
+								jsonCharArrayBuilder.appendCloseByte(']');
 							}
-						} catch (Exception e1) {
-							e1.printStackTrace();
-							return OKJSON_ERROR_UNEXPECT;
+						}
+					} else {
+						if( prettyFormatEnable ) {
+							jsonCharArrayBuilder.appendTabs(depth+1).appendJsonNameAndColonAndValuePretty(classField.fieldName,STRING_NULL);
+						} else {
+							jsonCharArrayBuilder.appendJsonNameAndColonAndValue(classField.fieldName,STRING_NULL);
 						}
 					}
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-				return OKJSON_ERROR_UNEXPECT;
+					break;
+				case CLASSFIELDTYPE_SUBCLASS :
+					Object subObject;
+					if( classField.getMethod != null ) {
+						try {
+							subObject = classField.getMethod.invoke( object );
+						} catch (Exception e) {
+							e.printStackTrace();
+							return OKJSON_ERROR_EXCEPTION;
+						}
+					} else {
+						try {
+							subObject = classField.field.get( object ) ;
+						} catch (Exception e) {
+							e.printStackTrace();
+							return OKJSON_ERROR_EXCEPTION;
+						}
+					}
+					if( subObject != null ) {
+						if( prettyFormatEnable ) {
+							jsonCharArrayBuilder.appendTabs(depth+1).appendJsonNameAndColonAndOpenBytePretty(classField.fieldName,'{');
+							nret = objectToPropertiesString( subObject, jsonCharArrayBuilder, depth+1 ) ;
+							if( nret != 0 )
+								return nret;
+							jsonCharArrayBuilder.appendTabs(depth+1).appendChar('}');
+						} else {
+							jsonCharArrayBuilder.appendJsonNameAndColonAndOpenByte(classField.fieldName,'{');
+							nret = objectToPropertiesString( subObject, jsonCharArrayBuilder, depth+1 ) ;
+							if( nret != 0 )
+								return nret;
+							jsonCharArrayBuilder.appendCloseByte('}');
+						}
+					} else { 
+						if( prettyFormatEnable ) {
+							jsonCharArrayBuilder.appendTabs(depth+1).appendJsonNameAndColonAndValuePretty(classField.fieldName,STRING_NULL);
+						} else {
+							jsonCharArrayBuilder.appendJsonNameAndColonAndValue(classField.fieldName,STRING_NULL);
+						}
+					}
+					break;
 			}
+			
+		}
+		
+		if( prettyFormatEnable ) {
+			jsonCharArrayBuilder.appendChar( '\n' );
 		}
 		
 		return 0;
@@ -1536,27 +1637,26 @@ public class OkJson {
 		OkJsonCharArrayBuilder	jsonCharArrayBuilder ;
 		OkJsonCharArrayBuilder	fieldCharArrayBuilder ;
 		HashMap<Class,Boolean>	basicTypeClassMapString ;
-		int						nret = 0 ;
 		
 		if( classMapFieldListCache == null ) {
-			classMapFieldListCache = new ThreadLocal<HashMap<String,LinkedList<ClassFieldType>>>() ;
+			classMapFieldListCache = new ThreadLocal<HashMap<String,LinkedList<OkJsonClassField>>>() ;
 			if( classMapFieldListCache == null ) {
 				errorDesc = "New object failed for clazz" ;
 				errorCode = OKJSON_ERROR_NEW_OBJECT;
 				return null;
 			}
-			classMapFieldListCache.set(new HashMap<String,LinkedList<ClassFieldType>>());
+			classMapFieldListCache.set(new HashMap<String,LinkedList<OkJsonClassField>>());
 		}
 		
-		if( stringMapMethodsCache == null ) {
-			stringMapMethodsCache = new ThreadLocal<HashMap<String,HashMap<String,Method>>>() ;
-			if( stringMapMethodsCache == null ) {
-				errorDesc = "New object failed for clazz" ;
-				errorCode = OKJSON_ERROR_NEW_OBJECT;
-				return null;
-			}
-			stringMapMethodsCache.set(new HashMap<String,HashMap<String,Method>>());
-		}
+//		if( stringMapMethodsCache == null ) {
+//			stringMapMethodsCache = new ThreadLocal<HashMap<String,HashMap<String,Method>>>() ;
+//			if( stringMapMethodsCache == null ) {
+//				errorDesc = "New object failed for clazz" ;
+//				errorCode = OKJSON_ERROR_NEW_OBJECT;
+//				return null;
+//			}
+//			stringMapMethodsCache.set(new HashMap<String,HashMap<String,Method>>());
+//		}
 		
 		if( jsonByteArrayBuilderCache == null ) {
 			jsonByteArrayBuilderCache = new ThreadLocal<OkJsonCharArrayBuilder>() ;
@@ -1623,7 +1723,7 @@ public class OkJson {
 			jsonCharArrayBuilder.appendChar( '{' );
 		}
 		
-		errorCode = objectToPropertiesString( object, jsonCharArrayBuilder, 1 );
+		errorCode = objectToPropertiesString( object, jsonCharArrayBuilder, 0 );
 		if( errorCode != 0 )
 			return null;
 		
@@ -1636,29 +1736,52 @@ public class OkJson {
 		return jsonCharArrayBuilder.toString();
 	}
 	
-	public void setDirectAccessPropertyEnable( boolean b ) {
-		this.directAccessPropertyEnable = b ;
-	}
-	
-	public void setStrictPolicy( boolean b ) {
-		this.strictPolicyEnable = b ;
-	}
-	
-	public void setPrettyFormatEnable( boolean b ) {
-		this.prettyFormatEnable = b;
+	public boolean isStrictPolicyEnable() {
+		return strictPolicyEnable;
 	}
 
-	public int getErrorCode() {
+	public void setStrictPolicyEnable(boolean strictPolicyEnable) {
+		this.strictPolicyEnable = strictPolicyEnable;
+	}
+
+	public boolean isDirectAccessPropertyEnable() {
+		return directAccessPropertyEnable;
+	}
+
+	public void setDirectAccessPropertyEnable(boolean directAccessPropertyEnable) {
+		this.directAccessPropertyEnable = directAccessPropertyEnable;
+	}
+
+	public boolean isPrettyFormatEnable() {
+		return prettyFormatEnable;
+	}
+
+	public void setPrettyFormatEnable(boolean prettyFormatEnable) {
+		this.prettyFormatEnable = prettyFormatEnable;
+	}
+
+	public Integer getErrorCode() {
 		return errorCode;
 	}
-	
+
+	public void setErrorCode(Integer errorCode) {
+		this.errorCode = errorCode;
+	}
+
 	public String getErrorDesc() {
 		return errorDesc;
 	}
-	
-	public OkJson() {
-		strictPolicyEnable = false ;
-		errorCode = 0 ;
+
+	public void setErrorDesc(String errorDesc) {
+		this.errorDesc = errorDesc;
+	}
+
+	public OkJsonGenerator() {
+		this.strictPolicyEnable = false ;
+		this.directAccessPropertyEnable = false ;
+		this.prettyFormatEnable = false ;
+		this.errorCode = 0 ;
+		this.errorDesc = null ;
 	}
 }
 
@@ -1692,6 +1815,7 @@ class OkJsonCharArrayBuilder {
 		if( newBufSize < newSize )
 			newBufSize = newSize ;
 		newBuf = new char[ newBufSize ] ;
+		System.arraycopy(buf, 0, newBuf, 0, bufLength);
 		buf = newBuf ;
 		bufSize = newBufSize ;
 	}
@@ -1779,38 +1903,19 @@ class OkJsonCharArrayBuilder {
 		return this;
 	}
 	
-	public OkJsonCharArrayBuilder appendCloseByte( char c, boolean isNotLastLine ) {
-		int		newBufLength = bufLength + 2 ;
+	public OkJsonCharArrayBuilder appendCloseByte( char c ) {
+		int		newBufLength = bufLength + 1 ;
 		
 		if( newBufLength > bufSize )
 			resize( newBufLength );
 		
 		buf[bufLength] = c ; bufLength++;
-		if( isNotLastLine ) {
-			buf[bufLength] = ',' ; bufLength++;
-		}
 		
 		return this;
 	}
 	
-	public OkJsonCharArrayBuilder appendCloseBytePretty( char c, boolean isNotLastLine ) {
-		int		newBufLength = bufLength + 4 ;
-		
-		if( newBufLength > bufSize )
-			resize( newBufLength );
-		
-		buf[bufLength] = c ; bufLength++;
-		buf[bufLength] = ' ' ; bufLength++;
-		if( isNotLastLine ) {
-			buf[bufLength] = ',' ; bufLength++;
-		}
-		buf[bufLength] = '\n' ; bufLength++;
-		
-		return this;
-	}
-	
-	public OkJsonCharArrayBuilder appendJsonNameAndColonAndValue( char[] name, char[] value, boolean isNotLastLine ) {
-		int		newBufLength = bufLength + name.length+value.length+5 ;
+	public OkJsonCharArrayBuilder appendJsonNameAndColonAndValue( char[] name, char[] value ) {
+		int		newBufLength = bufLength + name.length+value.length+4 ;
 		
 		if( newBufLength > bufSize )
 			resize( newBufLength );
@@ -1821,34 +1926,46 @@ class OkJsonCharArrayBuilder {
 		buf[bufLength] = ':' ; bufLength++;
 		System.arraycopy( value, 0, buf, bufLength, value.length ); bufLength+=value.length;
 		buf[bufLength] = ' ' ; bufLength++;
-		if( isNotLastLine ) {
-			buf[bufLength] = ',' ; bufLength++;
-		}
 		
 		return this;
 	}
 	
-	public OkJsonCharArrayBuilder appendJsonNameAndColonAndValuePretty( char[] name, char[] value, boolean isNotLastLine ) {
+	public OkJsonCharArrayBuilder appendJsonNameAndColonAndValuePretty( char[] name, char[] value ) {
 		int		newBufLength = bufLength + name.length+value.length+6 ;
 		
 		if( newBufLength > bufSize )
 			resize( newBufLength );
 		
 		buf[bufLength] = '"' ; bufLength++;
-		System.arraycopy( name, 0, buf, bufLength, name.length);
+		System.arraycopy( name, 0, buf, bufLength, name.length); bufLength+=name.length;
 		buf[bufLength] = '"' ; bufLength++;
 		buf[bufLength] = ' ' ; bufLength++;
 		buf[bufLength] = ':' ; bufLength++;
 		buf[bufLength] = ' ' ; bufLength++;
 		System.arraycopy( value, 0, buf, bufLength, value.length ); bufLength+=value.length;
-		if( isNotLastLine ) {
-			buf[bufLength] = ',' ; bufLength++;
-		}
+		buf[bufLength] = ' ' ; bufLength++;
 		
 		return this;
 	}
 	
-	public OkJsonCharArrayBuilder appendJsonNameAndColonAndString( char[] name, char[] str, boolean isNotLastLine ) {
+	public OkJsonCharArrayBuilder appendJsonNameAndColonAndString( char[] name, char[] str ) {
+		int		newBufLength = bufLength + name.length+str.length+5 ;
+		
+		if( newBufLength > bufSize )
+			resize( newBufLength );
+		
+		buf[bufLength] = '"' ; bufLength++;
+		System.arraycopy( name, 0, buf, bufLength, name.length); bufLength+=name.length;
+		buf[bufLength] = '"' ; bufLength++;
+		buf[bufLength] = ':' ; bufLength++;
+		buf[bufLength] = '"' ; bufLength++;
+		System.arraycopy( str, 0, buf, bufLength, str.length ); bufLength+=str.length;
+		buf[bufLength] = '"' ; bufLength++;
+		
+		return this;
+	}
+	
+	public OkJsonCharArrayBuilder appendJsonNameAndColonAndStringPretty( char[] name, char[] str ) {
 		int		newBufLength = bufLength + name.length+str.length+7 ;
 		
 		if( newBufLength > bufSize )
@@ -1857,72 +1974,40 @@ class OkJsonCharArrayBuilder {
 		buf[bufLength] = '"' ; bufLength++;
 		System.arraycopy( name, 0, buf, bufLength, name.length); bufLength+=name.length;
 		buf[bufLength] = '"' ; bufLength++;
-		buf[bufLength] = ':' ; bufLength++;
-		buf[bufLength] = '"' ; bufLength++;
-		System.arraycopy( str, 0, buf, bufLength, str.length ); bufLength+=str.length;
-		buf[bufLength] = '"' ; bufLength++;
-		buf[bufLength] = ' ' ; bufLength++;
-		if( isNotLastLine ) {
-			buf[bufLength] = ',' ; bufLength++;
-		}
-		
-		return this;
-	}
-	
-	public OkJsonCharArrayBuilder appendJsonNameAndColonAndStringPretty( char[] name, char[] str, boolean isNotLastLine ) {
-		int		newBufLength = bufLength + name.length+str.length+8 ;
-		
-		if( newBufLength > bufSize )
-			resize( newBufLength );
-		
-		buf[bufLength] = '"' ; bufLength++;
-		System.arraycopy( name, 0, buf, bufLength, name.length);
-		buf[bufLength] = '"' ; bufLength++;
 		buf[bufLength] = ' ' ; bufLength++;
 		buf[bufLength] = ':' ; bufLength++;
 		buf[bufLength] = ' ' ; bufLength++;
 		buf[bufLength] = '"' ; bufLength++;
 		System.arraycopy( str, 0, buf, bufLength, str.length ); bufLength+=str.length;
 		buf[bufLength] = '"' ; bufLength++;
-		if( isNotLastLine ) {
-			buf[bufLength] = ',' ; bufLength++;
-		}
 		
 		return this;
 	}
 	
-	public OkJsonCharArrayBuilder appendJsonValue( char[] value, boolean isNotLastLine ) {
-		int		newBufLength = bufLength + value.length+1 ;
+	public OkJsonCharArrayBuilder appendJsonValue( char[] value ) {
+		int		newBufLength = bufLength + value.length ;
 		
 		if( newBufLength > bufSize )
 			resize( newBufLength );
 		
 		System.arraycopy( value, 0, buf, bufLength, value.length ); bufLength+=value.length;
-		if( isNotLastLine ) {
-			buf[bufLength] = ',' ; bufLength++;
-		}
 		
 		return this;
 	}
 	
-	public OkJsonCharArrayBuilder appendJsonValuePretty( char[] value, boolean isNotLastLine ) {
-		int		newBufLength = bufLength + value.length+3 ;
+	public OkJsonCharArrayBuilder appendJsonValuePretty( char[] value ) {
+		int		newBufLength = bufLength + value.length ;
 		
 		if( newBufLength > bufSize )
 			resize( newBufLength );
 		
 		System.arraycopy( value, 0, buf, bufLength, value.length ); bufLength+=value.length;
-		if( isNotLastLine ) {
-			buf[bufLength] = ' ' ; bufLength++;
-			buf[bufLength] = ',' ; bufLength++;
-		}
-		buf[bufLength] = ' ' ; bufLength++;
 		
 		return this;
 	}
 	
-	public OkJsonCharArrayBuilder appendJsonString( char[] str, boolean isNotLastLine ) {
-		int		newBufLength = bufLength + str.length+3 ;
+	public OkJsonCharArrayBuilder appendJsonString( char[] str ) {
+		int		newBufLength = bufLength + str.length+2 ;
 		
 		if( newBufLength > bufSize )
 			resize( newBufLength );
@@ -1930,15 +2015,12 @@ class OkJsonCharArrayBuilder {
 		buf[bufLength] = '"' ; bufLength++;
 		System.arraycopy( str, 0, buf, bufLength, str.length ); bufLength+=str.length;
 		buf[bufLength] = '"' ; bufLength++;
-		if( isNotLastLine ) {
-			buf[bufLength] = ',' ; bufLength++;
-		}
 		
 		return this;
 	}
 	
-	public OkJsonCharArrayBuilder appendJsonStringPretty( char[] str, boolean isNotLastLine ) {
-		int		newBufLength = bufLength + str.length+5 ;
+	public OkJsonCharArrayBuilder appendJsonStringPretty( char[] str ) {
+		int		newBufLength = bufLength + str.length+2 ;
 		
 		if( newBufLength > bufSize )
 			resize( newBufLength );
@@ -1946,11 +2028,6 @@ class OkJsonCharArrayBuilder {
 		buf[bufLength] = '"' ; bufLength++;
 		System.arraycopy( str, 0, buf, bufLength, str.length ); bufLength+=str.length;
 		buf[bufLength] = '"' ; bufLength++;
-		if( isNotLastLine ) {
-			buf[bufLength] = ' ' ; bufLength++;
-			buf[bufLength] = ',' ; bufLength++;
-		}
-		buf[bufLength] = ' ' ; bufLength++;
 		
 		return this;
 	}
