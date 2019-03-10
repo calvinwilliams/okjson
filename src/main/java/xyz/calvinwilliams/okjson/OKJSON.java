@@ -8,8 +8,43 @@ public class OKJSON {
 	final public static int	OKJSON_OTIONS_PRETTY_FORMAT_ENABLE = 2 ;
 	final public static int	OKJSON_OTIONS_STRICT_POLICY = 4 ;
 	
+	final private static int	OKJSON_ERROR_NEW_OBJECT = -31 ;
+	
+	private static ThreadLocal<OkJsonGenerator>			okjsonGeneratorCache ;
+	private static ThreadLocal<OkJsonParser>			okjsonParserCache ;
+	
+	private static ThreadLocal<Integer>	errorCode = new ThreadLocal<Integer>() ;
+	private static ThreadLocal<String>	errorDesc = new ThreadLocal<String>() ;
+	
+	public static Integer getErrorCode() {
+		return errorCode.get();
+	}
+	
+	public static String getErrorDesc() {
+		return errorDesc.get();
+	}
+	
 	public static String objectToString( Object object, int options ) {
-		OkJsonGenerator okjsonGenerator = new OkJsonGenerator() ;
+		OkJsonGenerator okjsonGenerator ;
+		
+		if( okjsonGeneratorCache == null ) {
+			okjsonGeneratorCache = new ThreadLocal<OkJsonGenerator>() ;
+			if( okjsonGeneratorCache == null ) {
+				errorDesc.set("New object failed for ThreadLocal<OkJsonGenerator>") ;
+				errorCode.set(OKJSON_ERROR_NEW_OBJECT);
+				return null;
+			}
+			okjsonGenerator = new OkJsonGenerator() ;
+			if( okjsonGenerator == null ) {
+				errorDesc.set("New object failed for OkJsonGenerator") ;
+				errorCode.set(OKJSON_ERROR_NEW_OBJECT);
+				return null;
+			}
+			okjsonGeneratorCache.set(okjsonGenerator);
+		} else {
+			okjsonGenerator = okjsonGeneratorCache.get();
+		}
+		
 		if( (options&OKJSON_OTIONS_DIRECT_ACCESS_PROPERTY_ENABLE) != 0 )
 			okjsonGenerator.setDirectAccessPropertyEnable(true);
 		if( (options&OKJSON_OTIONS_PRETTY_FORMAT_ENABLE) != 0 )
@@ -24,7 +59,26 @@ public class OKJSON {
 	}
 	
 	public static <T> T stringToObject( String string, Class<T> clazz, int options ) {
-		OkJsonParser okjsonParser = new OkJsonParser() ;
+		OkJsonParser okjsonParser ;
+		
+		if( okjsonParserCache == null ) {
+			okjsonParserCache = new ThreadLocal<OkJsonParser>() ;
+			if( okjsonParserCache == null ) {
+				errorDesc.set("New object failed for ThreadLocal<OkJsonParser>") ;
+				errorCode.set(OKJSON_ERROR_NEW_OBJECT);
+				return null;
+			}
+			okjsonParser = new OkJsonParser() ;
+			if( okjsonParser == null ) {
+				errorDesc.set("New object failed for okjsonParser") ;
+				errorCode.set(OKJSON_ERROR_NEW_OBJECT);
+				return null;
+			}
+			okjsonParserCache.set(okjsonParser);
+		} else {
+			okjsonParser = okjsonParserCache.get();
+		}
+		
 		if( (options&OKJSON_OTIONS_DIRECT_ACCESS_PROPERTY_ENABLE) != 0 )
 			okjsonParser.setDirectAccessPropertyEnable(true);
 		if( (options&OKJSON_OTIONS_STRICT_POLICY) != 0 )
@@ -44,17 +98,6 @@ public class OKJSON {
 		errorDesc.set(okjsonParser.getErrorDesc());
 		
 		return object;
-	}
-	
-	private static ThreadLocal<Integer>	errorCode = new ThreadLocal<Integer>() ;
-	private static ThreadLocal<String>	errorDesc = new ThreadLocal<String>() ;
-	
-	public static Integer getErrorCode() {
-		return errorCode.get();
-	}
-	
-	public static String getErrorDesc() {
-		return errorDesc.get();
 	}
 }
 
@@ -1124,7 +1167,7 @@ class OkJsonParser {
 				errorCode = OKJSON_ERROR_NEW_OBJECT;
 				return null;
 			}
-			fieldStringBuilderCache.set(new StringBuilder(64));
+			fieldStringBuilderCache.set(new StringBuilder(1024));
 		}
 		
 		errorCode = tokenJsonWord( jsonCharArray ) ;
@@ -1238,7 +1281,8 @@ class OkJsonGenerator {
 	final private static char[] FIELD_SEPCHAR_PRETTY = " , \n".toCharArray() ;
 	
 	final private static char[]	STRING_NULL = "null".toCharArray() ;
-	final private static char[]	STRING_QM_NULL_QM = "\"null\"".toCharArray() ;
+	
+	final private static char[]	STRING_ENTER = "\n".toCharArray() ;
 	
 	private int objectToListString( List<Object> array, int arrayCount, Field field, OkJsonCharArrayBuilder jsonCharArrayBuilder, int depth ) {
 		
@@ -1316,7 +1360,7 @@ class OkJsonGenerator {
 			return OKJSON_ERROR_EXCEPTION;
 		}
 		
-		jsonCharArrayBuilder.appendChar('\n');
+		jsonCharArrayBuilder.appendCharArray(STRING_ENTER);
 		
 		return 0;
 	}
@@ -1626,7 +1670,7 @@ class OkJsonGenerator {
 		}
 		
 		if( prettyFormatEnable ) {
-			jsonCharArrayBuilder.appendChar( '\n' );
+			jsonCharArrayBuilder.appendCharArray(STRING_ENTER);
 		}
 		
 		return 0;
@@ -1647,16 +1691,6 @@ class OkJsonGenerator {
 			}
 			classMapFieldListCache.set(new HashMap<String,LinkedList<OkJsonClassField>>());
 		}
-		
-//		if( stringMapMethodsCache == null ) {
-//			stringMapMethodsCache = new ThreadLocal<HashMap<String,HashMap<String,Method>>>() ;
-//			if( stringMapMethodsCache == null ) {
-//				errorDesc = "New object failed for clazz" ;
-//				errorCode = OKJSON_ERROR_NEW_OBJECT;
-//				return null;
-//			}
-//			stringMapMethodsCache.set(new HashMap<String,HashMap<String,Method>>());
-//		}
 		
 		if( jsonByteArrayBuilderCache == null ) {
 			jsonByteArrayBuilderCache = new ThreadLocal<OkJsonCharArrayBuilder>() ;
@@ -1915,7 +1949,7 @@ class OkJsonCharArrayBuilder {
 	}
 	
 	public OkJsonCharArrayBuilder appendJsonNameAndColonAndValue( char[] name, char[] value ) {
-		int		newBufLength = bufLength + name.length+value.length+4 ;
+		int		newBufLength = bufLength + name.length+value.length+3 ;
 		
 		if( newBufLength > bufSize )
 			resize( newBufLength );
@@ -1925,7 +1959,6 @@ class OkJsonCharArrayBuilder {
 		buf[bufLength] = '"' ; bufLength++;
 		buf[bufLength] = ':' ; bufLength++;
 		System.arraycopy( value, 0, buf, bufLength, value.length ); bufLength+=value.length;
-		buf[bufLength] = ' ' ; bufLength++;
 		
 		return this;
 	}
