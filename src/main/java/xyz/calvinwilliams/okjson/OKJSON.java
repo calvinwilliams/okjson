@@ -1288,7 +1288,6 @@ class OkJsonGenerator {
 		
 		HashMap<Class,Boolean>	basicTypeClassMapBoolean = basicTypeClassMapBooleanCache.get();
 		int						arrayIndex ;
-		boolean					isNotLastLine ;
 		int						nret ;
 		
 		try {
@@ -1509,10 +1508,8 @@ class OkJsonGenerator {
 		
 		fieldIndex = 0 ;
 		for( OkJsonClassField classField : classFieldList ) {
-			fieldIndex++;
-			
 // System.out.println("fieldName["+new String(classField.fieldName)+"] type["+classField.type+"]");
-			
+			fieldIndex++;
 			if( fieldIndex > 1 ) {
 				if( prettyFormatEnable ) {
 					jsonCharArrayBuilder.appendCharArray( FIELD_SEPCHAR_PRETTY );
