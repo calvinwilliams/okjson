@@ -1537,19 +1537,18 @@ class OkJsonGenerator {
 						}
 					}
 					string = unfoldEscape( (String)string ) ;
-					char[] stringCharArray ;
 					if( string != null ) {
-						stringCharArray = string.toCharArray() ;
+						// char[] stringCharArray = string.toCharArray() ;
 						if( prettyFormatEnable ) {
-							jsonCharArrayBuilder.appendTabs(depth+1).appendJsonNameAndColonAndStringPretty(classField.fieldName,stringCharArray);
+							jsonCharArrayBuilder.appendTabs(depth+1).appendJsonNameAndColonAndStringPretty(classField.fieldName,string);
 						} else {
-							jsonCharArrayBuilder.appendJsonNameAndColonAndString(classField.fieldName,stringCharArray);
+							jsonCharArrayBuilder.appendJsonNameAndColonAndString(classField.fieldName,string);
 						}
 					} else {
 						if( prettyFormatEnable ) {
-							jsonCharArrayBuilder.appendTabs(depth+1).appendJsonNameAndColonAndValuePretty(classField.fieldName,STRING_NULL);
+							jsonCharArrayBuilder.appendTabs(depth+1).appendJsonNameAndColonAndCharArrayPretty(classField.fieldName,STRING_NULL);
 						} else {
-							jsonCharArrayBuilder.appendJsonNameAndColonAndValue(classField.fieldName,STRING_NULL);
+							jsonCharArrayBuilder.appendJsonNameAndColonAndCharArray(classField.fieldName,STRING_NULL);
 						}
 					}
 					break;
@@ -1571,14 +1570,18 @@ class OkJsonGenerator {
 						}
 					}
 					char[] valueCharArray ;
-					if( value != null )
-						valueCharArray = value.toString().toCharArray() ;
-					else
-						valueCharArray = STRING_NULL ;
-					if( prettyFormatEnable ) {
-						jsonCharArrayBuilder.appendTabs(depth+1).appendJsonNameAndColonAndValuePretty(classField.fieldName,valueCharArray);
+					if( value != null ) {
+						if( prettyFormatEnable ) {
+							jsonCharArrayBuilder.appendTabs(depth+1).appendJsonNameAndColonAndValuePretty(classField.fieldName,value.toString());
+						} else {
+							jsonCharArrayBuilder.appendJsonNameAndColonAndValue(classField.fieldName,value.toString());
+						}
 					} else {
-						jsonCharArrayBuilder.appendJsonNameAndColonAndValue(classField.fieldName,valueCharArray);
+						if( prettyFormatEnable ) {
+							jsonCharArrayBuilder.appendTabs(depth+1).appendJsonNameAndColonAndCharArrayPretty(classField.fieldName,STRING_NULL);
+						} else {
+							jsonCharArrayBuilder.appendJsonNameAndColonAndCharArray(classField.fieldName,STRING_NULL);
+						}
 					}
 					break;
 				case CLASSFIELDTYPE_LIST :
@@ -1617,9 +1620,9 @@ class OkJsonGenerator {
 						}
 					} else {
 						if( prettyFormatEnable ) {
-							jsonCharArrayBuilder.appendTabs(depth+1).appendJsonNameAndColonAndValuePretty(classField.fieldName,STRING_NULL);
+							jsonCharArrayBuilder.appendTabs(depth+1).appendJsonNameAndColonAndCharArrayPretty(classField.fieldName,STRING_NULL);
 						} else {
-							jsonCharArrayBuilder.appendJsonNameAndColonAndValue(classField.fieldName,STRING_NULL);
+							jsonCharArrayBuilder.appendJsonNameAndColonAndCharArray(classField.fieldName,STRING_NULL);
 						}
 					}
 					break;
@@ -1656,9 +1659,9 @@ class OkJsonGenerator {
 						}
 					} else { 
 						if( prettyFormatEnable ) {
-							jsonCharArrayBuilder.appendTabs(depth+1).appendJsonNameAndColonAndValuePretty(classField.fieldName,STRING_NULL);
+							jsonCharArrayBuilder.appendTabs(depth+1).appendJsonNameAndColonAndCharArrayPretty(classField.fieldName,STRING_NULL);
 						} else {
-							jsonCharArrayBuilder.appendJsonNameAndColonAndValue(classField.fieldName,STRING_NULL);
+							jsonCharArrayBuilder.appendJsonNameAndColonAndCharArray(classField.fieldName,STRING_NULL);
 						}
 					}
 					break;
@@ -1945,8 +1948,9 @@ class OkJsonCharArrayBuilder {
 		return this;
 	}
 	
-	public OkJsonCharArrayBuilder appendJsonNameAndColonAndValue( char[] name, char[] value ) {
-		int		newBufLength = bufLength + name.length+value.length+3 ;
+	public OkJsonCharArrayBuilder appendJsonNameAndColonAndValue( char[] name, String value ) {
+		int		valueLength = value.length() ;
+		int		newBufLength = bufLength + name.length+valueLength+3 ;
 		
 		if( newBufLength > bufSize )
 			resize( newBufLength );
@@ -1955,13 +1959,14 @@ class OkJsonCharArrayBuilder {
 		System.arraycopy( name, 0, buf, bufLength, name.length); bufLength+=name.length;
 		buf[bufLength] = '"' ; bufLength++;
 		buf[bufLength] = ':' ; bufLength++;
-		System.arraycopy( value, 0, buf, bufLength, value.length ); bufLength+=value.length;
+		value.getChars(0, valueLength, buf, bufLength); bufLength+=valueLength;
 		
 		return this;
 	}
 	
-	public OkJsonCharArrayBuilder appendJsonNameAndColonAndValuePretty( char[] name, char[] value ) {
-		int		newBufLength = bufLength + name.length+value.length+6 ;
+	public OkJsonCharArrayBuilder appendJsonNameAndColonAndValuePretty( char[] name, String value ) {
+		int		valueLength = value.length() ;
+		int		newBufLength = bufLength + name.length+valueLength+6 ;
 		
 		if( newBufLength > bufSize )
 			resize( newBufLength );
@@ -1972,13 +1977,28 @@ class OkJsonCharArrayBuilder {
 		buf[bufLength] = ' ' ; bufLength++;
 		buf[bufLength] = ':' ; bufLength++;
 		buf[bufLength] = ' ' ; bufLength++;
-		System.arraycopy( value, 0, buf, bufLength, value.length ); bufLength+=value.length;
+		value.getChars(0, valueLength, buf, bufLength); bufLength+=valueLength;
 		buf[bufLength] = ' ' ; bufLength++;
 		
 		return this;
 	}
 	
-	public OkJsonCharArrayBuilder appendJsonNameAndColonAndString( char[] name, char[] str ) {
+	public OkJsonCharArrayBuilder appendJsonNameAndColonAndCharArray( char[] name, char[] str ) {
+		int		newBufLength = bufLength + name.length+str.length+3 ;
+		
+		if( newBufLength > bufSize )
+			resize( newBufLength );
+		
+		buf[bufLength] = '"' ; bufLength++;
+		System.arraycopy( name, 0, buf, bufLength, name.length); bufLength+=name.length;
+		buf[bufLength] = '"' ; bufLength++;
+		buf[bufLength] = ':' ; bufLength++;
+		System.arraycopy( str, 0, buf, bufLength, str.length ); bufLength+=str.length;
+		
+		return this;
+	}
+	
+	public OkJsonCharArrayBuilder appendJsonNameAndColonAndCharArrayPretty( char[] name, char[] str ) {
 		int		newBufLength = bufLength + name.length+str.length+5 ;
 		
 		if( newBufLength > bufSize )
@@ -1987,16 +2007,35 @@ class OkJsonCharArrayBuilder {
 		buf[bufLength] = '"' ; bufLength++;
 		System.arraycopy( name, 0, buf, bufLength, name.length); bufLength+=name.length;
 		buf[bufLength] = '"' ; bufLength++;
+		buf[bufLength] = ' ' ; bufLength++;
+		buf[bufLength] = ':' ; bufLength++;
+		buf[bufLength] = ' ' ; bufLength++;
+		System.arraycopy( str, 0, buf, bufLength, str.length ); bufLength+=str.length;
+		
+		return this;
+	}
+	
+	public OkJsonCharArrayBuilder appendJsonNameAndColonAndString( char[] name, String str ) {
+		int		strLength = str.length() ;
+		int		newBufLength = bufLength + name.length+strLength+5 ;
+		
+		if( newBufLength > bufSize )
+			resize( newBufLength );
+		
+		buf[bufLength] = '"' ; bufLength++;
+		System.arraycopy( name, 0, buf, bufLength, name.length); bufLength+=name.length;
+		buf[bufLength] = '"' ; bufLength++;
 		buf[bufLength] = ':' ; bufLength++;
 		buf[bufLength] = '"' ; bufLength++;
-		System.arraycopy( str, 0, buf, bufLength, str.length ); bufLength+=str.length;
+		str.getChars(0, strLength, buf, bufLength); bufLength+=strLength;
 		buf[bufLength] = '"' ; bufLength++;
 		
 		return this;
 	}
 	
-	public OkJsonCharArrayBuilder appendJsonNameAndColonAndStringPretty( char[] name, char[] str ) {
-		int		newBufLength = bufLength + name.length+str.length+7 ;
+	public OkJsonCharArrayBuilder appendJsonNameAndColonAndStringPretty( char[] name, String str ) {
+		int		strLength = str.length() ;
+		int		newBufLength = bufLength + name.length+strLength+7 ;
 		
 		if( newBufLength > bufSize )
 			resize( newBufLength );
@@ -2008,7 +2047,7 @@ class OkJsonCharArrayBuilder {
 		buf[bufLength] = ':' ; bufLength++;
 		buf[bufLength] = ' ' ; bufLength++;
 		buf[bufLength] = '"' ; bufLength++;
-		System.arraycopy( str, 0, buf, bufLength, str.length ); bufLength+=str.length;
+		str.getChars(0, strLength, buf, bufLength); bufLength+=strLength;
 		buf[bufLength] = '"' ; bufLength++;
 		
 		return this;
