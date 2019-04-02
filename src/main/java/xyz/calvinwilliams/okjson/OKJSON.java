@@ -1,3 +1,11 @@
+/*
+ * okjson - A easy JSON parser/generator for Java
+ * author	: calvin
+ * email	: calvinwilliams@163.com
+ *
+ * See the file LICENSE in base directory.
+ */
+
 package xyz.calvinwilliams.okjson;
 
 import java.util.*;
