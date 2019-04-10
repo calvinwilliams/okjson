@@ -8,6 +8,9 @@
 
 package xyz.calvinwilliams.okjson;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 
 /**
@@ -20,7 +23,7 @@ public class TestObjectToJsonStringToObject {
 		
 		Branch7		branch7 ;
 		
-		object.str1 = "str1" ;
+		object.str1 = "str2" ;
 		object.byte1 = 1 ;
 		object.short1 = 12 ;
 		object.int1 = 1234 ;
@@ -93,6 +96,10 @@ public class TestObjectToJsonStringToObject {
 		object.numbers9.setDoubleE97( 1234.5678 );
 		object.numbers9.setDoubleE98( 1234.5678E2 );
 		object.numbers9.setDoubleE99( 1234.5678E-2 );
+		
+		object.localDate10 = LocalDate.of( 2019, 4, 10 ) ;
+		object.localTime11 = LocalTime.of( 21, 31, 41 ) ;
+		object.localDateTime12 = LocalDateTime.of( object.localDate10, object.localTime11 ) ;
 		
 		return;
 	}
@@ -216,6 +223,10 @@ public class TestObjectToJsonStringToObject {
 			System.out.println( "TestDataClass.numbers9.doubleE98["+obj.numbers9.getDoubleE98()+"]" );
 			System.out.println( "TestDataClass.numbers9.doubleE99["+obj.numbers9.getDoubleE99()+"]" );
 		}
+		
+		System.out.println( "TestDataClass.localDate10["+obj.localDate10+"]" );
+		System.out.println( "TestDataClass.localTime11["+obj.localTime11+"]" );
+		System.out.println( "TestDataClass.localDateTime12["+obj.localDateTime12+"]" );
 		
 		System.out.println( "------------------------------ dump end" );
 	}

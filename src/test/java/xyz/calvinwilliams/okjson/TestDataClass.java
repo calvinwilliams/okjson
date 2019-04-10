@@ -8,6 +8,9 @@
 
 package xyz.calvinwilliams.okjson;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 
 public class TestDataClass {
@@ -45,6 +48,16 @@ public class TestDataClass {
 	public Strings8				strings8 ;
 	public Numbers9				numbers9 ;
 	
+	public LocalDate			localDate10 ;
+	public LocalTime			localTime11 ;
+	public LocalDateTime		localDateTime12 ;
+
+	public LocalDate getLocalDate10() {
+		return localDate10;
+	}
+	public void setLocalDate10(LocalDate localDate10) {
+		this.localDate10 = localDate10;
+	}
 }
 
 class Branch2 {
