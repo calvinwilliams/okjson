@@ -73,8 +73,12 @@ public class OKJSON {
 		
 		if( (options&OKJSON_OTIONS_DIRECT_ACCESS_PROPERTY_ENABLE) != 0 )
 			okjsonGenerator.setDirectAccessPropertyEnable(true);
+		else
+			okjsonGenerator.setDirectAccessPropertyEnable(false);
 		if( (options&OKJSON_OTIONS_PRETTY_FORMAT_ENABLE) != 0 )
 			okjsonGenerator.setPrettyFormatEnable(true);
+		else
+			okjsonGenerator.setPrettyFormatEnable(false);
 		
 		String string = okjsonGenerator.objectToString(object) ;
 		
@@ -115,8 +119,12 @@ public class OKJSON {
 		
 		if( (options&OKJSON_OTIONS_DIRECT_ACCESS_PROPERTY_ENABLE) != 0 )
 			okjsonParser.setDirectAccessPropertyEnable(true);
+		else
+			okjsonParser.setDirectAccessPropertyEnable(false);
 		if( (options&OKJSON_OTIONS_STRICT_POLICY) != 0 )
 			okjsonParser.setStrictPolicyEnable(true);
+		else
+			okjsonParser.setStrictPolicyEnable(false);
 		
 		T object ;
 		try {
@@ -207,14 +215,10 @@ class OkJsonParser {
 			ch = jsonCharArray[jsonOffset] ;
 			if( ch == '"' ) {
 				tokenType = TokenType.TOKEN_TYPE_STRING ;
-				if( fieldStringBuilder.length() > 0 ) {
-					if( jsonOffset > beginOffset ) {
-						if( fieldStringBuilder.length() > 0 )
-							fieldStringBuilder.append( jsonCharArray, beginOffset, jsonOffset-beginOffset );
-					}
-				} else {
-					endOffset = jsonOffset-1 ;
+				if( jsonOffset > beginOffset ) {
+					fieldStringBuilder.append( jsonCharArray, beginOffset, jsonOffset-beginOffset );
 				}
+				endOffset = jsonOffset-1 ;
 				jsonOffset++;
 				return 0;
 			} else if ( ch == '\\' ) {
@@ -224,39 +228,47 @@ class OkJsonParser {
 				}
 				ch = jsonCharArray[jsonOffset] ;
 				if( ch == '"' ) {
-					if( fieldStringBuilder.length() == 0 )
+					if( jsonOffset > beginOffset+1 )
 						fieldStringBuilder.append( jsonCharArray, beginOffset, jsonOffset-beginOffset-1 );
 					fieldStringBuilder.append( '"' );
+					beginOffset = jsonOffset + 1 ;
 				} else if( ch == '\\' ) {
-					if( fieldStringBuilder.length() == 0 )
+					if( jsonOffset > beginOffset+1 )
 						fieldStringBuilder.append( jsonCharArray, beginOffset, jsonOffset-beginOffset-1 );
-					fieldStringBuilder.append( '\\' );
+					fieldStringBuilder.append( "\\" );
+					beginOffset = jsonOffset + 1 ;
 				} else if( ch == '/' ) {
-					if( fieldStringBuilder.length() == 0 )
+					if( jsonOffset > beginOffset+1 )
 						fieldStringBuilder.append( jsonCharArray, beginOffset, jsonOffset-beginOffset-1 );
-					fieldStringBuilder.append( "\\/" );
+					fieldStringBuilder.append( '/' );
+					beginOffset = jsonOffset + 1 ;
 				} else if( ch == 'b' ) {
-					if( fieldStringBuilder.length() == 0 )
+					if( jsonOffset > beginOffset+1 )
 						fieldStringBuilder.append( jsonCharArray, beginOffset, jsonOffset-beginOffset-1 );
 					fieldStringBuilder.append( '\b' );
+					beginOffset = jsonOffset + 1 ;
 				} else if( ch == 'f' ) {
-					if( fieldStringBuilder.length() == 0 )
+					if( jsonOffset > beginOffset+1 )
 						fieldStringBuilder.append( jsonCharArray, beginOffset, jsonOffset-beginOffset-1 );
 					fieldStringBuilder.append( '\f' );
+					beginOffset = jsonOffset + 1 ;
 				} else if( ch == 'n' ) {
-					if( fieldStringBuilder.length() == 0 )
+					if( jsonOffset > beginOffset+1 )
 						fieldStringBuilder.append( jsonCharArray, beginOffset, jsonOffset-beginOffset-1 );
 					fieldStringBuilder.append( '\n' );
+					beginOffset = jsonOffset + 1 ;
 				} else if( ch == 'r' ) {
-					if( fieldStringBuilder.length() == 0 )
+					if( jsonOffset > beginOffset+1 )
 						fieldStringBuilder.append( jsonCharArray, beginOffset, jsonOffset-beginOffset-1 );
 					fieldStringBuilder.append( '\r' );
+					beginOffset = jsonOffset + 1 ;
 				} else if( ch == 't' ) {
-					if( fieldStringBuilder.length() == 0 )
+					if( jsonOffset > beginOffset+1 )
 						fieldStringBuilder.append( jsonCharArray, beginOffset, jsonOffset-beginOffset-1 );
 					fieldStringBuilder.append( '\t' );
+					beginOffset = jsonOffset + 1 ;
 				} else if( ch == 'u' ) {
-					if( fieldStringBuilder.length() == 0 )
+					if( jsonOffset > beginOffset+1 )
 						fieldStringBuilder.append( jsonCharArray, beginOffset, jsonOffset-beginOffset-1 );
 					jsonOffset++;
 					if( jsonOffset >= jsonLength ) {
@@ -926,11 +938,19 @@ class OkJsonParser {
 		} else if( field.getType() == LocalDate.class ) {
 			if( valueTokenType == TokenType.TOKEN_TYPE_STRING ) {
 				try {
+					OkJsonDateTimeFormatter	okjsonDateTimeFormatter ;
+					String defaultDateTimeFormatter ;
 					LocalDate localDate ;
-					if( fieldStringBuilder.length() > 0 ) {
-						localDate = LocalDate.parse( fieldStringBuilder.toString(), DateTimeFormatter.ofPattern("yyyy-MM-dd") );
+					if( field.isAnnotationPresent(OkJsonDateTimeFormatter.class) ) {
+						okjsonDateTimeFormatter = field.getAnnotation(OkJsonDateTimeFormatter.class) ;
+						defaultDateTimeFormatter = okjsonDateTimeFormatter.format() ;
 					} else {
-						localDate = LocalDate.parse( new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1), DateTimeFormatter.ofPattern("yyyy-MM-dd") ) ;
+						defaultDateTimeFormatter = "yyyy-MM-dd" ;
+					}
+					if( fieldStringBuilder.length() > 0 ) {
+						localDate = LocalDate.parse( fieldStringBuilder.toString(), DateTimeFormatter.ofPattern(defaultDateTimeFormatter) );
+					} else {
+						localDate = LocalDate.parse( new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1), DateTimeFormatter.ofPattern(defaultDateTimeFormatter) ) ;
 					}
 					if( method != null ) {
 						method.invoke(object, localDate);
@@ -945,11 +965,19 @@ class OkJsonParser {
 		} else if( field.getType() == LocalTime.class ) {
 			if( valueTokenType == TokenType.TOKEN_TYPE_STRING ) {
 				try {
+					OkJsonDateTimeFormatter	okjsonDateTimeFormatter ;
+					String defaultDateTimeFormatter ;
 					LocalTime localTime ;
-					if( fieldStringBuilder.length() > 0 ) {
-						localTime = LocalTime.parse( fieldStringBuilder.toString(), DateTimeFormatter.ofPattern("HH:mm:ss") );
+					if( field.isAnnotationPresent(OkJsonDateTimeFormatter.class) ) {
+						okjsonDateTimeFormatter = field.getAnnotation(OkJsonDateTimeFormatter.class) ;
+						defaultDateTimeFormatter = okjsonDateTimeFormatter.format() ;
 					} else {
-						localTime = LocalTime.parse( new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1), DateTimeFormatter.ofPattern("HH:mm:ss") ) ;
+						defaultDateTimeFormatter = "HH:mm:ss" ;
+					}
+					if( fieldStringBuilder.length() > 0 ) {
+						localTime = LocalTime.parse( fieldStringBuilder.toString(), DateTimeFormatter.ofPattern(defaultDateTimeFormatter) );
+					} else {
+						localTime = LocalTime.parse( new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1), DateTimeFormatter.ofPattern(defaultDateTimeFormatter) ) ;
 					}
 					if( method != null ) {
 						method.invoke(object, localTime);
@@ -964,11 +992,19 @@ class OkJsonParser {
 		} else if( field.getType() == LocalDateTime.class ) {
 			if( valueTokenType == TokenType.TOKEN_TYPE_STRING ) {
 				try {
+					OkJsonDateTimeFormatter	okjsonDateTimeFormatter ;
+					String defaultDateTimeFormatter ;
 					LocalDateTime localDateTime ;
-					if( fieldStringBuilder.length() > 0 ) {
-						localDateTime = LocalDateTime.parse( fieldStringBuilder.toString(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss") );
+					if( field.isAnnotationPresent(OkJsonDateTimeFormatter.class) ) {
+						okjsonDateTimeFormatter = field.getAnnotation(OkJsonDateTimeFormatter.class) ;
+						defaultDateTimeFormatter = okjsonDateTimeFormatter.format() ;
 					} else {
-						localDateTime = LocalDateTime.parse( new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss") ) ;
+						defaultDateTimeFormatter = "yyyy-MM-dd HH:mm:ss" ;
+					}
+					if( fieldStringBuilder.length() > 0 ) {
+						localDateTime = LocalDateTime.parse( fieldStringBuilder.toString(), DateTimeFormatter.ofPattern(defaultDateTimeFormatter) );
+					} else {
+						localDateTime = LocalDateTime.parse( new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1), DateTimeFormatter.ofPattern(defaultDateTimeFormatter) ) ;
 					}
 					if( method != null ) {
 						method.invoke(object, localDateTime);
@@ -1327,11 +1363,12 @@ class OkJsonGenerator {
 	}
 	
 	class OkJsonClassField {
-		char[]			fieldName ;
-		char[]			fieldNameQM ;
-		ClassFieldType	type ;
-		Field			field ;
-		Method			getMethod ;
+		char[]					fieldName ;
+		char[]					fieldNameQM ;
+		ClassFieldType			type ;
+		Field					field ;
+		Method					getMethod ;
+		OkJsonDateTimeFormatter	okjsonDateTimeFormatter ;
 	}
 	
 	private static ThreadLocal<HashMap<String,LinkedList<OkJsonClassField>>>	classMapFieldListCache ;
@@ -1359,7 +1396,7 @@ class OkJsonGenerator {
 	final private static int	OKJSON_ERROR_NEW_OBJECT = -31 ;
 	
 	final private static char	SEPFIELD_CHAR = ',' ;
-	final private static char[]	SEPFIELD_CHAR_PRETTY = " , \n".toCharArray() ;
+	final private static char[]	SEPFIELD_CHAR_PRETTY = " ,\n".toCharArray() ;
 	final private static char	ENTER_CHAR = '\n' ;
 	final private static String	NULL_STRING = "null" ;
 	
@@ -1391,17 +1428,21 @@ class OkJsonGenerator {
 							arrayIndex++;
 							if( arrayIndex > 1 ) {
 								if( prettyFormatEnable ) {
-									jsonCharArrayBuilder.appendCharArrayWith4( SEPFIELD_CHAR_PRETTY );
+									jsonCharArrayBuilder.appendCharArrayWith3(SEPFIELD_CHAR_PRETTY).appendTabs(depth+1);
 								} else {
 									jsonCharArrayBuilder.appendChar(SEPFIELD_CHAR);
+								}
+							} else {
+								if( prettyFormatEnable ) {
+									jsonCharArrayBuilder.appendTabs(depth+1);
 								}
 							}
 							
 							if( typeClazz == String.class && object != null ) {
 								String str = (String)object ;
-								jsonCharArrayBuilder.appendTabs(depth+1).appendJsonQmStringQm(str);
+								jsonCharArrayBuilder.appendJsonQmStringQm(str);
 							} else {
-								jsonCharArrayBuilder.appendTabs(depth+1).appendJsonString(object.toString());
+								jsonCharArrayBuilder.appendJsonString(object.toString());
 							}
 						}
 				} else {
@@ -1410,7 +1451,7 @@ class OkJsonGenerator {
 						arrayIndex++;
 						if( arrayIndex > 1 ) {
 							if( prettyFormatEnable ) {
-								jsonCharArrayBuilder.appendCharArrayWith4(SEPFIELD_CHAR_PRETTY);
+								jsonCharArrayBuilder.appendCharArrayWith3(SEPFIELD_CHAR_PRETTY);
 							} else {
 								jsonCharArrayBuilder.appendChar(SEPFIELD_CHAR);
 							}
@@ -1428,7 +1469,7 @@ class OkJsonGenerator {
 							if( prettyFormatEnable ) {
 								jsonCharArrayBuilder.appendTabs(depth+1).appendString("}");
 							} else {
-								jsonCharArrayBuilder.appendTabs(depth+1).appendChar('}');
+								jsonCharArrayBuilder.appendChar('}');
 							}
 						}
 					}
@@ -1438,7 +1479,9 @@ class OkJsonGenerator {
 			return OKJSON_ERROR_EXCEPTION;
 		}
 		
-		jsonCharArrayBuilder.appendChar(ENTER_CHAR);
+		if( prettyFormatEnable ) {
+			jsonCharArrayBuilder.appendChar(ENTER_CHAR);
+		}
 		
 		return 0;
 	}
@@ -1600,6 +1643,12 @@ class OkJsonGenerator {
 					return OKJSON_ERROR_UNEXPECT;
 				}
 				
+				if( f.isAnnotationPresent(OkJsonDateTimeFormatter.class) ) {
+					classField.okjsonDateTimeFormatter = f.getAnnotation(OkJsonDateTimeFormatter.class) ;
+				} else {
+					classField.okjsonDateTimeFormatter = null ;
+				}
+				
 				classFieldList.add(classField);
 			}
 		}
@@ -1609,7 +1658,7 @@ class OkJsonGenerator {
 			fieldIndex++;
 			if( fieldIndex > 1 ) {
 				if( prettyFormatEnable ) {
-					jsonCharArrayBuilder.appendCharArrayWith4( SEPFIELD_CHAR_PRETTY );
+					jsonCharArrayBuilder.appendCharArrayWith3(SEPFIELD_CHAR_PRETTY);
 				} else {
 					jsonCharArrayBuilder.appendChar( SEPFIELD_CHAR );
 				}
@@ -1680,7 +1729,8 @@ class OkJsonGenerator {
 					}
 					break;
 				case CLASSFIELDTYPE_LOCALDATE :
-					LocalDate localDate = null ;
+					LocalDate localDate ;
+					String defaultDateTimeFormatter ;
 					if( classField.getMethod != null ) {
 						try {
 							localDate = (LocalDate)(classField.getMethod.invoke( object )) ;
@@ -1696,7 +1746,12 @@ class OkJsonGenerator {
 							return OKJSON_ERROR_EXCEPTION;
 						}
 					}
-					String localDateString = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(localDate) ;
+					if( classField.okjsonDateTimeFormatter != null ) {
+						defaultDateTimeFormatter = classField.okjsonDateTimeFormatter.format() ;
+					} else {
+						defaultDateTimeFormatter = "yyyy-MM-dd" ;
+					}
+					String localDateString = DateTimeFormatter.ofPattern(defaultDateTimeFormatter).format(localDate) ;
 					if( localDateString != null ) {
 						if( prettyFormatEnable ) {
 							jsonCharArrayBuilder.appendTabs(depth+1).appendJsonNameAndColonAndQmStringQmPretty(classField.fieldName,localDateString);
@@ -1728,7 +1783,12 @@ class OkJsonGenerator {
 							return OKJSON_ERROR_EXCEPTION;
 						}
 					}
-					String localTimeString = DateTimeFormatter.ofPattern("HH:mm:ss").format(localTime) ;
+					if( classField.okjsonDateTimeFormatter != null ) {
+						defaultDateTimeFormatter = classField.okjsonDateTimeFormatter.format() ;
+					} else {
+						defaultDateTimeFormatter = "HH:mm:ss" ;
+					}
+					String localTimeString = DateTimeFormatter.ofPattern(defaultDateTimeFormatter).format(localTime) ;
 					if( localTimeString != null ) {
 						if( prettyFormatEnable ) {
 							jsonCharArrayBuilder.appendTabs(depth+1).appendJsonNameAndColonAndQmStringQmPretty(classField.fieldName,localTimeString);
@@ -1760,7 +1820,12 @@ class OkJsonGenerator {
 							return OKJSON_ERROR_EXCEPTION;
 						}
 					}
-					String localDateTimeString = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(localDateTime) ;
+					if( classField.okjsonDateTimeFormatter != null ) {
+						defaultDateTimeFormatter = classField.okjsonDateTimeFormatter.format() ;
+					} else {
+						defaultDateTimeFormatter = "yyyy-MM-dd HH:mm:ss" ;
+					}
+					String localDateTimeString = DateTimeFormatter.ofPattern(defaultDateTimeFormatter).format(localDateTime) ;
 					if( localDateTimeString != null ) {
 						if( prettyFormatEnable ) {
 							jsonCharArrayBuilder.appendTabs(depth+1).appendJsonNameAndColonAndQmStringQmPretty(classField.fieldName,localDateTimeString);
@@ -2240,7 +2305,7 @@ class OkJsonCharArrayBuilder {
 	
 	public OkJsonCharArrayBuilder appendJsonNameAndColonAndStringPretty( char[] name, String str ) {
 		int		strLength = str.length() ;
-		int		newBufLength = bufLength + name.length+strLength+6 ;
+		int		newBufLength = bufLength + name.length+strLength+5 ;
 		
 		if( newBufLength > bufSize )
 			resize( newBufLength );
@@ -2252,7 +2317,7 @@ class OkJsonCharArrayBuilder {
 		buf[bufLength] = ':' ; bufLength++;
 		buf[bufLength] = ' ' ; bufLength++;
 		str.getChars(0, strLength, buf, bufLength); bufLength+=strLength;
-		buf[bufLength] = ' ' ; bufLength++;
+		// buf[bufLength] = ' ' ; bufLength++;
 		
 		return this;
 	}

@@ -232,11 +232,18 @@ public class TestObjectToJsonStringToObject {
 	}
 	
 	public static void main(String[] args) {
-		TestDataClass		object = new TestDataClass() ;
+		TestDataClass		object ;
+		TestDataClass		object2 ;
+		TestDataClass		object3 ;
+		String				string ;
+		String				string2 ;
+		String				string3 ;
 		
+		object = new TestDataClass() ;
 		setTestDataObject( object ) ;
+		printTestDataClass( object );
 		
-		String string = OKJSON.objectToString( object, OKJSON.OKJSON_OTIONS_DIRECT_ACCESS_PROPERTY_ENABLE|OKJSON.OKJSON_OTIONS_PRETTY_FORMAT_ENABLE ) ;
+		string = OKJSON.objectToString( object, OKJSON.OKJSON_OTIONS_DIRECT_ACCESS_PROPERTY_ENABLE|OKJSON.OKJSON_OTIONS_PRETTY_FORMAT_ENABLE ) ;
 		if( string == null ) {
 			System.out.println( "objectToString failed["+OKJSON.getErrorCode()+"]["+OKJSON.getErrorDesc()+"]" );
 			return;
@@ -245,7 +252,7 @@ public class TestObjectToJsonStringToObject {
 			System.out.println( "jsonString["+string+"]" );
 		}
 		
-		TestDataClass object2 = OKJSON.stringToObject( string, TestDataClass.class, OKJSON.OKJSON_OTIONS_DIRECT_ACCESS_PROPERTY_ENABLE ) ;
+		object2 = OKJSON.stringToObject( string, TestDataClass.class, OKJSON.OKJSON_OTIONS_DIRECT_ACCESS_PROPERTY_ENABLE ) ;
 		if( object2 == null ) {
 			System.out.println( "stringToObject failed["+OKJSON.getErrorCode()+"]["+OKJSON.getErrorDesc()+"]" );
 			return;
@@ -254,6 +261,64 @@ public class TestObjectToJsonStringToObject {
 			System.out.println( "stringToObject ok" );
 			printTestDataClass( object2 );
 		}
+		
+		string2 = OKJSON.objectToString( object2, OKJSON.OKJSON_OTIONS_DIRECT_ACCESS_PROPERTY_ENABLE ) ;
+		if( string2 == null ) {
+			System.out.println( "objectToString failed["+OKJSON.getErrorCode()+"]["+OKJSON.getErrorDesc()+"]" );
+			return;
+		} else {
+			System.out.println( "objectToString ok" );
+			System.out.println( "jsonString["+string2+"]" );
+		}
+		
+		object3 = OKJSON.stringToObject( string2, TestDataClass.class, OKJSON.OKJSON_OTIONS_DIRECT_ACCESS_PROPERTY_ENABLE ) ;
+		if( object3 == null ) {
+			System.out.println( "stringToObject failed["+OKJSON.getErrorCode()+"]["+OKJSON.getErrorDesc()+"]" );
+			return;
+		}
+		else {
+			System.out.println( "stringToObject ok" );
+			printTestDataClass( object3 );
+		}
+		
+		if( object.strings8.getString81() != null && object3.strings8.getString81() != null && ! object.strings8.getString81().equals(object3.strings8.getString81()) ) {
+			System.out.println( "object.strings8.string81["+object.strings8.getString81()+"] is not equals with object3.strings8.string81["+object3.strings8.getString81()+"]" );
+			return;
+		}
+		if( object.strings8.getString82() != null && object3.strings8.getString82() != null && ! object.strings8.getString82().equals(object3.strings8.getString82()) ) {
+			System.out.println( "object.strings8.string82["+object.strings8.getString82()+"] is not equals with object3.strings8.string82["+object3.strings8.getString82()+"]" );
+			return;
+		}
+		if( object.strings8.getString83() != null && object3.strings8.getString83() != null && ! object.strings8.getString83().equals(object3.strings8.getString83()) ) {
+			System.out.println( "object.strings8.string83["+object.strings8.getString83()+"] is not equals with object3.strings8.string83["+object3.strings8.getString83()+"]" );
+			return;
+		}
+		if( object.strings8.getString84() != null && object3.strings8.getString84() != null && ! object.strings8.getString84().equals(object3.strings8.getString84()) ) {
+			System.out.println( "object.strings8.string84["+object.strings8.getString84()+"] is not equals with object3.strings8.string84["+object3.strings8.getString84()+"]" );
+			return;
+		}
+		if( object.strings8.getString85() != null && object3.strings8.getString85() != null && ! object.strings8.getString85().equals(object3.strings8.getString85()) ) {
+			System.out.println( "object.strings8.string85["+object.strings8.getString85()+"] is not equals with object3.strings8.string85["+object3.strings8.getString85()+"]" );
+			return;
+		}
+		if( object.strings8.getString86() != null && object3.strings8.getString86() != null && ! object.strings8.getString86().equals(object3.strings8.getString86()) ) {
+			System.out.println( "object.strings8.string86["+object.strings8.getString86()+"] is not equals with object3.strings8.string86["+object3.strings8.getString86()+"]" );
+			return;
+		}
+		if( object.strings8.getString87() != null && object3.strings8.getString87() != null && ! object.strings8.getString87().equals(object3.strings8.getString87()) ) {
+			System.out.println( "object.strings8.string87["+object.strings8.getString87()+"] is not equals with object3.strings8.string87["+object3.strings8.getString87()+"]" );
+			return;
+		}
+		if( object.strings8.getString88() != null && object3.strings8.getString88() != null && ! object.strings8.getString88().equals(object3.strings8.getString88()) ) {
+			System.out.println( "object.strings8.string88["+object.strings8.getString88()+"] is not equals with object3.strings8.string88["+object3.strings8.getString88()+"]" );
+			return;
+		}
+		if( object.strings8.getString89() != null && object3.strings8.getString89() != null && ! object.strings8.getString89().equals(object3.strings8.getString89()) ) {
+			System.out.println( "object.strings8.string89["+object.strings8.getString89()+"] is not equals with object3.strings8.string89["+object3.strings8.getString89()+"]" );
+			return;
+		}
+		
+		System.out.println( "ALL test is OK" );
 		
 		return;
 	}

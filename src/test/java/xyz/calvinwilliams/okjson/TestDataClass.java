@@ -48,8 +48,13 @@ public class TestDataClass {
 	public Strings8				strings8 ;
 	public Numbers9				numbers9 ;
 	
+	@OkJsonDateTimeFormatter(format="MM/dd/yyyy")
 	public LocalDate			localDate10 ;
+	
+	@OkJsonDateTimeFormatter(format="HHmmss")
 	public LocalTime			localTime11 ;
+	
+	@OkJsonDateTimeFormatter(format="MM/dd/yyyy HHmmss")
 	public LocalDateTime		localDateTime12 ;
 
 	public LocalDate getLocalDate10() {
@@ -57,6 +62,13 @@ public class TestDataClass {
 	}
 	public void setLocalDate10(LocalDate localDate10) {
 		this.localDate10 = localDate10;
+	}
+	public LocalTime getLocalTime11() {
+		return localTime11;
+	}
+	
+	public void setLocalTime11(LocalTime localTime11) {
+		this.localTime11 = localTime11;
 	}
 }
 
