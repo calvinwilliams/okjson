@@ -70,6 +70,9 @@ public class TestDataClass {
 	public void setLocalTime11(LocalTime localTime11) {
 		this.localTime11 = localTime11;
 	}
+	
+	@OkJsonDateTimeFormatter(format="yyyy-MM-dd HH:mm:ss")
+	public LinkedList<LocalDateTime>	list13 ;
 }
 
 class Branch2 {

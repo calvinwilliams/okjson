@@ -1,6 +1,8 @@
 0.0.9.0		2019-04-12		calvin
 			* 静态类OKJSON新增方法objectToFile和fileToObject
 			* 新增Demo.java
+			* JSON数组简单类型新增支持日期、时间
+			* 编写README.md
 
 0.0.8.0		2019-04-11		calvin
 			* 支持日期、时间属性的序列化/反序列化

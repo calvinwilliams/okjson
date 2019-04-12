@@ -1,9 +1,6 @@
 package xyz.calvinwilliams.okjson;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 
 public class Demo {
 
@@ -33,10 +30,9 @@ public class Demo {
 	
 	public static void main(String[] args) {
 		DemoUserClass	demoUser = new DemoUserClass() ;
-		String			jsonString ;
 		
 		System.out.println( "OKJSON.stringToObject ..." );
-		demoUser = OKJSON.fileToObject( "demo.json", DemoUserClass.class, OKJSON.OKJSON_OTIONS_DIRECT_ACCESS_PROPERTY_ENABLE ) ;
+		demoUser = OKJSON.fileToObject( "demo.json", DemoUserClass.class, OKJSON.OPTIONS_DIRECT_ACCESS_PROPERTY_ENABLE ) ;
 		if( demoUser == null ) {
 			System.out.println( "OKJSON.stringToObject failed["+OKJSON.getErrorCode()+"]["+OKJSON.getErrorDesc()+"]" );
 			return;

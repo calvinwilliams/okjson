@@ -11,6 +11,7 @@ package xyz.calvinwilliams.okjson;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -224,9 +225,18 @@ public class TestObjectToJsonStringToObject {
 			System.out.println( "TestDataClass.numbers9.doubleE99["+obj.numbers9.getDoubleE99()+"]" );
 		}
 		
-		System.out.println( "TestDataClass.localDate10["+obj.localDate10+"]" );
-		System.out.println( "TestDataClass.localTime11["+obj.localTime11+"]" );
-		System.out.println( "TestDataClass.localDateTime12["+obj.localDateTime12+"]" );
+		System.out.println( "TestDataClass.localDate10["+DateTimeFormatter.ofPattern("yyyy-MM-dd").format(obj.localDate10)+"]" );
+		System.out.println( "TestDataClass.localTime11["+DateTimeFormatter.ofPattern("HH:mm:ss").format(obj.localTime11)+"]" );
+		System.out.println( "TestDataClass.localDateTime12["+DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(obj.localDateTime12)+"]" );
+		
+		System.out.println( "------------------------------ dump TestDataClass.list13" );
+		if( obj.list13 != null ) {
+			Iterator<LocalDateTime> iterList13 = obj.list13.iterator() ;
+			while( iterList13.hasNext() ) {
+				LocalDateTime localDateTime = iterList13.next() ;
+				System.out.println( "TestDataClass.list13.<LocalDateTime>.["+DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(localDateTime)+"]" );
+			}
+		}
 		
 		System.out.println( "------------------------------ dump end" );
 	}
@@ -244,7 +254,7 @@ public class TestObjectToJsonStringToObject {
 		setTestDataObject( object ) ;
 		printTestDataClass( object );
 		
-		string = OKJSON.objectToString( object, OKJSON.OKJSON_OTIONS_DIRECT_ACCESS_PROPERTY_ENABLE|OKJSON.OKJSON_OTIONS_PRETTY_FORMAT_ENABLE ) ;
+		string = OKJSON.objectToString( object, OKJSON.OPTIONS_DIRECT_ACCESS_PROPERTY_ENABLE|OKJSON.OPTIONS_PRETTY_FORMAT_ENABLE ) ;
 		if( string == null ) {
 			System.out.println( "objectToString failed["+OKJSON.getErrorCode()+"]["+OKJSON.getErrorDesc()+"]" );
 			return;
@@ -253,7 +263,7 @@ public class TestObjectToJsonStringToObject {
 			System.out.println( "jsonString["+string+"]" );
 		}
 		
-		object2 = OKJSON.stringToObject( string, TestDataClass.class, OKJSON.OKJSON_OTIONS_DIRECT_ACCESS_PROPERTY_ENABLE ) ;
+		object2 = OKJSON.stringToObject( string, TestDataClass.class, OKJSON.OPTIONS_DIRECT_ACCESS_PROPERTY_ENABLE ) ;
 		if( object2 == null ) {
 			System.out.println( "stringToObject failed["+OKJSON.getErrorCode()+"]["+OKJSON.getErrorDesc()+"]" );
 			return;
@@ -263,7 +273,7 @@ public class TestObjectToJsonStringToObject {
 			printTestDataClass( object2 );
 		}
 		
-		string2 = OKJSON.objectToString( object2, OKJSON.OKJSON_OTIONS_DIRECT_ACCESS_PROPERTY_ENABLE ) ;
+		string2 = OKJSON.objectToString( object2, OKJSON.OPTIONS_DIRECT_ACCESS_PROPERTY_ENABLE ) ;
 		if( string2 == null ) {
 			System.out.println( "objectToString failed["+OKJSON.getErrorCode()+"]["+OKJSON.getErrorDesc()+"]" );
 			return;
@@ -272,7 +282,7 @@ public class TestObjectToJsonStringToObject {
 			System.out.println( "jsonString["+string2+"]" );
 		}
 		
-		object3 = OKJSON.stringToObject( string2, TestDataClass.class, OKJSON.OKJSON_OTIONS_DIRECT_ACCESS_PROPERTY_ENABLE ) ;
+		object3 = OKJSON.stringToObject( string2, TestDataClass.class, OKJSON.OPTIONS_DIRECT_ACCESS_PROPERTY_ENABLE ) ;
 		if( object3 == null ) {
 			System.out.println( "stringToObject failed["+OKJSON.getErrorCode()+"]["+OKJSON.getErrorDesc()+"]" );
 			return;
@@ -320,7 +330,7 @@ public class TestObjectToJsonStringToObject {
 		}
 		
 		System.out.println( "fileToObject ..." );
-		object = OKJSON.fileToObject( "parser.json", TestDataClass.class, OKJSON.OKJSON_OTIONS_DIRECT_ACCESS_PROPERTY_ENABLE ) ;
+		object = OKJSON.fileToObject( "parser.json", TestDataClass.class, OKJSON.OPTIONS_DIRECT_ACCESS_PROPERTY_ENABLE ) ;
 		if( object == null ) {
 			System.out.println( "fileToObject failed["+OKJSON.getErrorCode()+"]["+OKJSON.getErrorDesc()+"]" );
 			return;
@@ -331,7 +341,7 @@ public class TestObjectToJsonStringToObject {
 		}
 		
 		System.out.println( "objectToFile ..." );
-		nret = OKJSON.objectToFile( object, "generator.json", OKJSON.OKJSON_OTIONS_DIRECT_ACCESS_PROPERTY_ENABLE|OKJSON.OKJSON_OTIONS_PRETTY_FORMAT_ENABLE ) ;
+		nret = OKJSON.objectToFile( object, "generator.json", OKJSON.OPTIONS_DIRECT_ACCESS_PROPERTY_ENABLE|OKJSON.OPTIONS_PRETTY_FORMAT_ENABLE ) ;
 		if( nret != 0 ) {
 			System.out.println( "objectToFile failed["+OKJSON.getErrorCode()+"]["+OKJSON.getErrorDesc()+"]" );
 			return;

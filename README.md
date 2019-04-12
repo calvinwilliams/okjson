@@ -1,6 +1,6 @@
-okjson
-======
+okjson - A small efficient flexible JSON parser/generator for Java
+==================================================================
 
 # overview
 
-okjson is a JSON processor (JSON parser + JSON generator) written in JavaWelcome JAVA
+okjson is A small efficient flexible JSON parser/generator for Java

@@ -1,5 +1,5 @@
 /*
- * okjson - A easy JSON parser/generator for Java
+ * okjson - A small efficient flexible JSON parser/generator for Java
  * author	: calvin
  * email	: calvinwilliams@163.com
  *
@@ -20,11 +20,21 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 public class OKJSON {
-	final public static int	OKJSON_OTIONS_DIRECT_ACCESS_PROPERTY_ENABLE = 1 ;
-	final public static int	OKJSON_OTIONS_PRETTY_FORMAT_ENABLE = 2 ;
-	final public static int	OKJSON_OTIONS_STRICT_POLICY = 4 ;
+	final public static int	OPTIONS_DIRECT_ACCESS_PROPERTY_ENABLE = 1 ;
+	final public static int	OPTIONS_PRETTY_FORMAT_ENABLE = 2 ;
+	final public static int	OPTIONS_STRICT_POLICY = 4 ;
 	
-	final private static int	OKJSON_ERROR_NEW_OBJECT = -31 ;
+	final public static int	OKJSON_ERROR_END_OF_BUFFER = OkJsonParser.OKJSON_ERROR_END_OF_BUFFER ;
+	final public static int	OKJSON_ERROR_UNEXPECT = OkJsonParser.OKJSON_ERROR_UNEXPECT ;
+	final public static int	OKJSON_ERROR_EXCEPTION = OkJsonParser.OKJSON_ERROR_EXCEPTION ;
+	final public static int	OKJSON_ERROR_INVALID_BYTE = OkJsonParser.OKJSON_ERROR_INVALID_BYTE ;
+	final public static int	OKJSON_ERROR_FIND_FIRST_LEFT_BRACE = OkJsonParser.OKJSON_ERROR_FIND_FIRST_LEFT_BRACE ;
+	final public static int	OKJSON_ERROR_NAME_INVALID = OkJsonParser.OKJSON_ERROR_NAME_INVALID ;
+	final public static int	OKJSON_ERROR_EXPECT_COLON_AFTER_NAME = OkJsonParser.OKJSON_ERROR_EXPECT_COLON_AFTER_NAME ;
+	final public static int	OKJSON_ERROR_UNEXPECT_TOKEN_AFTER_LEFT_BRACE = OkJsonParser.OKJSON_ERROR_UNEXPECT_TOKEN_AFTER_LEFT_BRACE ;
+	final public static int	OKJSON_ERROR_PORPERTY_TYPE_NOT_MATCH_IN_OBJECT = OkJsonParser.OKJSON_ERROR_PORPERTY_TYPE_NOT_MATCH_IN_OBJECT ;
+	final public static int	OKJSON_ERROR_NAME_NOT_FOUND_IN_OBJECT = OkJsonParser.OKJSON_ERROR_NAME_NOT_FOUND_IN_OBJECT ;
+	final public static int	OKJSON_ERROR_NEW_OBJECT = OkJsonParser.OKJSON_ERROR_NEW_OBJECT ;
 	
 	private static ThreadLocal<OkJsonGenerator>			okjsonGeneratorCache ;
 	private static ThreadLocal<OkJsonParser>			okjsonParserCache ;
@@ -71,11 +81,11 @@ public class OKJSON {
 			okjsonGenerator = okjsonGeneratorCache.get();
 		}
 		
-		if( (options&OKJSON_OTIONS_DIRECT_ACCESS_PROPERTY_ENABLE) != 0 )
+		if( (options&OPTIONS_DIRECT_ACCESS_PROPERTY_ENABLE) != 0 )
 			okjsonGenerator.setDirectAccessPropertyEnable(true);
 		else
 			okjsonGenerator.setDirectAccessPropertyEnable(false);
-		if( (options&OKJSON_OTIONS_PRETTY_FORMAT_ENABLE) != 0 )
+		if( (options&OPTIONS_PRETTY_FORMAT_ENABLE) != 0 )
 			okjsonGenerator.setPrettyFormatEnable(true);
 		else
 			okjsonGenerator.setPrettyFormatEnable(false);
@@ -121,11 +131,11 @@ public class OKJSON {
 			okjsonParser = okjsonParserCache.get();
 		}
 		
-		if( (options&OKJSON_OTIONS_DIRECT_ACCESS_PROPERTY_ENABLE) != 0 )
+		if( (options&OPTIONS_DIRECT_ACCESS_PROPERTY_ENABLE) != 0 )
 			okjsonParser.setDirectAccessPropertyEnable(true);
 		else
 			okjsonParser.setDirectAccessPropertyEnable(false);
-		if( (options&OKJSON_OTIONS_STRICT_POLICY) != 0 )
+		if( (options&OPTIONS_STRICT_POLICY) != 0 )
 			okjsonParser.setStrictPolicyEnable(true);
 		else
 			okjsonParser.setStrictPolicyEnable(false);
@@ -181,17 +191,17 @@ class OkJsonParser {
 	private int					endOffset ;
 	private boolean				booleanValue ;
 	
-	final private static int	OKJSON_ERROR_END_OF_BUFFER = 1 ;
-	final private static int	OKJSON_ERROR_UNEXPECT = -4 ;
-	final private static int	OKJSON_ERROR_EXCEPTION = -8 ;
-	final private static int	OKJSON_ERROR_INVALID_BYTE = -11 ;
-	final private static int	OKJSON_ERROR_FIND_FIRST_LEFT_BRACE = -21 ;
-	final private static int	OKJSON_ERROR_NAME_INVALID = -22 ;
-	final private static int	OKJSON_ERROR_EXPECT_COLON_AFTER_NAME = -23 ;
-	final private static int	OKJSON_ERROR_UNEXPECT_TOKEN_AFTER_LEFT_BRACE = -24 ;
-	final private static int	OKJSON_ERROR_PORPERTY_TYPE_NOT_MATCH_IN_OBJECT = -26 ;
-	final private static int	OKJSON_ERROR_NAME_NOT_FOUND_IN_OBJECT = -28 ;
-	final private static int	OKJSON_ERROR_NEW_OBJECT = -31 ;
+	final public static int	OKJSON_ERROR_END_OF_BUFFER = 1 ;
+	final public static int	OKJSON_ERROR_UNEXPECT = -4 ;
+	final public static int	OKJSON_ERROR_EXCEPTION = -8 ;
+	final public static int	OKJSON_ERROR_INVALID_BYTE = -11 ;
+	final public static int	OKJSON_ERROR_FIND_FIRST_LEFT_BRACE = -21 ;
+	final public static int	OKJSON_ERROR_NAME_INVALID = -22 ;
+	final public static int	OKJSON_ERROR_EXPECT_COLON_AFTER_NAME = -23 ;
+	final public static int	OKJSON_ERROR_UNEXPECT_TOKEN_AFTER_LEFT_BRACE = -24 ;
+	final public static int	OKJSON_ERROR_PORPERTY_TYPE_NOT_MATCH_IN_OBJECT = -26 ;
+	final public static int	OKJSON_ERROR_NAME_NOT_FOUND_IN_OBJECT = -28 ;
+	final public static int	OKJSON_ERROR_NEW_OBJECT = -31 ;
 	
 	private int tokenJsonString( char[] jsonCharArray ) {
 		StringBuilder	fieldStringBuilder ;
@@ -573,6 +583,54 @@ class OkJsonParser {
 				} else if( typeClass == Boolean.class ) {
 					if( valueTokenType == TokenType.TOKEN_TYPE_BOOL ) {
 						((List<Object>) object).add( booleanValue );
+					} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
+						;
+					}
+				} else if( typeClass == LocalDate.class ) {
+					if( valueTokenType == TokenType.TOKEN_TYPE_STRING ) {
+						OkJsonDateTimeFormatter	okjsonDateTimeFormatter ;
+						String defaultDateTimeFormatter ;
+						LocalDate localDate ;
+						if( field.isAnnotationPresent(OkJsonDateTimeFormatter.class) ) {
+							okjsonDateTimeFormatter = field.getAnnotation(OkJsonDateTimeFormatter.class) ;
+							defaultDateTimeFormatter = okjsonDateTimeFormatter.format() ;
+						} else {
+							defaultDateTimeFormatter = "yyyy-MM-dd" ;
+						}
+						localDate = LocalDate.parse( new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1), DateTimeFormatter.ofPattern(defaultDateTimeFormatter) ) ;
+						((List<Object>) object).add( localDate );
+					} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
+						;
+					}
+				} else if( typeClass == LocalTime.class ) {
+					if( valueTokenType == TokenType.TOKEN_TYPE_STRING ) {
+						OkJsonDateTimeFormatter	okjsonDateTimeFormatter ;
+						String defaultDateTimeFormatter ;
+						LocalTime localTime ;
+						if( field.isAnnotationPresent(OkJsonDateTimeFormatter.class) ) {
+							okjsonDateTimeFormatter = field.getAnnotation(OkJsonDateTimeFormatter.class) ;
+							defaultDateTimeFormatter = okjsonDateTimeFormatter.format() ;
+						} else {
+							defaultDateTimeFormatter = "HH:mm:ss" ;
+						}
+						localTime = LocalTime.parse( new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1), DateTimeFormatter.ofPattern(defaultDateTimeFormatter) ) ;
+						((List<Object>) object).add( localTime );
+					} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
+						;
+					}
+				} else if( typeClass == LocalDateTime.class ) {
+					if( valueTokenType == TokenType.TOKEN_TYPE_STRING ) {
+						OkJsonDateTimeFormatter	okjsonDateTimeFormatter ;
+						String defaultDateTimeFormatter ;
+						LocalDateTime localDateTime ;
+						if( field.isAnnotationPresent(OkJsonDateTimeFormatter.class) ) {
+							okjsonDateTimeFormatter = field.getAnnotation(OkJsonDateTimeFormatter.class) ;
+							defaultDateTimeFormatter = okjsonDateTimeFormatter.format() ;
+						} else {
+							defaultDateTimeFormatter = "yyyy-MM-dd HH:mm:ss" ;
+						}
+						localDateTime = LocalDateTime.parse( new String(jsonCharArray,valueBeginOffset,valueEndOffset-valueBeginOffset+1), DateTimeFormatter.ofPattern(defaultDateTimeFormatter) ) ;
+						((List<Object>) object).add( localDateTime );
 					} else if( valueTokenType == TokenType.TOKEN_TYPE_NULL ) {
 						;
 					}
@@ -1321,17 +1379,8 @@ class OkJsonGenerator {
 	private Integer				errorCode ;
 	private String				errorDesc ;
 	
-	final private static int	OKJSON_ERROR_END_OF_BUFFER = 1 ;
-	final private static int	OKJSON_ERROR_UNEXPECT = -4 ;
-	final private static int	OKJSON_ERROR_EXCEPTION = -8 ;
-	final private static int	OKJSON_ERROR_INVALID_BYTE = -11 ;
-	final private static int	OKJSON_ERROR_FIND_FIRST_LEFT_BRACE = -21 ;
-	final private static int	OKJSON_ERROR_NAME_INVALID = -22 ;
-	final private static int	OKJSON_ERROR_EXPECT_COLON_AFTER_NAME = -23 ;
-	final private static int	OKJSON_ERROR_UNEXPECT_TOKEN_AFTER_LEFT_BRACE = -24 ;
-	final private static int	OKJSON_ERROR_PORPERTY_TYPE_NOT_MATCH_IN_OBJECT = -26 ;
-	final private static int	OKJSON_ERROR_NAME_NOT_FOUND_IN_OBJECT = -28 ;
-	final private static int	OKJSON_ERROR_NEW_OBJECT = -31 ;
+	final public static int	OKJSON_ERROR_EXCEPTION = -8 ;
+	final public static int	OKJSON_ERROR_NEW_OBJECT = -31 ;
 	
 	final private static char	SEPFIELD_CHAR = ',' ;
 	final private static char[]	SEPFIELD_CHAR_PRETTY = " ,\n".toCharArray() ;
@@ -1555,7 +1604,7 @@ class OkJsonGenerator {
 					;
 				} catch (Exception e) {
 					e.printStackTrace();
-					return OKJSON_ERROR_UNEXPECT;
+					return OKJSON_ERROR_EXCEPTION;
 				}
 				
 				if( f.isAnnotationPresent(OkJsonDateTimeFormatter.class) ) {
