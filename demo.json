@@ -1,0 +1,32 @@
+{
+	"userName" : "Calvin" ,
+	"email" : "calvinwilliams@163.com" ,
+	"userExtInfo" : {
+		"gender" : "M" ,
+		"age" : 30 ,
+		"address" : "I won't tell you"
+	} ,
+	"interestGroupList" : [
+		"Programing", "Playing game", "Reading", "Sleeping"
+	] ,
+	"borrowDetailList" : [
+		{
+			"bookName" : "Thinking in JAVA" ,
+			"author" : "Bruce Eckel" ,
+			"borrowDate" : "2014-01-02" ,
+			"borrowTime" : "17:30:00"
+		} ,
+		{
+			"bookName" : "Thinking in C++" ,
+			"author" : "Bruce Eckel too" ,
+			"borrowDate" : "2014-02-04" ,
+			"borrowTime" : "17:35:00"
+		} ,
+		{
+			"bookName" : "Thinking in okjson" ,
+			"author" : "It's me !!!" ,
+			"borrowDate" : "2014-03-06" ,
+			"borrowTime" : "17:40:00"
+		}
+	]
+}

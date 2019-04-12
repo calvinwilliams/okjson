@@ -1,0 +1,78 @@
+{
+	"str1" : "str1" ,
+	"byte1" : 1 ,
+	"short1" : 12 ,
+	"int1" : 1234 ,
+	"long1" : 12345678 ,
+	"float1" : 1.234 ,
+	"double1" : 1.2345678 ,
+	"boolean1" : true ,
+	"null1" : null ,
+	"name1" : "value1" ,
+	"branch2" : {
+		"str2" : "str2" ,
+		"byte2" : 2 ,
+		"short2" : 23 ,
+		"int2" : -2345 ,
+		"long2" : 23456789 ,
+		"float2" : -2.345 ,
+		"double2" : 2345.6789 ,
+		"boolean2" : false ,
+		"null2" : null
+	} ,
+	"branch3" : {
+		"str3" : "str3" ,
+		"byte3" : 3 ,
+		"short3" : 34 ,
+		"int3" : 3456 ,
+		"long3" : 34567890 ,
+		"float3" : 3.456 ,
+		"double3" : 3456.789 ,
+		"boolean3" : true ,
+		"null3" : null ,
+		"branch33" : {
+			"str33" : "str33" ,
+			"byte33" : 33 ,
+			"short33" : 33 ,
+			"int33" : 3345 ,
+			"long33" : 33456789 ,
+			"float33" : 33.45 ,
+			"double33" : 3345.6789 ,
+			"boolean33" : false ,
+			"null33" : null ,
+			"name33" : "value33"
+		}
+	} ,
+	"array4" : null ,
+	"array5" : null ,
+	"array6" : null ,
+	"array65" : null ,
+	"array7" : null ,
+	"strings8" : {
+		"string81" : "\"\\\/\b\f\n\r\t" ,
+		"string82" : "ABC\"\\\/\b\f\n\r\t" ,
+		"string83" : "\"\\\/\b\f\n\r\tABC" ,
+		"string84" : "A\"\\\/B\b\f\n\r\tC" ,
+		"string85" : "计算机学院" ,
+		"string86" : "ABC计算机学院" ,
+		"string87" : "计算机学院ABC" ,
+		"string88" : "A计算B机学院C" ,
+		"string89" : "计A算B机学C院"
+	} ,
+	"numbers9" : {
+		"long91" : 123 ,
+		"long92" : -123 ,
+		"long93" : 1234567890 ,
+		"floatE94" : 1234.0 ,
+		"floatE95" : -0.1234 ,
+		"floatE96" : -12.34 ,
+		"doubleE97" : 1234.5678 ,
+		"doubleE98" : 123456.78 ,
+		"doubleE99" : 12.345678
+	} ,
+	"localDate10" : "2019-04-10" ,
+	"localTime11" : "21:31:41" ,
+	"localDateTime12" : "2019-04-10 21:31:41"
+}
+"
+}

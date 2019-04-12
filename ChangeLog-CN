@@ -1,3 +1,7 @@
+0.0.9.0		2019-04-12		calvin
+			* 静态类OKJSON新增方法objectToFile和fileToObject
+			* 新增Demo.java
+
 0.0.8.0		2019-04-11		calvin
 			* 支持日期、时间属性的序列化/反序列化
 			* 增加注解OkJsonDateTimeFormatter用于格式化日期、时间属性

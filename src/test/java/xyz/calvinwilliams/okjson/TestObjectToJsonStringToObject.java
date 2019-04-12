@@ -232,12 +232,13 @@ public class TestObjectToJsonStringToObject {
 	}
 	
 	public static void main(String[] args) {
-		TestDataClass		object ;
-		TestDataClass		object2 ;
-		TestDataClass		object3 ;
-		String				string ;
-		String				string2 ;
-		String				string3 ;
+		TestDataClass	object ;
+		TestDataClass	object2 ;
+		TestDataClass	object3 ;
+		String			string ;
+		String			string2 ;
+		String			string3 ;
+		int				nret = 0 ;
 		
 		object = new TestDataClass() ;
 		setTestDataObject( object ) ;
@@ -316,6 +317,26 @@ public class TestObjectToJsonStringToObject {
 		if( object.strings8.getString89() != null && object3.strings8.getString89() != null && ! object.strings8.getString89().equals(object3.strings8.getString89()) ) {
 			System.out.println( "object.strings8.string89["+object.strings8.getString89()+"] is not equals with object3.strings8.string89["+object3.strings8.getString89()+"]" );
 			return;
+		}
+		
+		System.out.println( "fileToObject ..." );
+		object = OKJSON.fileToObject( "parser.json", TestDataClass.class, OKJSON.OKJSON_OTIONS_DIRECT_ACCESS_PROPERTY_ENABLE ) ;
+		if( object == null ) {
+			System.out.println( "fileToObject failed["+OKJSON.getErrorCode()+"]["+OKJSON.getErrorDesc()+"]" );
+			return;
+		}
+		else {
+			System.out.println( "fileToObject ok" );
+			printTestDataClass( object );
+		}
+		
+		System.out.println( "objectToFile ..." );
+		nret = OKJSON.objectToFile( object, "generator.json", OKJSON.OKJSON_OTIONS_DIRECT_ACCESS_PROPERTY_ENABLE|OKJSON.OKJSON_OTIONS_PRETTY_FORMAT_ENABLE ) ;
+		if( nret != 0 ) {
+			System.out.println( "objectToFile failed["+OKJSON.getErrorCode()+"]["+OKJSON.getErrorDesc()+"]" );
+			return;
+		} else {
+			System.out.println( "objectToFile ok" );
 		}
 		
 		System.out.println( "ALL test is OK" );

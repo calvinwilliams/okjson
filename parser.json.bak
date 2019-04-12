@@ -73,8 +73,8 @@
 		"string85" : "\u8BA1\u7B97\u673A\u5B66\u9662" ,
 		"string86" : "ABC\u8BA1\u7B97\u673A\u5B66\u9662" ,
 		"string87" : "\u8BA1\u7B97\u673A\u5B66\u9662ABC" ,
-		"string88" : "\u8\u7B97\u67\u5B66\u966" ,
-		"string89" : "\u8BA1\u7\u673A\u5B6\u9662"
+		"string88" : "A\u8BA1\u7B97B\u673A\u5B66\u9662C" ,
+		"string89" : "\u8BA1A\u7B97B\u673A\u5B66C\u9662"
 	} ,
 	
 	"numbers9" : {
@@ -87,7 +87,7 @@
 		"doubleE97" : 1234.5678 ,
 		"doubleE98" : 1234.5678E+2 ,
 		"doubleE99" : 1234.5678E-2
-	}
+	} ,
 	
 	"localDate10" : "2019-04-10" ,
 	"localTime11" : "21:31:41" ,

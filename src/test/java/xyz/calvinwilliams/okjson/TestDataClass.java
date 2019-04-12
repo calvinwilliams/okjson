@@ -48,13 +48,13 @@ public class TestDataClass {
 	public Strings8				strings8 ;
 	public Numbers9				numbers9 ;
 	
-	@OkJsonDateTimeFormatter(format="MM/dd/yyyy")
+	@OkJsonDateTimeFormatter(format="yyyy-MM-dd")
 	public LocalDate			localDate10 ;
 	
-	@OkJsonDateTimeFormatter(format="HHmmss")
+	@OkJsonDateTimeFormatter(format="HH:mm:ss")
 	public LocalTime			localTime11 ;
 	
-	@OkJsonDateTimeFormatter(format="MM/dd/yyyy HHmmss")
+	@OkJsonDateTimeFormatter(format="yyyy-MM-dd HH:mm:ss")
 	public LocalDateTime		localDateTime12 ;
 
 	public LocalDate getLocalDate10() {
