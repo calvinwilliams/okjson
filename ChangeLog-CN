@@ -3,6 +3,7 @@
 			* 新增Demo.java
 			* JSON数组简单类型新增支持日期、时间
 			* 编写README.md
+			* 编写README.zh-CN.md
 
 0.0.8.0		2019-04-11		calvin
 			* 支持日期、时间属性的序列化/反序列化
