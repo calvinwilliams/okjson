@@ -269,22 +269,22 @@ public class Demo {
 
 ## 3.2. JSON字段类型与实体类属性类型映射表
 
-| JSON字段类型 | 实体类属性类型 |
-|---|---|
-| 字符串 | String |
-| 整型数字 | Byte或byte |
-| 整型数字 | Short或short |
-| 整型数字 | Integer或int |
-| 整型数字 | Long或long |
-| 浮点数字 | Float或float |
-| 浮点数字 | Double或double |
-| 布尔值 | Boolean或boolean |
-| 字符串 | LocalDate |
-| 字符串 | LocalTime |
-| 字符串 | LocalDateTime |
-| 数组 | ArrayList |
-| 数组 | LinkedList |
-| JSON树枝 | JAVA对象 |
+| JSON字段类型 | JSON示例 | 实体类属性类型 |
+|---|---|---|
+| 字符串 | "..." | String |
+| 整型数字 | 123 | Byte或byte |
+| 整型数字 | 123 | Short或short |
+| 整型数字 | 123 | Integer或int |
+| 整型数字 | 123 | Long或long |
+| 浮点数字 | 123.456 | Float或float |
+| 浮点数字 | 123.456 | Double或double |
+| 布尔值 | true/false | Boolean或boolean |
+| 字符串 | "..." | LocalDate |
+| 字符串 | "..." | LocalTime |
+| 字符串 | "..." | LocalDateTime |
+| 数组 | [...] | ArrayList |
+| 数组 | [...] |  LinkedList |
+| JSON树枝 | {...} | JAVA对象 |
 
 如：
 ```
@@ -328,20 +328,20 @@ class BorrowDetail {
 
 ## 3.3. JSON数组简单元素类型与实体类属性类型映射表
 
-| JSON数组简单元素类型 | 实体类属性类型 |
-|---|---|
-| 字符串 | String |
-| 整型数字 | Byte |
-| 整型数字 | Short |
-| 整型数字 | Integer |
-| 整型数字 | Long |
-| 浮点数字 | Float |
-| 浮点数字 | Double |
-| 布尔值 | Boolean |
-| 字符串 | LocalDate |
-| 字符串 | LocalTime |
-| 字符串 | LocalDateTime |
-| JSON树枝 | JAVA对象 |
+| JSON数组简单元素类型 | JSON示例 | 实体类属性类型 |
+|---|---|---|
+| 字符串 | "..." | String |
+| 整型数字 | 123 | Byte |
+| 整型数字 | 123 | Short |
+| 整型数字 | 123 | Integer |
+| 整型数字 | 123 | Long |
+| 浮点数字 | 123.456 | Float |
+| 浮点数字 | 123.456 | Double |
+| 布尔值 | true/false | Boolean |
+| 字符串 | "..." | LocalDate |
+| 字符串 | "..." | LocalTime |
+| 字符串 | "..." | LocalDateTime |
+| JSON树枝 | {...} | JAVA对象 |
 
 如：
 ```

@@ -6,17 +6,27 @@ okjson - A small efficient flexible JSON parser/generator for Java
 - [okjson - A small efficient flexible JSON parser/generator for Java](#okjson---a-small-efficient-flexible-json-parsergenerator-for-java)
 - [1. Overview](#1-overview)
 - [2. A demo](#2-a-demo)
-  - [2.1. Write json file](#21-write-json-file)
-  - [2.2. Write mapping class file](#22-write-mapping-class-file)
-  - [2.3. Write demo](#23-write-demo)
+	- [2.1. Write json file](#21-write-json-file)
+	- [2.2. Write mapping class file](#22-write-mapping-class-file)
+	- [2.3. Write demo](#23-write-demo)
+- [3. Refenence](#3-refenence)
+	- [3.1. Static mathod](#31-static-mathod)
+		- [3.1.1. `OKJSON.getErrorCode`](#311-okjsongeterrorcode)
+		- [3.1.2. `OKJSON.getErrorDesc`](#312-okjsongeterrordesc)
+		- [3.1.3. `OKJSON.stringToObject`](#313-okjsonstringtoobject)
+		- [3.1.4. `OKJSON.fileToObject`](#314-okjsonfiletoobject)
+		- [3.1.5. `OKJSON.objectToString`](#315-okjsonobjecttostring)
+		- [3.1.6. `OKJSON.objectToFile`](#316-okjsonobjecttofile)
+	- [3.2. JSON element value mapping JAVA class/type](#32-json-element-value-mapping-java-classtype)
+	- [3.3. JSON array simple-value mapping JAVA class/type](#33-json-array-simple-value-mapping-java-classtype)
 - [3. Benchmark](#3-benchmark)
-  - [fastjson](#fastjson)
-  - [4.4. okjson](#44-okjson)
-  - [4.5. Benchmarking](#45-benchmarking)
-  - [4.6. Result](#46-result)
+	- [fastjson](#fastjson)
+	- [4.4. okjson](#44-okjson)
+	- [4.5. Benchmarking](#45-benchmarking)
+	- [4.6. Result](#46-result)
 - [5. TODO](#5-todo)
-- [6. 关于本项目](#6-%E5%85%B3%E4%BA%8E%E6%9C%AC%E9%A1%B9%E7%9B%AE)
-- [7. 关于作者](#7-%E5%85%B3%E4%BA%8E%E4%BD%9C%E8%80%85)
+- [6. About project](#6-about-project)
+- [7. About author](#7-about-author)
 
 <!-- /TOC -->
 
@@ -127,6 +137,120 @@ public class Demo {
 	}
 }
 ```
+
+# 3. Refenence
+
+## 3.1. Static mathod
+
+### 3.1.1. `OKJSON.getErrorCode`
+
+| | |
+|---|---|
+| Prototype | Integer getErrorCode(); |
+
+### 3.1.2. `OKJSON.getErrorDesc`
+
+| | |
+|---|---|
+| Prototype | String getErrorDesc(); |
+
+### 3.1.3. `OKJSON.stringToObject`
+
+| | |
+|---|---|
+| Prototype | <T> T stringToObject( String jsonString, Class<T> clazz, int options ); |
+
+<p />
+
+| options |
+|---|
+| OKJSON.OPTIONS_DIRECT_ACCESS_PROPERTY_ENABLE |
+| OKJSON.OPTIONS_STRICT_POLICY |
+
+<p />
+
+| errcode |
+|---|
+| OKJSON_ERROR_END_OF_BUFFER | |
+| OKJSON_ERROR_UNEXPECT | |
+| OKJSON_ERROR_EXCEPTION | |
+| OKJSON_ERROR_INVALID_BYTE | |
+| OKJSON_ERROR_FIND_FIRST_LEFT_BRACE |
+| OKJSON_ERROR_NAME_INVALID |
+| OKJSON_ERROR_EXPECT_COLON_AFTER_NAME |
+| OKJSON_ERROR_UNEXPECT_TOKEN_AFTER_LEFT_BRACE |
+| OKJSON_ERROR_PORPERTY_TYPE_NOT_MATCH_IN_OBJECT |
+| OKJSON_ERROR_NAME_NOT_FOUND_IN_OBJECT |
+| OKJSON_ERROR_NEW_OBJECT |
+
+### 3.1.4. `OKJSON.fileToObject`
+
+| | |
+|---|---|
+| Prototype | <T> T fileToObject( String filePath, Class<T> clazz, int options ); |
+
+### 3.1.5. `OKJSON.objectToString`
+
+| | |
+|---|---|
+| Prototype | String objectToString( Object object, int options ); |
+
+<p />
+
+| options |
+|---|
+| OKJSON.OPTIONS_DIRECT_ACCESS_PROPERTY_ENABLE |
+| OKJSON.OPTIONS_PRETTY_FORMAT_ENABLE |
+
+<p />
+
+| errcode |
+|---|
+| OKJSON_ERROR_END_OF_BUFFER |
+| OKJSON_ERROR_EXCEPTION |
+| OKJSON_ERROR_NEW_OBJECT |
+
+### 3.1.6. `OKJSON.objectToFile`
+
+| | |
+|---|---|
+| Prototype | int objectToFile( Object object, String filePath, int options ); |
+
+## 3.2. JSON element value mapping JAVA class/type
+
+| JSON element value | JAVA class/type |
+|---|---|
+| "..." | String |
+| 123 | Byte或byte |
+| 123 | Short或short |
+| 123 | Integer或int |
+| 123 | Long或long |
+| 123.456 | Float或float |
+| 123.456 | Double或double |
+| true/false | Boolean或boolean |
+| "..." | LocalDate |
+| "..." | LocalTime |
+| "..." | LocalDateTime |
+| [...] | ArrayList |
+| [...] | LinkedList |
+| {...} | JAVA对象 |
+
+## 3.3. JSON array simple-value mapping JAVA class/type
+
+| JSON array simple-value | JAVA class/type |
+|---|---|
+| "..." | String |
+| 123 | Byte |
+| 123 | Short |
+| 123 | Integer |
+| 123 | Long |
+| 123.456 | Float |
+| 123.456 | Double |
+| true/false | Boolean |
+| "..." | LocalDate |
+| "..." | LocalTime |
+| "..." | LocalDateTime |
+| {...} | JAVA对象 |
 
 # 3. Benchmark
 
@@ -655,10 +779,10 @@ count per second[1419446.4158978]
 * Support more field type, for example : JAVA old-version Date Time class
 * XML Parser, Generator
 
-# 6. 关于本项目
+# 6. About project
 
 Get source at : [gitee](https://gitee.com/calvinwilliams/okjson)、[github](https://github.com/calvinwilliams/okjson)
 
-# 7. 关于作者
+# 7. About author
 
 Mailto : [netease](mailto:calvinwilliams@163.com)、[Gmail](mailto:calvinwilliams.c@gmail.com)
