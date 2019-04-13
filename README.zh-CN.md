@@ -165,7 +165,7 @@ public class Demo {
 ### 3.1.1. `OKJSON.getErrorCode`
 
 | 静态方法 | OKJSON.getErrorCode |
-|---|---|---|
+|---|---|
 | 方法原型 | Integer getErrorCode(); |
 | 方法说明 | 当JSON解析或生成失败后，调用此方法获取错误码 |
 | 返回值 | 最近错误码 |
@@ -173,7 +173,7 @@ public class Demo {
 ### 3.1.2. `OKJSON.getErrorDesc`
 
 | | |
-|---|---|---|
+|---|---|
 | 方法原型 | String getErrorDesc(); |
 | 方法说明 | 当JSON解析或生成失败后，调用此方法获取错误描述 |
 | 返回值 | 最近错误描述 |
@@ -181,7 +181,7 @@ public class Demo {
 ### 3.1.3. `OKJSON.stringToObject`
 
 | | |
-|---|---|---|
+|---|---|
 | 方法原型 | <T> T stringToObject( String jsonString, Class<T> clazz, int options ); |
 | 方法说明 | 映射JSON字符串中的字段数据到实体类属性 |
 | 参数 | String jsonString : JSON字符串 |
@@ -216,7 +216,7 @@ public class Demo {
 ### 3.1.4. `OKJSON.fileToObject`
 
 | | |
-|---|---|---|
+|---|---|
 | 方法原型 | <T> T fileToObject( String filePath, Class<T> clazz, int options ); |
 | 方法说明 | 映射JSON字符串中的字段数据到实体类属性 |
 | 参数 | String filePath : JSON文件名 |
@@ -230,7 +230,7 @@ public class Demo {
 ### 3.1.5. `OKJSON.objectToString`
 
 | | |
-|---|---|---|
+|---|---|
 | 方法原型 | String objectToString( Object object, int options ); |
 | 方法说明 | 映射实体类属性生成JSON字符串 |
 | 参数 | Object object : 实体类 |
@@ -256,7 +256,7 @@ public class Demo {
 ### 3.1.6. `OKJSON.objectToFile`
 
 | | |
-|---|---|---|
+|---|---|
 | 方法原型 | int objectToFile( Object object, String filePath, int options ); |
 | 方法说明 | 映射实体类属性生成JSON字符串写到文件中 |
 | 参数 | Object object : 实体类 |
@@ -270,7 +270,7 @@ public class Demo {
 ## 3.2. JSON字段类型与实体类属性类型映射表
 
 | JSON字段类型 | 实体类属性类型 |
-|---|---|---|
+|---|---|
 | 字符串 | String |
 | 整型数字 | Byte或byte |
 | 整型数字 | Short或short |
