@@ -164,7 +164,7 @@ public class Demo {
 
 ### 3.1.1. `OKJSON.getErrorCode`
 
-| | |
+| 　 | 　 |
 |---|---|---|
 | 方法原型 | Integer getErrorCode(); |
 | 方法说明 | 当JSON解析或生成失败后，调用此方法获取错误码 |
