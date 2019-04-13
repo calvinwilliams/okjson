@@ -781,7 +781,21 @@ count per second[1419446.4158978]
 
 # 6. About project
 
-Get source at : [gitee](https://gitee.com/calvinwilliams/okjson)¡¢[github](https://github.com/calvinwilliams/okjson)
+Download source at : [gitee](https://gitee.com/calvinwilliams/okjson)¡¢[github](https://github.com/calvinwilliams/okjson)
+
+Apache Maven
+```
+<dependency>
+  <groupId>xyz.calvinwilliams</groupId>
+  <artifactId>okjson</artifactId>
+  <version>0.0.9.0</version>
+</dependency>
+```
+
+Gradle Kotlin DSL
+```
+compile("xyz.calvinwilliams:okjson:0.0.9.0")
+```
 
 # 7. About author
 

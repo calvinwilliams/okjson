@@ -906,6 +906,20 @@ JSON生成器性能曲线图：
 
 源码托管地址 : [开源中国](https://gitee.com/calvinwilliams/okjson)、[github](https://github.com/calvinwilliams/okjson)
 
+Apache Maven
+```
+<dependency>
+  <groupId>xyz.calvinwilliams</groupId>
+  <artifactId>okjson</artifactId>
+  <version>0.0.9.0</version>
+</dependency>
+```
+
+Gradle Kotlin DSL
+```
+compile("xyz.calvinwilliams:okjson:0.0.9.0")
+```
+
 # 7. 关于作者
 
 厉华，左手C，右手JAVA，写过小到性能卓越方便快捷的日志库、HTTP解析器、日志采集器等，大到交易平台/中间件等，分布式系统实践者，容器技术专研者，目前在某城商行负责基础架构。
