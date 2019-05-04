@@ -22,7 +22,7 @@ public class TestObjectToJsonStringToObject {
 	
 	public static void setTestDataObject( TestDataClass object ) {
 		
-		Branch7		branch7 ;
+		TestDataBranch7		branch7 ;
 		
 		object.str1 = "str2" ;
 		object.byte1 = 1 ;
@@ -34,7 +34,7 @@ public class TestObjectToJsonStringToObject {
 		object.boolean1 = true ;
 		object.name1 = null ;
 		
-		object.branch2 = new Branch2() ;
+		object.branch2 = new TestDataBranch2() ;
 		object.branch2.str2 = "str2" ;
 		object.branch2.byte2 = 2 ;
 		object.branch2.short2 = 23 ;
@@ -59,24 +59,24 @@ public class TestObjectToJsonStringToObject {
 		object.array6.add( false );
 		object.array6.add( true );
 		
-		object.array7 = new ArrayList<Branch7>() ;
+		object.array7 = new ArrayList<TestDataBranch7>() ;
 		
-		branch7 = new Branch7() ;
+		branch7 = new TestDataBranch7() ;
 		branch7.str7 = "str71" ;
 		branch7.int7 = 71 ;
 		object.array7.add(branch7);
 		
-		branch7 = new Branch7() ;
+		branch7 = new TestDataBranch7() ;
 		branch7.str7 = "str72" ;
 		branch7.int7 = 0 ;
 		object.array7.add(branch7);
 		
-		branch7 = new Branch7() ;
+		branch7 = new TestDataBranch7() ;
 		branch7.str7 = null ;
 		branch7.int7 = 0 ;
 		object.array7.add(branch7);
 		
-		object.strings8 = new Strings8() ;
+		object.strings8 = new TestDataStrings8() ;
 		object.strings8.setString81( "\"\\/\b\f\n\r\t" );
 		object.strings8.setString82( "ABC\"\\/\b\f\n\r\t" );
 		object.strings8.setString83( "\"\\/\b\f\n\r\tABC" );
@@ -87,7 +87,7 @@ public class TestObjectToJsonStringToObject {
 		object.strings8.setString88( "A\u8BA1\u7B97B\u673A\u5B66\u9662C" );
 		object.strings8.setString89( "\u8BA1A\u7B97\u673AB\u5B66C\u9662" );
 		
-		object.numbers9 = new Numbers9() ;
+		object.numbers9 = new TestDataNumbers9() ;
 		object.numbers9.setLong91( 123 );
 		object.numbers9.setLong92( -123 );
 		object.numbers9.setLong93( 1234567890 );
@@ -192,9 +192,9 @@ public class TestObjectToJsonStringToObject {
 		
 		System.out.println( "------------------------------ dump TestDataClass.array7" );
 		if( obj.array7 != null ) {
-			Iterator<Branch7> iterArray7 = obj.array7.iterator() ;
+			Iterator<TestDataBranch7> iterArray7 = obj.array7.iterator() ;
 			while( iterArray7.hasNext() ) {
-				Branch7 value = iterArray7.next() ;
+				TestDataBranch7 value = iterArray7.next() ;
 				System.out.println( "TestDataClass.array6.<Branch7>.str7["+value.str7+"] .int7["+value.int7+"]" );
 			}
 		}

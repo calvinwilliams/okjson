@@ -1,3 +1,6 @@
+0.0.10.0	2019-05-04		calvin
+			* 增加了只有public属性才能参与序列化/反序列化的约束
+
 0.0.9.0		2019-04-12		calvin
 			* 静态类OKJSON新增方法objectToFile和fileToObject
 			* 新增Demo.java

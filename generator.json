@@ -9,6 +9,7 @@
 	"boolean1" : true ,
 	"null1" : null ,
 	"name1" : "value1" ,
+	"name1" : "value1" ,
 	"branch2" : {
 		"str2" : "str2" ,
 		"byte2" : 2 ,
@@ -40,6 +41,7 @@
 			"double33" : 3345.6789 ,
 			"boolean33" : false ,
 			"null33" : null ,
+			"name33" : "value33" ,
 			"name33" : "value33"
 		}
 	} ,
@@ -49,40 +51,48 @@
 	"array65" : null ,
 	"array7" : null ,
 	"strings8" : {
-		"string81" : "\"\\\/\b\f\n\r\t" ,
-		"string82" : "ABC\"\\\/\b\f\n\r\t" ,
-		"string83" : "\"\\\/\b\f\n\r\tABC" ,
-		"string84" : "A\"\\\/B\b\f\n\r\tC" ,
-		"string85" : "计算机学院" ,
-		"string86" : "ABC计算机学院" ,
-		"string87" : "计算机学院ABC" ,
-		"string88" : "A计算B机学院C" ,
-		"string89" : "计A算B机学C院"
+		"string81" : null ,
+		"string82" : null ,
+		"string83" : null ,
+		"string84" : null ,
+		"string85" : null ,
+		"string86" : null ,
+		"string87" : null ,
+		"string88" : null ,
+		"string89" : null
 	} ,
 	"numbers9" : {
-		"long91" : 123 ,
-		"long92" : -123 ,
-		"long93" : 1234567890 ,
-		"floatE94" : 1234.0 ,
-		"floatE95" : -0.1234 ,
-		"floatE96" : -12.34 ,
-		"doubleE97" : 1234.5678 ,
-		"doubleE98" : 123456.78 ,
-		"doubleE99" : 12.345678
+		"long91" : 0 ,
+		"long92" : 0 ,
+		"long93" : 0 ,
+		"floatE94" : 0.0 ,
+		"floatE95" : 0.0 ,
+		"floatE96" : 0.0 ,
+		"doubleE97" : 0.0 ,
+		"doubleE98" : 0.0 ,
+		"doubleE99" : 0.0
 	} ,
 	"localDate10" : "2019-04-10" ,
+	"localDate10" : "2019-04-10" ,
+	"localTime11" : "21:31:41" ,
 	"localTime11" : "21:31:41" ,
 	"localDateTime12" : "2019-04-10 21:31:41" ,
 	"list13" : [
 		{
 			"MIN" : "+1000000000-01-01 00:00:00" ,
-			"MAX" : "+999999999-12-31 23:59:59" ,
-			"serialVersionUID" : 6207766400415563566 ,
-			"date" : "2014-01-02" ,
-			"time" : "17:30:00"
+			"MAX" : "+999999999-12-31 23:59:59"
 		} ,
 		{
 			"MIN" : "+1000000000-01-01 00:00:00" ,
+			"MAX" : "+999999999-12-31 23:59:59"
+		} ,
+		{
+			"MIN" : "+1000000000-01-01 00:00:00" ,
+			"MAX" : "+999999999-12-31 23:59:59"
+		}
+	]
+}
+: "+1000000000-01-01 00:00:00" ,
 			"MAX" : "+999999999-12-31 23:59:59" ,
 			"serialVersionUID" : 6207766400415563566 ,
 			"date" : "2014-02-04" ,
@@ -92,6 +102,12 @@
 			"MIN" : "+1000000000-01-01 00:00:00" ,
 			"MAX" : "+999999999-12-31 23:59:59" ,
 			"serialVersionUID" : 6207766400415563566 ,
+			"date" : "2014-03-06" ,
+			"time" : "17:40:00"
+		}
+	]
+}
+rsionUID" : 6207766400415563566 ,
 			"date" : "2014-03-06" ,
 			"time" : "17:40:00"
 		}

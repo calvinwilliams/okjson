@@ -1048,7 +1048,7 @@ class OkJsonParser {
 		HashMap<String,Method>	stringMapMethods ;
 		Field[]					fields ;
 		Field					field ;
-		Method					method ;
+		Method					method = null ;
 		TokenType				fieldNameTokenType ;
 		int						fieldNameBeginOffset ;
 		int						fieldNameEndOffset ;
@@ -1080,16 +1080,22 @@ class OkJsonParser {
 	                f.setAccessible(true);
 	                
 					fieldName = f.getName();
-					stringMapFields.put(fieldName, f);
 					
+					method = null ;
 					try {
-						method = clazz.getDeclaredMethod( "set" + fieldName.substring(0,1).toUpperCase(Locale.getDefault()) + fieldName.substring(1), f.getType() ) ;
+						method = clazz.getMethod( "set" + fieldName.substring(0,1).toUpperCase(Locale.getDefault()) + fieldName.substring(1), f.getType() ) ;
 						method.setAccessible(true);
-						stringMapMethods.put(fieldName, method);
 					} catch (NoSuchMethodException e2) {
 						;
 					} catch (SecurityException e2) {
 						;
+					}
+					
+					if( Modifier.isPublic(f.getModifiers()) ) {
+						stringMapFields.put(fieldName, f);
+					}
+					if( method != null && Modifier.isPublic(method.getModifiers()) ) {
+						stringMapMethods.put(fieldName, method);
 					}
 				}
 			}
@@ -1593,13 +1599,13 @@ class OkJsonGenerator {
 					classField.type = ClassFieldType.CLASSFIELDTYPE_SUBCLASS ;
 				
 				try {
-						if( f.getType() == Boolean.class || f.getType().getName().equals("boolean") ) {
-							methodName = "is" + f.getName().substring(0,1).toUpperCase(Locale.getDefault()) + f.getName().substring(1) ;
-						} else {
-							methodName = "get" + f.getName().substring(0,1).toUpperCase(Locale.getDefault()) + f.getName().substring(1) ;
-						}
-						classField.getMethod = clazz.getDeclaredMethod( methodName ) ;
-						classField.getMethod.setAccessible(true);
+					if( f.getType() == Boolean.class || f.getType().getName().equals("boolean") ) {
+						methodName = "is" + f.getName().substring(0,1).toUpperCase(Locale.getDefault()) + f.getName().substring(1) ;
+					} else {
+						methodName = "get" + f.getName().substring(0,1).toUpperCase(Locale.getDefault()) + f.getName().substring(1) ;
+					}
+					classField.getMethod = clazz.getMethod( methodName ) ;
+					classField.getMethod.setAccessible(true);
 				} catch (NoSuchMethodException e) {
 					;
 				} catch (Exception e) {
@@ -1613,7 +1619,12 @@ class OkJsonGenerator {
 					classField.okjsonDateTimeFormatter = null ;
 				}
 				
-				classFieldList.add(classField);
+				if( Modifier.isPublic(f.getModifiers()) ) {
+					classFieldList.add(classField);
+				}
+				if( classField.getMethod != null && Modifier.isPublic(classField.getMethod.getModifiers()) ) {
+					classFieldList.add(classField);
+				}
 			}
 		}
 		
