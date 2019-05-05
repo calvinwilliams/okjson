@@ -102,6 +102,9 @@ public class TestObjectToJsonStringToObject {
 		object.localTime11 = LocalTime.of( 21, 31, 41 ) ;
 		object.localDateTime12 = LocalDateTime.of( object.localDate10, object.localTime11 ) ;
 		
+		object.list13 = new LinkedList<LocalDateTime>() ;
+		object.list13.add( LocalDateTime.now() );
+		
 		return;
 	}
 	
@@ -186,7 +189,7 @@ public class TestObjectToJsonStringToObject {
 			Iterator<String> iterArray65 = obj.array65.iterator() ;
 			while( iterArray65.hasNext() ) {
 				String value = iterArray65.next() ;
-				System.out.println( "TestDataClass.array6.<Boolean>.["+value+"]" );
+				System.out.println( "TestDataClass.array65.<Boolean>.["+value+"]" );
 			}
 		}
 		
@@ -195,7 +198,7 @@ public class TestObjectToJsonStringToObject {
 			Iterator<TestDataBranch7> iterArray7 = obj.array7.iterator() ;
 			while( iterArray7.hasNext() ) {
 				TestDataBranch7 value = iterArray7.next() ;
-				System.out.println( "TestDataClass.array6.<Branch7>.str7["+value.str7+"] .int7["+value.int7+"]" );
+				System.out.println( "TestDataClass.array7.<Branch7>.str7["+value.str7+"] .int7["+value.int7+"]" );
 			}
 		}
 		

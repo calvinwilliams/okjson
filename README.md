@@ -788,13 +788,13 @@ Apache Maven
 <dependency>
   <groupId>xyz.calvinwilliams</groupId>
   <artifactId>okjson</artifactId>
-  <version>0.0.9.0</version>
+  <version>0.0.10.0</version>
 </dependency>
 ```
 
 Gradle Kotlin DSL
 ```
-compile("xyz.calvinwilliams:okjson:0.0.9.0")
+compile("xyz.calvinwilliams:okjson:0.0.10.0")
 ```
 
 # 7. About author

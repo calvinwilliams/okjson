@@ -53,7 +53,7 @@ public class OKJSON {
 	public static int objectToFile( Object object, String filePath, int options ) {
 		String jsonString = objectToString( object, options ) ;
 		try {
-			Files.write(Paths.get(filePath), jsonString.getBytes(), StandardOpenOption.CREATE);
+			Files.write(Paths.get(filePath), jsonString.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
 			return 0;
 		} catch (IOException e) {
 			return -1;
@@ -1091,11 +1091,12 @@ class OkJsonParser {
 						;
 					}
 					
-					if( Modifier.isPublic(f.getModifiers()) ) {
-						stringMapFields.put(fieldName, f);
-					}
+					
 					if( method != null && Modifier.isPublic(method.getModifiers()) ) {
 						stringMapMethods.put(fieldName, method);
+						stringMapFields.put(fieldName, f);
+					} else if( Modifier.isPublic(f.getModifiers()) ) {
+						stringMapFields.put(fieldName, f);
 					}
 				}
 			}
@@ -1393,14 +1394,14 @@ class OkJsonGenerator {
 	final private static char	ENTER_CHAR = '\n' ;
 	final private static String	NULL_STRING = "null" ;
 	
-	private int objectToListString( List<Object> array, int arrayCount, Field field, OkJsonCharArrayBuilder jsonCharArrayBuilder, int depth ) {
+	private int objectToListString( List<Object> array, int arrayCount, OkJsonClassField classField, OkJsonCharArrayBuilder jsonCharArrayBuilder, int depth ) {
 		
 		HashMap<Class,Boolean>	basicTypeClassMapBoolean = basicTypeClassMapBooleanCache.get();
 		int						arrayIndex ;
 		int						nret ;
 		
 		try {
-				Type type = field.getGenericType() ;
+				Type type = classField.field.getGenericType() ;
 				ParameterizedType pt = (ParameterizedType) type ;
 				Class<?> typeClazz = (Class<?>) pt.getActualTypeArguments()[0] ;
 				Boolean b = basicTypeClassMapBoolean.get( typeClazz ) ;
@@ -1425,6 +1426,39 @@ class OkJsonGenerator {
 							if( typeClazz == String.class && object != null ) {
 								String str = (String)object ;
 								jsonCharArrayBuilder.appendJsonQmStringQm(str);
+							} else if( typeClazz == LocalDate.class && object != null ) {
+								LocalDate localDate ;
+								String defaultDateTimeFormatter ;
+								localDate = (LocalDate)object ;
+								if( classField.okjsonDateTimeFormatter != null ) {
+									defaultDateTimeFormatter = classField.okjsonDateTimeFormatter.format() ;
+								} else {
+									defaultDateTimeFormatter = "yyyy-MM-dd" ;
+								}
+								String localDateString = DateTimeFormatter.ofPattern(defaultDateTimeFormatter).format(localDate) ;
+								jsonCharArrayBuilder.appendJsonQmStringQm(localDateString);
+							} else if( typeClazz == LocalTime.class && object != null ) {
+								LocalTime localTime ;
+								String defaultDateTimeFormatter ;
+								localTime = (LocalTime)object ;
+								if( classField.okjsonDateTimeFormatter != null ) {
+									defaultDateTimeFormatter = classField.okjsonDateTimeFormatter.format() ;
+								} else {
+									defaultDateTimeFormatter = "yyyy-MM-dd" ;
+								}
+								String localTimeString = DateTimeFormatter.ofPattern(defaultDateTimeFormatter).format(localTime) ;
+								jsonCharArrayBuilder.appendJsonQmStringQm(localTimeString);
+							} else if( typeClazz == LocalDateTime.class && object != null ) {
+								LocalDateTime localDateTime ;
+								String defaultDateTimeFormatter ;
+								localDateTime = (LocalDateTime)object ;
+								if( classField.okjsonDateTimeFormatter != null ) {
+									defaultDateTimeFormatter = classField.okjsonDateTimeFormatter.format() ;
+								} else {
+									defaultDateTimeFormatter = "yyyy-MM-dd" ;
+								}
+								String localDateTimeString = DateTimeFormatter.ofPattern(defaultDateTimeFormatter).format(localDateTime) ;
+								jsonCharArrayBuilder.appendJsonQmStringQm(localDateTimeString);
 							} else {
 								jsonCharArrayBuilder.appendJsonString(object.toString());
 							}
@@ -1585,8 +1619,6 @@ class OkJsonGenerator {
 				classField.field = f ;
 				if( f.getType() == String.class )
 					classField.type = ClassFieldType.CLASSFIELDTYPE_STRING ;
-				else if( basicTypeClassMapBoolean.get( f.getType() ) != null || f.getType().isPrimitive() )
-					classField.type = ClassFieldType.CLASSFIELDTYPE_NOT_STRING ;
 				else if( f.getType() == LocalDate.class )
 					classField.type = ClassFieldType.CLASSFIELDTYPE_LOCALDATE ;
 				else if( f.getType() == LocalTime.class )
@@ -1595,6 +1627,8 @@ class OkJsonGenerator {
 					classField.type = ClassFieldType.CLASSFIELDTYPE_LOCALDATETIME ;
 				else if( f.getType() == ArrayList.class || f.getType() == LinkedList.class )
 					classField.type = ClassFieldType.CLASSFIELDTYPE_LIST ;
+				else if( basicTypeClassMapBoolean.get( f.getType() ) != null || f.getType().isPrimitive() )
+					classField.type = ClassFieldType.CLASSFIELDTYPE_NOT_STRING ;
 				else
 					classField.type = ClassFieldType.CLASSFIELDTYPE_SUBCLASS ;
 				
@@ -1621,8 +1655,7 @@ class OkJsonGenerator {
 				
 				if( Modifier.isPublic(f.getModifiers()) ) {
 					classFieldList.add(classField);
-				}
-				if( classField.getMethod != null && Modifier.isPublic(classField.getMethod.getModifiers()) ) {
+				} else if( classField.getMethod != null && Modifier.isPublic(classField.getMethod.getModifiers()) ) {
 					classFieldList.add(classField);
 				}
 			}
@@ -1837,13 +1870,13 @@ class OkJsonGenerator {
 						if( arrayCount > 0 ) {
 							if( prettyFormatEnable ) {
 								jsonCharArrayBuilder.appendTabs(depth+1).appendJsonNameAndColonAndOpenBytePretty(classField.fieldName,'[');
-								nret = objectToListString( array, arrayCount, classField.field, jsonCharArrayBuilder, depth+1 ) ;
+								nret = objectToListString( array, arrayCount, classField, jsonCharArrayBuilder, depth+1 ) ;
 								if( nret != 0 )
 									return nret;
 								jsonCharArrayBuilder.appendTabs(depth+1).appendChar(']');
 							} else {
 								jsonCharArrayBuilder.appendJsonNameAndColonAndOpenByte(classField.fieldName,'[');
-								nret = objectToListString( array, arrayCount, classField.field, jsonCharArrayBuilder, depth+1 ) ;
+								nret = objectToListString( array, arrayCount, classField, jsonCharArrayBuilder, depth+1 ) ;
 								if( nret != 0 )
 									return nret;
 								jsonCharArrayBuilder.appendCloseByte(']');
@@ -1988,6 +2021,9 @@ class OkJsonGenerator {
 			basicTypeClassMapString.put( Float.class, new Boolean(true) );
 			basicTypeClassMapString.put( Double.class, new Boolean(true) );
 			basicTypeClassMapString.put( Boolean.class, new Boolean(true) );
+			basicTypeClassMapString.put( LocalDate.class, new Boolean(true) );
+			basicTypeClassMapString.put( LocalTime.class, new Boolean(true) );
+			basicTypeClassMapString.put( LocalDateTime.class, new Boolean(true) );
 			basicTypeClassMapBooleanCache.set(basicTypeClassMapString);
 		}
 		
